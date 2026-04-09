@@ -623,8 +623,8 @@ router.post("/query", requireAuth, async (req: AuthRequest, res) => {
             .where(and(eq(supportTicketsTable.schoolId, effectiveSchoolId), eq(supportTicketsTable.status, "open"))),
         ]);
 
-        const present = Number(attendanceToday.find(r => r.status === "present")?.cnt || 0);
-        const absent = Number(attendanceToday.find(r => r.status === "absent")?.cnt || 0);
+        const present = Number(attendanceToday.find((r: any) => r.status === "present")?.cnt || 0);
+        const absent = Number(attendanceToday.find((r: any) => r.status === "absent")?.cnt || 0);
         const attendancePct = (present + absent) > 0 ? Math.round((present / (present + absent)) * 100) : 0;
 
         answer = `🏫 School Dashboard Overview — ${new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}\n\n👥 People:\n• Students: ${students}\n• Teachers: ${teachers}\n• Classes: ${classes}\n\n📊 Today's Attendance:\n• Present: ${present} | Absent: ${absent} | Rate: ${attendancePct}%\n\n💰 Finance:\n• Pending Fees: ₹${Number(pendingFees).toLocaleString("en-IN")}\n\n📅 School Life:\n• Upcoming Events: ${upcomingEvents}\n• Active Homework: ${pendingHw}\n• Open Notices: ${notices}\n• Support Tickets: ${openTickets}\n\nAsk me about any specific area — attendance, fees, students, teachers, homework, exams, events, transport, library, discipline, admissions, payroll, leaves, and more!`;
