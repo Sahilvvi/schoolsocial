@@ -6,12 +6,8 @@
       "destination": "/api/index.ts"
     },
     {
-      "source": "/assets/(.*)",
-      "destination": "/grade-sphere-now-main/dist/assets/$1"
-    },
-    {
       "source": "/((?!api/).*)",
-      "destination": "/grade-sphere-now-main/dist/index.html"
+      "destination": "/index.html"
     }
   ],
   "functions": {

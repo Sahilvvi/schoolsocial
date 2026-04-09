@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "node -e \"if(!process.env.npm_config_user_agent?.includes('pnpm')) { console.error('Use pnpm instead'); process.exit(1); }\"",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build && mkdir -p public && cp -r grade-sphere-now-main/dist/* public/",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "db:push": "pnpm --filter @workspace/db run db:push"
