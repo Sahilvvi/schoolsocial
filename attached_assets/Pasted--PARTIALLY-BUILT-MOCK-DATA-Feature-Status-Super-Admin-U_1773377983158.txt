@@ -1,0 +1,48 @@
+⚠️ PARTIALLY BUILT / MOCK DATA
+Feature	Status
+Super Admin Users page	Shows mock users — not queried from DB
+Student schedule	Static hardcoded — no DB table
+Student homework	Static hardcoded — no DB table
+Teacher-class assignment	Classes have no teacherId — not linked
+Revenue charts	All mock/generated data, not calculated from real fees
+School plan subscription	UI only, no actual plan stored per school
+❌ NOT BUILT YET
+School Admin — Missing Features
+Edit School Profile — No way to update school name, logo, address, about, board, facilities
+Timetable / Class Schedule Management — No timetable builder or assignment
+Exam Management — No exam scheduling or results entry
+Report Cards / Grade Management — No grades table, no report generation
+Bulk Messaging / Announcements — No SMS/email broadcast to parents
+Student Promotion — No "promote all students to next class" feature
+Fee Receipts / Invoices — No printable/downloadable fee receipt
+School Gallery / Photo Upload — No file upload for school images
+Teacher Panel — Missing
+Mark Homework — No homework creation or submission tracking
+Exam results entry — No grades entry system
+Leave requests — No teacher leave management
+Parent Panel — Missing
+Parent-teacher communication — No chat or messaging
+Real-time notifications — No push/SMS alerts
+Academic report card view — No grades visibility for parents
+Student Panel — Missing
+Real homework/assignments — Currently static hardcoded
+Real timetable — Currently static hardcoded
+Exam schedule from DB — Not connected
+Public Portal — Missing
+School registration / onboarding form — No self-service "Register My School" flow
+Advanced school search filters — No fee range, student count filters
+School comparison — No side-by-side school comparison
+Super Admin — Missing
+Live user query from DB — Users page uses mock data
+School onboarding approval workflow — Basic approve/suspend only, no onboarding steps
+Revenue from real fee data — Charts use mock numbers
+System-Wide — Missing
+File uploads — No logo/photo/resume/document upload (no object storage)
+Real payment gateway — Fee "payment" just changes status; no Razorpay/Stripe
+Push notifications / SMS — No real-time alerts
+Email system — No emails sent for approvals, fee reminders, etc.
+Mobile app — Web only; no React Native / Expo app
+Dark mode — No theme toggle
+Multi-language (Hindi/regional) — English only
+Audit logs — No tracking of admin actions
+Data export (CSV/Excel) — No download for attendance, fees, student lists

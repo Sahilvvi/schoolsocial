@@ -1,0 +1,49 @@
+⚠️ PARTIALLY DONE (Exists but uses Mock/Static data)
+Super Admin
+Page	What's Mock
+All Users	Role stats are hardcoded numbers; user table shows only 6 demo users
+Revenue	All charts and figures are completely hardcoded static data
+Reviews	All review cards are hardcoded mock data; no real useListReviews API call
+Settings	Route exists but points to Dashboard — no actual settings page
+Teacher Panel
+Feature	Status
+Class list	❌ Hardcoded 3 mock classes — not from real DB
+Student list	❌ Hardcoded 5 mock students — not real
+Notices	❌ Hardcoded 3 mock notices
+Profile	❌ Hardcoded "Mathematics Teacher, 7 years experience"
+Sidebar links	❌ All 4 sidebar links go to the same /teacher route
+Parent Panel
+Feature	Status
+Child profile	❌ Hardcoded "Aarav Sharma, Class 10-A"
+Attendance log	❌ Hardcoded 5 static records
+Fees	❌ Hardcoded 4 fake invoices; pay button does nothing
+Notices	❌ Hardcoded 4 mock notices
+Student Panel
+Feature	Status
+Attendance summary	❌ Hardcoded 87/5/3
+Class schedule	❌ Hardcoded timetable (no timetable table in DB)
+Homework	❌ Hardcoded 4 tasks (no homework table in DB)
+Notices	❌ Hardcoded 3 notices
+QR ID Card	⚠️ Generates a QR but no scanner/verifier page exists
+Subject performance	❌ Hardcoded scores
+Career / Job Seeker
+Feature	Status
+Job listing	⚠️ Real API but falls back to 6 mock jobs if DB empty
+Apply button	❌ Just sets local state — no real useApplyJob mutation called
+My Applications tab	❌ Button exists in header but does nothing
+❌ ENTIRELY MISSING (Not built at all)
+Panel	Missing Feature
+Super Admin	Settings page (platform config, school plan management, billing)
+Teacher	Separate pages for Classes, Attendance, Notices (all currently a single page with tabs)
+Teacher	Real class assignment from DB (which classes this teacher teaches)
+Teacher	Homework assignment form (post homework for students)
+Parent	Real-time fee payment flow
+Parent	Push notification / messaging section
+Student	Exam results / report card page
+Student	QR ID scanner/verifier page
+Public	Leave a review form on school profile (UI missing)
+Public	School comparison feature
+Career	Resume upload (form exists but upload does nothing)
+Career	Job seeker profile / My Applications dashboard
+All	School Admin — edit school profile page
+All	Password change / account settings for any role

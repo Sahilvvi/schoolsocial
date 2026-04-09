@@ -1,0 +1,5 @@
+UPDATE schools SET banner = 'https://images.unsplash.com/photo-1592066575517-58df903152f2?w=800&q=80' WHERE banner LIKE '%1523050854058%';
+UPDATE schools SET banner = REPLACE(banner, 'w=800&h=400&fit=crop', 'w=800&q=80') WHERE banner LIKE '%h=400&fit=crop%';
+UPDATE schools SET gallery = array_replace(gallery, 'https://images.unsplash.com/photo-1523050854058-8df90110c476?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1592066575517-58df903152f2?w=800&q=80') WHERE 'https://images.unsplash.com/photo-1523050854058-8df90110c476?w=800&h=400&fit=crop' = ANY(gallery);
+UPDATE events SET image = REPLACE(image, 'w=800&h=400&fit=crop', 'w=800&q=80') WHERE image LIKE '%h=400&fit=crop%';
+UPDATE news SET image = REPLACE(image, 'w=800&h=400&fit=crop', 'w=800&q=80') WHERE image LIKE '%h=400&fit=crop%';

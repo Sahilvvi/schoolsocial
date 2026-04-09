@@ -1,0 +1,37 @@
+⚠️ SUPER ADMIN PANEL — Nav Bug
+10 pages exist, all dynamic, but there's a navigation bug:
+
+The 3 newer pages (Support Tickets, Platform Announcements, Subscriptions) can't be reached from the Dashboard, Schools, Users, Revenue, Reviews, Settings, or Audit Logs because those older pages still have their own stale nav list that was never updated.
+
+You can only navigate to the new pages if you're already on one of them.
+
+✅ TEACHER PANEL — Complete
+13 tabs, all dynamic:
+Classes, Attendance, Timetable, Homework, Exam Entry, Gradebook, Assignments, Study Materials, Leave Requests, Notices, Messages, Class Analytics, Profile
+
+✅ PARENT PANEL — Complete
+9 tabs, all dynamic:
+Home, Children, Attendance, Fees, Results, Homework, Messages, Notices, PTM Booking
+
+⚠️ STUDENT PANEL — One Missing Tab
+7 of 8 tabs work. Materials tab is there, but students cannot submit assignments — they can only view study materials. The teacher can post assignments, but students have no way to submit them.
+
+✅ CAREER / JOB SEEKER PANEL — Complete
+4 views, all dynamic:
+Browse Jobs (with filters), My Applications (with status), Saved Jobs, Profile Setup
+
+⚠️ PUBLIC PORTAL — Missing 1 Page
+6 of 7 pages built:
+Discovery, School Profile (ratings/reviews/events), Admission Form, Blog, School Comparison, School Registration
+
+Missing: Public events feed / "What's happening near you" page that was in the original spec.
+
+🔴 WHAT NEEDS TO BE BUILT / FIXED
+#	Issue	Panel	Priority
+1	Super Admin nav bug — old pages can't navigate to Support Tickets, Announcements, Subscriptions	Super Admin	High
+2	Student assignment submission tab	Student	High
+3	School Admin: Syllabus/curriculum management page (DB table exists, no page)	School Admin	Medium
+4	Public events feed page (/events)	Public	Medium
+5	Parent: Better multi-child switcher with avatar/photo	Parent	Low
+6	Teacher: Syllabus planner tab (mark which topics covered)	Teacher	Low
+7	Super Admin: School approval flow with notification email	Super Admin

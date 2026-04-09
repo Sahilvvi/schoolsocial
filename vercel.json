@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/grade-sphere-now-main/$1"
+    }
+  ],
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "artifacts/api-server/**",
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}

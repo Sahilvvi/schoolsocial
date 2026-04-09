@@ -1,0 +1,54 @@
+❌ MISSING / NOT YET BUILT
+Super Admin — Missing
+School drill-down analytics — click a school to see its detailed stats, student count, revenue history
+Subscription/plan management — upgrade/downgrade a school's plan, billing history
+Platform-wide announcements — send a notice to all school admins
+Support ticket system — schools raise issues, super admin responds
+School Admin — Missing
+Fee structure setup — define fee categories (tuition, transport, sports) with amounts before assigning to students. Currently fees are added one by one manually
+Bulk fee assignment — assign the same fee to an entire class in one click
+Student ID card printing — generate printable ID cards with QR code, photo, class, school name
+Library management — book catalog, issue/return tracking, overdue reminders
+Transport management — bus routes, vehicle numbers, student allocation
+Staff payroll/salary — teacher salary management, monthly payslips
+Parent-Teacher Meeting (PTM) scheduling — book slots, track attendance
+Student discipline/behavior records — incidents, warnings, suspensions
+Certificate generation — bonafide, character, transfer certificates
+Study materials upload — publish PDFs/notes per class/subject
+Syllabus/curriculum management — topic-wise lesson plans
+Bulk student import — upload Excel/CSV to add students in bulk
+Data export — download attendance, fees, results as Excel or PDF
+Teacher Dashboard — Missing
+Full gradebook — all students × all subjects in one combined grid view
+Study material upload — share notes/PDFs with a class
+Lesson planning — topic-wise plan for each period
+Assignment/project management — separate from homework (longer-form work)
+Direct message to parents — currently teacher ↔ student, not teacher ↔ parent
+Parent Dashboard — Missing
+Multiple children — if a parent has 2+ children, only one shows. No quick child-switcher
+Fee due alerts — highlight upcoming/overdue fees prominently
+Syllabus/circular viewer — see what topics are being taught
+PTM slot booking — book a teacher meeting time
+Direct message to school admin — currently only messages teachers
+Student Dashboard — Missing
+Study materials — view notes/PDFs uploaded by teacher
+Admit card — downloadable exam admit card
+Library — check if a book is available, view issued books
+Discussion/forum — ask questions, interact with classmates
+Career Panel — Missing
+Resume builder — structured profile → generate downloadable CV
+Job alerts — notify when a new matching job is posted
+Interview scheduling — when shortlisted, school offers interview slots
+School/employer ratings by job seekers — after placement
+Public Portal — Missing
+School comparison tool — compare 2–3 schools side by side (fees, ratings, facilities)
+Admission inquiry form — send interest to a school directly from its public page
+School's public gallery — photos from the gallery module visible on the public school profile
+Fee structure — display school's fee structure publicly for parents to evaluate
+Blog/news section — school news & updates
+Cross-Cutting (Platform-wide) — Missing
+Real-time notifications — currently polling-based. No WebSocket/live push
+Email notifications — fee due, new homework, leave approval etc. via email
+PWA (installable app) — service worker + manifest so parents/students can add to home screen
+In-app calendar — unified school calendar showing exams, events, holidays
+Dark mode persistence issue — dark mode toggle may reset on page refresh for some panels

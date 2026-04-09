@@ -1,0 +1,1141 @@
+MULTI-PANEL ROLE BASED SYSTEM (MANDATORY)
+
+The platform must be built as a multi-panel application with separate dashboards and UI experiences for each role.
+
+Each user role must have its own login, dashboard, permissions, and interface.
+
+The system must include the following panels:
+
+1️⃣ PLATFORM SUPER ADMIN PANEL
+
+This panel is for the platform owner (MySchool team).
+
+Purpose:
+Control and monitor the entire ecosystem.
+
+Capabilities:
+
+School management
+Approve / reject school onboarding
+
+Platform analytics
+• total schools
+• total students
+• active parents
+• monthly growth
+
+Subscription control
+• manage pricing plans
+• activate / deactivate schools
+
+Review moderation
+• approve school reviews
+• remove abuse
+
+Marketplace control
+• job postings
+• tutor listings
+
+Revenue dashboard
+• subscriptions
+• commissions
+
+Platform configuration
+• feature toggles
+• SMS integrations
+• payment gateway settings
+
+2️⃣ SCHOOL ADMIN PANEL
+
+This is the main operational dashboard for a school.
+
+Modules inside school admin panel:
+
+Overview (AI dashboard)
+
+Students
+
+Teachers
+
+Classes
+
+Attendance
+
+Fees
+
+Notices
+
+Events
+
+Reports
+
+Hiring
+
+Settings
+
+Overview Page (Important)
+
+The overview page must contain:
+
+School Analytics
+
+• total students
+• attendance today
+• fee pending
+• notices sent
+• upcoming events
+
+And a right-side AI assistant interface.
+
+AI Assistant
+
+This AI must:
+
+Understand school data
+
+Query database
+
+Answer admin questions
+
+Example queries:
+
+"Show students absent today"
+
+"Who are fee defaulters?"
+
+"Which class has lowest attendance?"
+
+"Generate attendance report."
+
+"Send fee reminder notices."
+
+The AI must only access the school's data.
+
+3️⃣ TEACHER PANEL
+
+Teachers must have their own simplified dashboard.
+
+Modules:
+
+Class dashboard
+
+Student list
+
+Attendance marking
+
+Homework posting
+
+Complaints / remarks
+
+Exam schedule upload
+
+Class notices
+
+Teacher should NOT see full school admin data.
+
+Only assigned classes.
+
+4️⃣ PARENT PANEL
+
+Parents must have their own mobile-first dashboard.
+
+Parents may have multiple children.
+
+Modules:
+
+Child profiles
+
+Attendance records
+
+Fee status
+
+School notices
+
+Events
+
+Complaint responses
+
+Exam schedules
+
+Push notifications for updates.
+
+5️⃣ STUDENT PANEL
+
+Students get a simple dashboard.
+
+Modules:
+
+Schedule
+
+Homework
+
+Exam dates
+
+Notices
+
+Attendance summary
+
+Event updates.
+
+6️⃣ PUBLIC USER PANEL
+
+Users who are not logged in can browse the platform.
+
+Features:
+
+School search
+
+School public profiles
+
+Ratings & reviews
+
+School events
+
+Admission announcements
+
+Teacher job listings
+
+This panel helps build school discovery and visibility.
+
+7️⃣ TEACHER JOB SEEKER PANEL
+
+Teachers searching for jobs get a career dashboard.
+
+Features:
+
+Teacher profile
+
+Resume upload
+
+Job search
+
+Apply to school vacancies
+
+Track application status.
+
+8️⃣ TUTOR MARKETPLACE PANEL (Future)
+
+Parents and tutors connect.
+
+Parents can:
+
+Post tuition requirement.
+
+Teachers can:
+
+Apply for tutoring jobs.
+
+Chat with parents.
+
+PERMISSION SYSTEM
+
+Use RBAC (Role Based Access Control).
+
+Example:
+
+SuperAdmin → full system access
+SchoolAdmin → school data only
+Teacher → assigned classes only
+Parent → own children only
+Student → personal data only
+PublicUser → public pages only
+MULTI TENANT DATA ISOLATION
+
+Each school must have isolated data access.
+
+Example:
+
+School A admin cannot see School B data.
+
+All queries must be filtered by:
+
+school_id
+LOGIN SYSTEM
+
+Support:
+
+Email login
+
+Phone login
+
+OTP verification
+
+Role-based redirect after login.
+
+Example:
+
+Teacher → teacher dashboard
+
+Parent → parent dashboard
+
+Admin → admin dashboard
+
+UI STRUCTURE
+
+Navigation should adapt based on role.
+
+Example:
+
+Admin → full sidebar
+
+Teacher → limited sidebar
+
+Parent → bottom mobile navigation
+
+MOBILE EXPERIENCE
+
+Parent and student panels must be mobile-first PWA apps.
+
+Admin and teacher panels must be desktop-friendly dashboards.
+
+FINAL REQUIREMENT
+
+The system must generate all panels in a modular architecture so that:
+
+Each role has its own dashboard and experience.
+
+✅ With this added, your platform will have 7 different user panels, which makes it a true ecosystem platform, not just a school app.
+
+💡 One more thing (very important for your startup mindset):
+
+Your biggest moat won't be the ERP.
+
+It will be the school network + rating + marketplace layer.
+
+That’s what can make this very big in India.
+
+If you want, I can also show you something very interesting:
+
+The exact feature that can make this platform spread to 10,000 schools. (Most founders miss it.)
+
+Telll me 
+
+The one feature that can make your platform spread to thousands of schools is not the ERP, AI, or dashboards.
+
+It is the Public School Identity + Parent Utility Loop.
+
+Most founders miss this. If you build it right, schools themselves will bring parents, and parents will push schools to join.
+
+Let me explain.
+
+The Feature That Can Make MySchool Spread Fast
+1️⃣ Public Digital Identity for Every School
+
+Create a public page for every school on the platform.
+
+Think like:
+
+Google Business Profile
+
+Zomato restaurant pages
+
+But for schools.
+
+Each school gets a page like:
+
+myschool.app/schools/delhi-public-school-pune
+
+The page shows:
+
+• school photos
+• facilities
+• ratings
+• reviews
+• events
+• achievements
+• admission info
+• teacher openings
+
+Now something powerful happens.
+
+Parents start searching schools inside the app.
+
+2️⃣ Parent Utility Tools (Growth Loop)
+
+Give parents free useful tools even if their school is not onboard.
+
+Examples:
+
+Parent Tools
+
+School comparison
+
+Compare:
+
+• fees
+• ratings
+• facilities
+• results
+
+Admission tracker
+
+Parents can:
+
+Track admission openings across schools.
+
+Nearby schools map
+
+Show:
+
+Schools within 5 km.
+
+School reviews
+
+Parents leave reviews.
+
+Now imagine the situation.
+
+A parent searches for a school and sees:
+
+This school is not yet on MySchool.
+Claim this school profile.
+3️⃣ School Claim Feature
+
+School admins can:
+
+Claim their school page.
+
+Then unlock:
+
+• dashboard
+• parent communication
+• smart IDs
+• ERP tools
+
+This becomes viral distribution.
+
+Parents → discover schools
+Schools → join platform to control profile
+
+4️⃣ Events Feed (Network Effect)
+
+Create a school events feed.
+
+Example posts:
+
+Annual day celebration
+Sports competition
+Science exhibition
+Top board results
+
+Parents love this.
+
+Schools love visibility.
+
+Now the platform becomes a social layer for schools.
+
+5️⃣ Teacher Hiring Marketplace
+
+Teachers searching for jobs come to platform.
+
+Schools posting vacancies.
+
+This creates another growth loop.
+
+The Real Strategy
+
+Your product is 3 things combined.
+
+Layer 1
+
+School OS
+
+ERP + communication.
+
+Layer 2
+
+School identity
+
+Profiles + ratings.
+
+Layer 3
+
+Marketplace
+
+Hiring + tutors.
+
+When these combine, you get something similar to:
+
+• LinkedIn for teachers
+• Google profiles for schools
+• ERP like Teachmint
+
+But in one platform.
+
+Why This Works in India
+
+India has:
+
+• 15 lakh schools
+• most are not digital
+• parents rely on word of mouth
+
+If you give:
+
+Trust + visibility + management tools
+
+schools will join.
+
+Brutally Honest Advice
+
+Your real MVP should not be huge.
+
+If I were building this startup, I would launch with just 3 things:
+
+1️⃣ School profile pages
+2️⃣ Parent review system
+3️⃣ Simple communication dashboard
+
+Then expand to ERP.
+
+This reduces build time from 1 year → 2 months.
+
+If you want, I can also show you:
+
+• The exact MVP that can reach 1,000 schools in 6 months
+• How to build this using AI tools in 30 days
+• The biggest mistake ERP founders make (99% fail here).
+
+Now analyse everything above and make the proep4 master prompt to achieve alll and should be proer and details 
+
+Below is a complete professional “MASTER PROMPT” you can directly give to Lovable / Cursor / Replit AI / Bolt / any AI full-stack builder to generate the entire MySchool ecosystem platform.
+
+I structured it like a real product requirements document (PRD) + system architecture, so the AI understands exactly what to build.
+
+You can copy and paste this entire prompt.
+
+MASTER PROMPT — Build “MySchool” AI School Ecosystem Platform
+
+You are a senior product architect, UX designer, and full-stack engineer responsible for building a production-ready SaaS platform called “MySchool.”
+
+The goal is to create India’s digital ecosystem for schools, combining:
+
+• School ERP
+• Parent communication
+• Public school discovery
+• School ratings & reviews
+• Teacher hiring marketplace
+• Tutor marketplace
+• AI data assistant connected to school data
+
+This platform must function as a multi-tenant SaaS system where thousands of schools can operate independently while being part of one ecosystem.
+
+The product is not just a school ERP, it is a school network platform.
+
+1 PRODUCT VISION
+
+Build a platform that solves four major problems in Indian schools:
+
+1️⃣ Schools lack digital management tools
+2️⃣ Parent communication happens on WhatsApp chaos
+3️⃣ Schools lack public identity and visibility
+4️⃣ Teacher hiring and tutoring markets are fragmented
+
+MySchool solves this by combining:
+
+• School management system
+• Structured communication
+• Public school identity
+• Trust system (ratings & reviews)
+• Education marketplaces
+
+2 PLATFORM ARCHITECTURE
+
+The platform must be designed as a multi-tenant SaaS system.
+
+Each school acts as a tenant with isolated data.
+
+Example structure:
+
+Platform
+ ├── School A
+ │   ├── Students
+ │   ├── Teachers
+ │   ├── Parents
+ │   └── Admin
+ │
+ ├── School B
+ │
+ └── School C
+
+Requirements:
+
+• tenant data isolation
+• role-based access
+• scalable architecture
+• API-driven backend
+
+All database queries must include:
+
+school_id
+3 TECHNOLOGY STACK
+
+Frontend
+
+Next.js (React framework)
+
+TypeScript
+
+TailwindCSS
+
+ShadCN UI components
+
+PWA support for mobile experience.
+
+Backend
+
+Node.js with NestJS architecture
+
+Use modular services.
+
+Database
+
+PostgreSQL
+
+Design scalable relational schema.
+
+Caching
+
+Redis
+
+Realtime
+
+WebSockets or Supabase realtime.
+
+Used for:
+
+• attendance updates
+• notifications
+• live announcements
+
+Storage
+
+AWS S3 / Cloud storage.
+
+For:
+
+• student photos
+• ID cards
+• school media
+
+Authentication
+
+JWT authentication
+
+Role Based Access Control (RBAC).
+
+Deployment
+
+Docker containers
+
+Cloud hosting (AWS / GCP / Vercel).
+
+4 USER ROLES (MULTI PANEL SYSTEM)
+
+The platform must support separate dashboards for each role.
+
+Panels include:
+
+1️⃣ Super Admin Panel
+2️⃣ School Admin Panel
+3️⃣ Teacher Panel
+4️⃣ Parent Panel
+5️⃣ Student Panel
+6️⃣ Public User Panel
+7️⃣ Teacher Job Seeker Panel
+8️⃣ Tutor Marketplace Panel (future)
+
+Each role must have:
+
+• separate dashboard
+• role-based permissions
+• customized navigation
+
+5 SUPER ADMIN PANEL (PLATFORM OWNER)
+
+Controls entire platform ecosystem.
+
+Capabilities:
+
+School management
+• approve schools
+• suspend schools
+
+Platform analytics
+• total schools
+• total students
+• active users
+• revenue analytics
+
+Subscription management
+• create pricing plans
+• activate subscriptions
+
+Review moderation
+• approve reviews
+• remove abuse
+
+Marketplace moderation
+• teacher job listings
+• tutor leads
+
+Platform settings
+• payment gateway
+• SMS integration
+• feature toggles
+
+6 SCHOOL ADMIN PANEL
+
+School admins manage their school operations.
+
+Modules include:
+
+Overview
+Students
+Teachers
+Classes
+Attendance
+Fees
+Notices
+Events
+Reports
+Hiring
+Settings
+
+7 OVERVIEW DASHBOARD (WITH AGENTIC AI)
+
+The overview page must contain:
+
+Analytics cards:
+
+• total students
+• attendance today
+• fee pending
+• recent notices
+• upcoming events
+
+And a right-side AI assistant interface.
+
+8 AGENTIC AI SCHOOL DATA ASSISTANT
+
+This AI assistant must be connected to the school's internal database.
+
+It should function as a data-aware assistant for school administrators.
+
+The AI must:
+
+• interpret user queries
+• fetch data from database
+• generate reports
+• perform actions
+
+Important restriction:
+
+The AI must only access platform data.
+
+It must NOT access universal internet APIs.
+
+Example queries
+
+Admin can ask:
+
+"How many students were absent today?"
+
+"Show fee defaulters."
+
+"Which class has lowest attendance?"
+
+"Generate attendance report for last month."
+
+"Show students with complaints."
+
+"Which teachers posted notices this week?"
+
+Example actions
+
+The AI should also perform actions:
+
+"Send reminder to fee defaulters."
+
+"Generate attendance report for class 9."
+
+"Post notice to all parents."
+
+AI architecture should include:
+
+• query interpreter
+• secure database access layer
+• tenant isolation
+
+9 STUDENT SMART ID SYSTEM
+
+Each student receives a QR-based digital ID card.
+
+Features:
+
+Unique QR code
+
+Student profile linked
+
+Scan QR → open student record
+
+Emergency contact info
+
+Attendance via QR scan.
+
+Admin must be able to:
+
+Generate ID cards
+
+Download printable ID cards.
+
+10 STUDENT PROFILE SYSTEM
+
+Each student profile must include:
+
+Name
+Class
+Section
+Photo
+Parent details
+Attendance history
+Academic records
+Complaints / remarks
+QR code ID.
+
+11 ATTENDANCE SYSTEM
+
+Teachers can:
+
+Mark attendance manually
+
+Bulk mark attendance
+
+Scan QR for attendance.
+
+Parents can:
+
+View attendance history.
+
+Admins can:
+
+Generate attendance reports.
+
+12 FEE MANAGEMENT SYSTEM
+
+Admin features:
+
+Create fee structure
+
+Track payments
+
+Identify defaulters
+
+Send payment reminders.
+
+Parents can:
+
+View fees
+
+View payment history
+
+Pay fees online.
+
+13 NOTICE SYSTEM
+
+Schools can post notices such as:
+
+Exam schedules
+
+Holiday announcements
+
+PTM
+
+Class notices
+
+Important updates.
+
+Parents receive:
+
+Push notifications
+
+SMS alerts.
+
+14 EVENT SYSTEM
+
+Schools can publish events.
+
+Examples:
+
+Annual day
+
+Sports day
+
+Competitions
+
+Cultural programs
+
+Achievements.
+
+Visibility modes:
+
+Private → parents only
+
+Public → visible across platform.
+
+15 SCHOOL PUBLIC PROFILE
+
+Every school gets a public discovery page.
+
+Example:
+
+myschool.app/schools/school-name
+
+Profile includes:
+
+School name
+
+Address
+
+Photos
+
+Facilities
+
+Achievements
+
+Admission details
+
+Contact information
+
+Teacher vacancies.
+
+16 SCHOOL DISCOVERY SYSTEM
+
+Parents can browse schools.
+
+Features:
+
+Search schools
+
+Nearby schools map
+
+Compare schools
+
+Admission announcements.
+
+17 SCHOOL RATING SYSTEM
+
+Parents and users can review schools.
+
+Ratings include:
+
+Teaching quality
+
+Infrastructure
+
+Safety
+
+Communication.
+
+Include moderation system.
+
+18 SCHOOL NEWS & EVENTS FEED
+
+Public school posts appear in a platform-wide feed.
+
+Examples:
+
+Annual day photos
+
+Competition results
+
+Achievements
+
+Admission announcements.
+
+19 TEACHER HIRING MARKETPLACE
+
+Schools can post job openings.
+
+Examples:
+
+Math teacher
+
+Science teacher
+
+Coordinator.
+
+Teachers can:
+
+Create profile
+
+Upload resume
+
+Apply to jobs.
+
+20 TUTOR MARKETPLACE (FUTURE)
+
+Parents can post:
+
+Tuition requirement.
+
+Example:
+
+Need Math tutor for Class 8.
+
+Teachers can:
+
+Apply
+
+Chat with parents.
+
+Revenue model:
+
+Lead fees.
+
+21 DATABASE TABLE STRUCTURE
+
+Design tables such as:
+
+Users
+
+Schools
+
+Students
+
+Parents
+
+Teachers
+
+Classes
+
+Sections
+
+Attendance
+
+Fees
+
+Payments
+
+Notices
+
+Events
+
+Reviews
+
+Jobs
+
+Applications
+
+TutorRequests
+
+Notifications
+
+AIQueries.
+
+22 NOTIFICATION SYSTEM
+
+Support:
+
+Push notifications
+
+SMS alerts
+
+Email alerts.
+
+23 SECURITY
+
+Implement:
+
+Role-based access
+
+Tenant data isolation
+
+Encrypted data
+
+Secure APIs.
+
+24 UI/UX DESIGN
+
+Interface must be:
+
+Clean
+
+Mobile friendly
+
+School friendly
+
+Dashboard-based.
+
+Parent and student panels must be mobile-first PWA apps.
+
+Admin dashboards must support desktop workflows.
+
+25 MONETIZATION
+
+Support multiple revenue models:
+
+School subscription plans
+
+Per student pricing
+
+Job posting fees
+
+Tutor lead fees
+
+Featured school listings.
+
+26 SCALABILITY
+
+System must scale to:
+
+10,000+ schools
+
+Millions of users.
+
+Architecture must be microservice-ready.
+
+27 MVP DEVELOPMENT ROADMAP
+
+Phase 1
+
+Smart ID
+Attendance
+Notices
+Parent dashboard.
+
+Phase 2
+
+School public profiles
+Events feed.
+
+Phase 3
+
+Ratings system
+Hiring marketplace.
+
+Phase 4
+
+Tutor marketplace.
+
+28 FINAL OUTPUT REQUIRED
+
+Generate:
+
+Full frontend application
+
+Backend API architecture
+
+Database schema
+
+Role-based dashboards
+
+AI assistant module
+
+QR ID generator
+
+Admin panels
+
+PWA configuration
+
+Deployment setup

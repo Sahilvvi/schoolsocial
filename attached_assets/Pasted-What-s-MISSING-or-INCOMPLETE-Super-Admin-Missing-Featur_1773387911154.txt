@@ -1,0 +1,43 @@
+What's MISSING or INCOMPLETE ❌
+Super Admin
+Missing Feature	Notes
+School approval queue	When schools register, no pending approval workflow — super admin can't approve/reject new schools
+School onboarding status	No step tracker for newly registered schools
+Platform analytics drill-down	No enrollment trends, state/city heatmap, month-over-month growth charts
+School impersonation / login-as	Super admin can't log in as a school admin to debug
+Bulk school actions	No bulk enable/disable/delete schools
+School Admin
+Missing Feature	Notes
+Student health records	health.ts API file exists but zero UI — no page, not even in nav
+Homework management page	Teachers create homework; admin has no view or oversight
+Bulk CSV import	No student or teacher CSV upload/import
+Financial dashboard/charts	No visual fee collection summary, revenue charts per month
+Student ID card bulk print	Can view one at a time via QR but no bulk export
+Alumni management	No graduated students tracking/list
+Parent-teacher communication log	Admin can't see message thread history
+Teacher Dashboard
+Missing Feature	Notes
+Leave status tracking	Teacher can apply for leave but can't see if it was approved/rejected
+Parent contact tab	No direct way to message a specific parent from teacher panel
+Class timetable creation	Teachers can only view, not create — creation is admin-only
+Student health notes	Can't view/log student health from teacher side
+Parent Dashboard
+Missing Feature	Notes
+Child's assignments	Parent can't see what assignments child has been given
+School events/calendar	No events tab showing upcoming school events
+Leave application	No way to apply for child's leave from parent app
+Child's study materials	Parent can't access materials the teacher uploaded
+Transport tracking	No bus route / transport tab for child's commute
+Student Dashboard
+Missing Feature	Notes
+Leave application	Student can't apply for leave themselves
+Library access	No library book search/borrow view
+Attendance calendar	Only sees recent records in a list — no monthly calendar view
+Syllabus view	Student can't see the syllabus progress their teacher planned
+Online quiz / self-test	No quiz or practice test feature
+Career/Job Seeker Panel
+Missing Feature	Notes
+Resume builder	Profile exists but no formatted resume download/PDF
+Public job listings page	Only logged-in job seekers see jobs — no public /jobs page
+Job alerts / notifications	No email or in-app alert when new jobs match profile
+School recruiter chat	No direct messaging to the hiring school

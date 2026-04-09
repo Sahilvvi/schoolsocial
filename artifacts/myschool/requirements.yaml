@@ -1,0 +1,20 @@
+packages:
+  "framer-motion": "For beautiful page transitions and micro-interactions"
+  "recharts": "For dashboard analytics charts"
+  "date-fns": "For human-readable date formatting"
+  "react-qr-code": "For student smart ID cards"
+  "react-hook-form": "For robust form handling and validation"
+  "@hookform/resolvers": "For zod schema validation in forms"
+
+images:
+  - path: "artifacts/myschool/public/images/login-bg.png"
+    description: "Abstract modern gradient background with soft deep blue and vibrant orange intersecting shapes, premium education technology vibe, clean and professional, 3d glassmorphism elements"
+    aspect_ratio: "16:9"
+  - path: "artifacts/myschool/public/images/hero-bg.png"
+    description: "Beautiful Indian school campus illustrated in a modern, flat vector style with soft light, happy students, lush green campus, deep blue sky"
+    aspect_ratio: "16:9"
+
+notes:
+  - All API calls use the @workspace/api-client-react hooks
+  - The JWT token is injected globally via a fetch interceptor in App.tsx
+  - Wouter is used for role-based routing

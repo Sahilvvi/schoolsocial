@@ -1,0 +1,407 @@
+You are a world-class product designer, motion designer, and frontend engineer.
+
+Upgrade the entire public website UI of the MySchool platform to make it extremely modern, interactive, animated, and visually impressive, similar to top SaaS websites.
+
+The goal is to make the landing page visually stunning, highly interactive, and information-rich while explaining the MySchool ecosystem platform.
+
+The website must look premium and high-trust, suitable for schools, parents, and investors.
+
+DESIGN STYLE
+
+The UI should feel similar to modern SaaS products like:
+
+• Stripe
+• Vercel
+• Linear
+
+Design requirements:
+
+• smooth scrolling
+• glassmorphism effects
+• animated gradients
+• interactive cards
+• parallax elements
+• hover animations
+• micro-interactions
+• animated statistics
+• dynamic feature showcases
+
+Use:
+
+Framer Motion animations
+
+Scroll-triggered effects
+
+Interactive UI elements
+
+Gradient backgrounds.
+
+WEBSITE STRUCTURE
+
+The website must contain 4 main pages:
+
+1️⃣ Home Page
+2️⃣ Schools Page
+3️⃣ About Page
+4️⃣ Contact Page
+
+Each page must have at least 7–8 sections with rich content and animation.
+
+GLOBAL UI FEATURES
+
+The entire website should include:
+
+Smooth page transitions
+
+Sticky animated navbar
+
+Animated CTA buttons
+
+Hover effects
+
+Scroll-triggered animations
+
+Interactive feature cards
+
+Floating UI elements
+
+3D illustrations or animated graphics
+
+Dynamic counters
+
+Carousel sections
+
+Dark/light theme support.
+
+NAVBAR
+
+Sticky animated navbar.
+
+Items:
+
+Home
+Schools
+About
+Contact
+
+Right side CTA:
+
+“Get Started”
+
+“Request Demo”
+
+Add animated hover effects.
+
+HOME PAGE (Landing Page)
+
+The landing page must be highly engaging and premium.
+
+Include at least 10 sections.
+
+1️⃣ Hero Section
+
+Large animated hero area.
+
+Include:
+
+Headline:
+
+"India’s Digital Ecosystem for Schools"
+
+Subheadline explaining platform.
+
+Animated UI mockup of the dashboard.
+
+CTA buttons:
+
+Start School
+Explore Platform.
+
+Add floating UI elements and subtle motion.
+
+2️⃣ Platform Overview Section
+
+Explain the four platform layers:
+
+School Management
+Communication System
+School Visibility
+Education Marketplace.
+
+Use animated feature cards.
+
+3️⃣ AI Assistant Showcase
+
+Highlight the Agentic AI assistant inside the dashboard.
+
+Show animated chat UI example.
+
+Example queries:
+
+"Show fee defaulters"
+
+"Generate attendance report"
+
+"Which class has lowest attendance?"
+
+Use animated typing simulation.
+
+4️⃣ Smart ID System Section
+
+Explain QR-based student ID system.
+
+Show animated QR scan example.
+
+Include:
+
+• student digital profile
+• QR attendance
+• ID card generator.
+
+5️⃣ Platform Features Grid
+
+Large animated grid with feature cards.
+
+Features:
+
+Attendance system
+
+Fee management
+
+Notice system
+
+Events
+
+School profiles
+
+Ratings
+
+Teacher hiring
+
+Tutor marketplace.
+
+Each card should animate on hover.
+
+6️⃣ School Discovery Feature
+
+Show how parents can discover schools.
+
+Include animated UI showing:
+
+school profiles
+
+ratings
+
+reviews
+
+admission info.
+
+7️⃣ Ecosystem Network Section
+
+Explain how the platform connects:
+
+Schools
+Parents
+Teachers
+Tutors.
+
+Use animated flow diagram.
+
+8️⃣ Marketplace Section
+
+Show hiring and tutoring marketplace.
+
+Animated cards:
+
+Teacher job listings
+
+Tutor requirements.
+
+9️⃣ Statistics Section
+
+Animated counters:
+
+10,000+ schools
+
+1M+ parents
+
+100k teachers.
+
+Use number animations.
+
+🔟 Call To Action Section
+
+Large CTA block.
+
+Buttons:
+
+Register School
+
+Book Demo.
+
+Add gradient background and animated shapes.
+
+SCHOOLS PAGE
+
+This page targets school administrators.
+
+Must include 8 sections.
+
+1️⃣ Page Hero
+
+Headline:
+
+"Transform Your School Operations"
+
+Show dashboard UI.
+
+2️⃣ Problems Schools Face
+
+Explain problems:
+
+Manual attendance
+
+WhatsApp communication chaos
+
+No digital identity.
+
+3️⃣ MySchool Solution
+
+Animated comparison:
+
+Traditional system vs MySchool.
+
+4️⃣ School Dashboard Showcase
+
+Show animated UI of:
+
+Admin dashboard
+
+Teacher dashboard
+
+Parent dashboard.
+
+5️⃣ Smart ID System
+
+Explain QR ID cards.
+
+6️⃣ AI Assistant for Schools
+
+Show AI assistant helping admins.
+
+7️⃣ Pricing Overview
+
+Display subscription plans.
+
+8️⃣ CTA Section
+
+Book demo.
+
+ABOUT PAGE
+
+Tell the story of the platform.
+
+Include 7 sections.
+
+1️⃣ Mission
+
+Building India's digital infrastructure for schools.
+
+2️⃣ Problem in Education
+
+Explain fragmented systems.
+
+3️⃣ Our Vision
+
+Create a school network ecosystem.
+
+4️⃣ Platform Philosophy
+
+Management + Communication + Marketplace.
+
+5️⃣ Platform Architecture
+
+Explain ecosystem layers.
+
+6️⃣ Future Vision
+
+AI-driven school operations.
+
+7️⃣ Join the Ecosystem
+
+CTA for schools.
+
+CONTACT PAGE
+
+Include 7 sections.
+
+1️⃣ Hero
+
+"Get in Touch With Us"
+
+2️⃣ Contact Form
+
+Fields:
+
+Name
+Email
+School Name
+Message.
+
+3️⃣ Demo Request Form
+
+Schools can request demo.
+
+4️⃣ Support Information
+
+Email support.
+
+5️⃣ Office Information
+
+Location and contact details.
+
+6️⃣ FAQ Section
+
+Common questions.
+
+7️⃣ Final CTA
+
+Join the platform.
+
+FOOTER
+
+Footer should include:
+
+Platform links
+
+School resources
+
+Contact links
+
+Social media icons.
+
+TECHNICAL UI REQUIREMENTS
+
+Use:
+
+Next.js
+
+TailwindCSS
+
+Framer Motion animations
+
+Responsive mobile design.
+
+The UI must feel premium SaaS quality.
+
+FINAL RESULT
+
+The website must feel:
+
+Modern
+Animated
+Interactive
+Premium
+Highly informative.
+
+It should look like a top-tier startup website that makes visitors trust the platform.
