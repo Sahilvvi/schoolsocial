@@ -11,5 +11,16 @@ if (!process.env.DATABASE_URL) {
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle(pool, { schema });
 
-export * from "./schema";
+export {
+  usersTable, schoolsTable, teachersTable, studentsTable, classesTable, 
+  attendanceTable, feesTable, noticesTable, eventsTable, reviewsTable, 
+  jobsTable, timetableTable, examsTable, homeworkTable, homeworkSubmissionsTable,
+  teacherLeavesTable, messagesTable, announcementsTable, notificationsTable, 
+  galleryTable, auditLogsTable, careerTable, platformSettingsTable, 
+  libraryBooksTable, libraryIssuesTable, transportRoutesTable, 
+  transportStudentsTable, payrollTable, ptmSlotsTable, disciplineRecordsTable, 
+  studyMaterialsTable, syllabusTable, assignmentsTable, supportTicketsTable, 
+  admissionsTable, studentHealthTable, studentLeavesTable, quizzesTable, 
+  examResultsTable, admissionInquiriesTable
+} from "./schema/index.ts";
 export * from "drizzle-orm";
