@@ -3,6 +3,7 @@ packages:
   - lib/*
   - lib/integrations/*
   - scripts
+  - grade-sphere-now-main
 
 autoInstallPeers: false
 
