@@ -12,7 +12,7 @@ const handler = async (req: any, res: any) => {
       console.warn("Seeding skipped/failed during lambda startup:", e);
     }
   }
-  return app(req, res);
+  return (app as any)(req, res);
 };
 
 export default handler;
