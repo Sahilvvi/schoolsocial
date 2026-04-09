@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { schoolsTable, usersTable, studentsTable, teachersTable, classesTable, attendanceTable, feesTable, noticesTable, eventsTable } from "@workspace/db";
-import { eq, and, like, count, sql, inArray } from "drizzle-orm";
+import { eq, and, like, count, sql, inArray } from "@workspace/db";
 import { requireAuth, requireRole, type AuthRequest } from "../middlewares/auth.js";
 import { generateToken } from "./auth.js";
 import crypto from "crypto";

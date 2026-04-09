@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db";
-import { eq, or } from "drizzle-orm";
+import { eq, or } from "@workspace/db";
 import crypto from "crypto";
 
 const router: IRouter = Router();

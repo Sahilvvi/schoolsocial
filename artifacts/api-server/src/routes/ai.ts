@@ -8,7 +8,7 @@ import {
   payrollTable, admissionInquiriesTable, announcementsTable, timetableTable,
   supportTicketsTable, ptmSlotsTable,
 } from "@workspace/db";
-import { eq, and, count, sql, gte, lte, desc, ne } from "drizzle-orm";
+import { eq, and, count, sql, gte, lte, desc, ne } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../middlewares/auth.js";
 
 const router = Router();
