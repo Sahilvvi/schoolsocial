@@ -1,5 +1,6 @@
 import crypto from "crypto";
-import { db, usersTable, schoolsTable, teachersTable, studentsTable, classesTable, noticesTable, eventsTable, feesTable, count, eq } from "@workspace/db";
+import * as dbModule from "@workspace/db";
+const { db, usersTable, schoolsTable, teachersTable, studentsTable, classesTable, noticesTable, eventsTable, feesTable, count, eq } = dbModule as any;
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password + "myschool_salt").digest("hex");

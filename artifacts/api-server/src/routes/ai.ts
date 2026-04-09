@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { db } from "@workspace/db";
-import {
-  studentsTable, attendanceTable, feesTable, noticesTable, classesTable, teachersTable,
+import * as dbModule from "@workspace/db";
+const {
+  db, studentsTable, attendanceTable, feesTable, noticesTable, classesTable, teachersTable,
   homeworkTable, homeworkSubmissionsTable, examsTable, examResultsTable,
   eventsTable, transportRoutesTable, transportStudentsTable, disciplineRecordsTable,
   libraryBooksTable, libraryIssuesTable, teacherLeavesTable, studentLeavesTable,
   payrollTable, admissionInquiriesTable, announcementsTable, timetableTable,
-  supportTicketsTable, ptmSlotsTable,
-} from "@workspace/db";
-import { eq, and, count, sql, gte, lte, desc, ne } from "@workspace/db";
+  supportTicketsTable, ptmSlotsTable, eq, and, count, sql, gte, lte, desc, ne
+} = dbModule as any;
 import { requireAuth, type AuthRequest } from "../middlewares/auth.js";
 
 const router = Router();
