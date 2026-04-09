@@ -12,7 +12,7 @@
   ],
   "functions": {
     "api/index.ts": {
-      "includeFiles": "artifacts/api-server/**",
+      "includeFiles": "artifacts/api-server/dist/**",
       "memory": 1024,
       "maxDuration": 10
     }

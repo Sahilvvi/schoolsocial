@@ -1,5 +1,4 @@
-import app from "../artifacts/api-server/src/app.js";
-import { seedSuperAdmin } from "../artifacts/api-server/src/seed.js";
+import { app, seedSuperAdmin } from "../artifacts/api-server/dist/vercel.mjs";
 
 // Initialize DB seeding on first lambda cold start
 let seeded = false;

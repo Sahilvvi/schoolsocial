@@ -67,6 +67,25 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+
+  // Build Vercel serverless bundle — a single ESM file with everything inlined
+  console.log("building vercel serverless bundle...");
+  await esbuild({
+    entryPoints: [path.resolve(__dirname, "src/vercel-entry.ts")],
+    platform: "node",
+    bundle: true,
+    format: "esm",
+    outfile: path.resolve(distDir, "vercel.mjs"),
+    define: {
+      "process.env.NODE_ENV": '"production"',
+    },
+    minify: true,
+    external: externals,
+    logLevel: "info",
+    banner: {
+      js: 'import{createRequire}from"module";const require=createRequire(import.meta.url);',
+    },
+  });
 }
 
 buildAll().catch((err) => {
