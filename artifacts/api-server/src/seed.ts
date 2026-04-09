@@ -1,5 +1,6 @@
 import crypto from "crypto";
-import { db, usersTable, schoolsTable, teachersTable, studentsTable, classesTable, noticesTable, eventsTable, feesTable, count, eq } from "@workspace/db";
+import { db, count, eq } from "@workspace/db";
+import { usersTable, schoolsTable, teachersTable, studentsTable, classesTable, noticesTable, eventsTable, feesTable } from "@workspace/db/schema";
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password + "myschool_salt").digest("hex");
