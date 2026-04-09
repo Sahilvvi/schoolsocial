@@ -242,7 +242,7 @@ router.post("/query", requireAuth, async (req: AuthRequest, res) => {
 
         const classMap = new Map(classes.map(c => [c.id, `${c.name}${c.section ? "-" + c.section : ""}`]));
 
-        answer = `🎓 Student Enrollment\n\n• Total Students: ${total}\n\nClass-wise breakdown:\n${byClass.map(b => `  — ${classMap.get(b.classId) || "Unassigned"}: ${b.cnt} students`).join("\n") || "  No class data available."}`;
+        answer = `🎓 Student Enrollment\n\n• Total Students: ${total}\n\nClass-wise breakdown:\n${byClass.map(b => `  — ${b.classId ? (classMap.get(b.classId) || "Unknown") : "Unassigned"}: ${b.cnt} students`).join("\n") || "  No class data available."}`;
         data = { total: Number(total), byClass };
         break;
       }
@@ -280,7 +280,7 @@ router.post("/query", requireAuth, async (req: AuthRequest, res) => {
         const countMap = new Map(studentCounts.map(s => [s.classId, Number(s.cnt)]));
         const totalStudents = studentCounts.reduce((sum, s) => sum + Number(s.cnt), 0);
 
-        answer = `🏫 Class Overview\n\nTotal Classes: ${classes.length}\nTotal Students Assigned: ${totalStudents}\n\n${classes.map(c => `• ${c.name}${c.section ? "-" + c.section : ""}${c.medium ? " (" + c.medium + ")" : ""}: ${countMap.get(c.id) || 0} students`).join("\n")}\n${classes.length === 0 ? "No classes found. Add classes in the Classes module." : ""}`;
+        answer = `🏫 Class Overview\n\nTotal Classes: ${classes.length}\nTotal Students Assigned: ${totalStudents}\n\n${classes.map(c => `• ${c.name}${c.section ? "-" + c.section : ""}: ${countMap.get(c.id) || 0} students`).join("\n")}\n${classes.length === 0 ? "No classes found. Add classes in the Classes module." : ""}`;
         data = { classes: classes.map(c => ({ ...c, studentCount: countMap.get(c.id) || 0 })) };
         break;
       }
@@ -353,7 +353,7 @@ router.post("/query", requireAuth, async (req: AuthRequest, res) => {
           .from(examResultsTable)
           .where(eq(examResultsTable.schoolId, effectiveSchoolId));
 
-        answer = `📝 Exam Information\n\n🗓️ Upcoming Exams (${upcoming.length}):\n${upcoming.map(e => `• ${e.title} — ${e.examDate}${e.subject ? " | " + e.subject : ""}${e.totalMarks ? " | Max: " + e.totalMarks : ""}`).join("\n") || "  No upcoming exams scheduled."}\n\n📅 Recent Past Exams (${past.length}):\n${past.map(e => `• ${e.title} — ${e.examDate}`).join("\n") || "  No past exams found."}\n\n📊 Total Results Entered: ${resultCount}`;
+        answer = `📝 Exam Information\n\n🗓️ Upcoming Exams (${upcoming.length}):\n${upcoming.map(e => `• ${e.examName} — ${e.examDate}${e.subject ? " | " + e.subject : ""}${e.maxMarks ? " | Max: " + e.maxMarks : ""}`).join("\n") || "  No upcoming exams scheduled."}\n\n📅 Recent Past Exams (${past.length}):\n${past.map(e => `• ${e.examName} — ${e.examDate}`).join("\n") || "  No past exams found."}\n\n📊 Total Results Entered: ${resultCount}`;
         data = { upcoming, past, resultCount: Number(resultCount) };
         break;
       }
@@ -565,7 +565,7 @@ router.post("/query", requireAuth, async (req: AuthRequest, res) => {
         const inProgress = byStatus.find(b => b.status === "in_progress");
         const resolved = byStatus.find(b => b.status === "resolved");
 
-        answer = `🎫 Support Tickets\n\n• Open: ${open?.cnt || 0}\n• In Progress: ${inProgress?.cnt || 0}\n• Resolved: ${resolved?.cnt || 0}\n\nRecent Tickets:\n${tickets.slice(0, 5).map((t, i) => `${i + 1}. [${(t.status || "OPEN").toUpperCase()}] ${t.title} — Priority: ${t.priority}`).join("\n") || "  No support tickets."}`;
+        answer = `🎫 Support Tickets\n\n• Open: ${open?.cnt || 0}\n• In Progress: ${inProgress?.cnt || 0}\n• Resolved: ${resolved?.cnt || 0}\n\nRecent Tickets:\n${tickets.slice(0, 5).map((t, i) => `${i + 1}. [${(t.status || "OPEN").toUpperCase()}] ${t.subject} — Priority: ${t.priority}`).join("\n") || "  No support tickets."}`;
         data = { tickets, byStatus };
         break;
       }

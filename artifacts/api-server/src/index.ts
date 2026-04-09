@@ -13,7 +13,7 @@ const startServer = async () => {
   try {
     await seedSuperAdmin();
   } catch (err) {
-    console.log("[api-server] DB connection skipped or failed:", err.message);
+    console.log("[api-server] DB connection skipped or failed:", err instanceof Error ? err.message : String(err));
   }
   app.listen(port, () => {
     console.log(`[api-server] Running at http://localhost:${port}`);
