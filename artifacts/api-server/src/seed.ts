@@ -187,7 +187,7 @@ export async function seedSuperAdmin(): Promise<void> {
       parentEmail: "parent@myschool.in",
     }).returning();
 
-    await db.update(studentsTable).set({ qrCode: `student:${student1.id}:DPS2024001` }).where(eq(studentsTable.id, student1.id));
+    await db.update(studentsTable).set({ qrCode: `student:${student1.id}:DPS2024001` }).where(eq(studentsTable.id, student1.id) as any);
 
     // Extra students
     for (let i = 2; i <= 8; i++) {
@@ -201,7 +201,7 @@ export async function seedSuperAdmin(): Promise<void> {
         parentName: `Parent of Student ${i}`,
         parentPhone: `9876543${String(200 + i)}`,
       }).returning();
-      await db.update(studentsTable).set({ qrCode: `student:${s.id}:${admNo}` }).where(eq(studentsTable.id, s.id));
+      await db.update(studentsTable).set({ qrCode: `student:${s.id}:${admNo}` }).where(eq(studentsTable.id, s.id) as any);
     }
 
     // ─── Job Seeker User ──────────────────────────────────────────────────────

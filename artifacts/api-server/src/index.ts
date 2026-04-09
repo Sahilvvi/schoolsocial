@@ -1,5 +1,5 @@
-import app from "./app";
-import { seedSuperAdmin } from "./seed";
+import app from "./app.js";
+import { seedSuperAdmin } from "./seed.js";
 
 // Default to 3001 for local development if PORT is not set
 const rawPort = process.env["PORT"] ?? "3001";

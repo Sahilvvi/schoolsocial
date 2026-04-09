@@ -12,6 +12,9 @@ catalogs:
     '@types/node':
       specifier: ^25.3.3
       version: 25.3.5
+    drizzle-orm:
+      specifier: ^0.45.1
+      version: 0.45.1
     tsx:
       specifier: ^4.21.0
       version: 4.21.0
@@ -20,7 +23,6 @@ catalogs:
       version: 3.25.76
 
 overrides:
-  drizzle-orm: 0.45.1
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-arm64': '-'
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-x64': '-'
@@ -133,7 +135,7 @@ importers:
         specifier: ^2
         version: 2.8.6
       drizzle-orm:
-        specifier: 0.45.1
+        specifier: 'catalog:'
         version: 0.45.1(@types/pg@8.18.0)(better-sqlite3@12.8.0)(pg@8.20.0)
       express:
         specifier: ^5
@@ -423,7 +425,7 @@ importers:
         specifier: ^17.4.1
         version: 17.4.1
       drizzle-orm:
-        specifier: 0.45.1
+        specifier: 'catalog:'
         version: 0.45.1(@types/pg@8.18.0)(better-sqlite3@12.8.0)(pg@8.20.0)
       drizzle-zod:
         specifier: ^0.8.3
@@ -2210,7 +2212,7 @@ packages:
   drizzle-zod@0.8.3:
     resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
     peerDependencies:
-      drizzle-orm: 0.45.1
+      drizzle-orm: '>=0.36.0'
       zod: ^3.25.0 || ^4.0.0
 
   dunder-proto@1.0.1:

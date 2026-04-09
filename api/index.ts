@@ -1,5 +1,5 @@
-import app from "../artifacts/api-server/src/app";
-import { seedSuperAdmin } from "../artifacts/api-server/src/seed";
+import app from "../artifacts/api-server/src/app.js";
+import { seedSuperAdmin } from "../artifacts/api-server/src/seed.js";
 
 // Initialize DB seeding on first lambda cold start
 let seeded = false;
