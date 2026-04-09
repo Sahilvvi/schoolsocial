@@ -1,3 +1,3 @@
-export * from "./generated/api";
-export * from "./generated/types";
-export { AiQueryResponse } from "./generated/api";
+export * from "./generated/api.js";
+export * from "./generated/types.js";
+export { AiQueryResponse } from "./generated/api.js";
