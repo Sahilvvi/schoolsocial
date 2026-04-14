@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   GraduationCap, Menu, X, User, LogOut,
   School, CalendarDays, Briefcase, BookOpen, Newspaper,
-  Crown, MessageSquare, ChevronDown, Upload, Settings, LayoutDashboard, GitCompareArrows
+  Crown, MessageSquare, ChevronDown, Upload, Settings, LayoutDashboard, GitCompareArrows,
+  QrCode, Globe, UserCircle
 } from "lucide-react";
 import GlobalSearch from "@/components/GlobalSearch";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -29,6 +30,9 @@ const primaryLinks = [
 const moreLinks = [
   { to: "/compare", label: "Compare Schools", icon: GitCompareArrows },
   { to: "/tuition-enquiry", label: "Home Tuition", icon: MessageSquare },
+  { to: "/community", label: "Community", icon: Globe },
+  { to: "/scanner", label: "QR Scanner", icon: QrCode },
+  { to: "/teacher-profile", label: "Teacher Profile", icon: UserCircle },
   { to: "/plans", label: "Plans", icon: Crown },
   { to: "/upload-school", label: "List School", icon: Upload },
 ];
@@ -198,6 +202,17 @@ export default function Navbar() {
             className="md:hidden border-t border-border/40 overflow-hidden glass"
           >
             <div className="flex flex-col p-3 gap-0.5">
+              {/* Mobile Quick Toggle: Schools / Tuitions */}
+              <div className="flex items-center gap-1 mb-2 p-1 bg-muted/20 rounded-xl">
+                <Link to="/schools" onClick={() => setOpen(false)}
+                  className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${location.pathname === "/schools" ? "gradient-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted/30"}`}>
+                  Schools
+                </Link>
+                <Link to="/tutors" onClick={() => setOpen(false)}
+                  className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${location.pathname === "/tutors" ? "gradient-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted/30"}`}>
+                  Tuitions
+                </Link>
+              </div>
               {allLinks.map((l, i) => {
                 const Icon = l.icon;
                 return (

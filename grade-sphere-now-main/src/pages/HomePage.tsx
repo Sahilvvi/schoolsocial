@@ -58,6 +58,39 @@ const testimonials = [
   { name: "Deepak Gupta", role: "School Principal", text: "Our school visibility increased 10x after listing on MySchool. We get quality admission leads every day.", avatar: "DG", rating: 5 },
 ];
 
+/* ── Haversine distance (km) ───────────────────────────────── */
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const toRad = (v: number) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/* Delhi-area mock coords for demo schools without real lat/lng */
+const CITY_COORDS: Record<string, [number, number]> = {
+  "new delhi": [28.6139, 77.209],
+  delhi: [28.6139, 77.209],
+  noida: [28.5355, 77.391],
+  gurugram: [28.4595, 77.0266],
+  gurgaon: [28.4595, 77.0266],
+  mumbai: [19.076, 72.8777],
+  bangalore: [12.9716, 77.5946],
+  hyderabad: [17.385, 78.4867],
+  pune: [18.5204, 73.8567],
+  chennai: [13.0827, 80.2707],
+};
+
+function guessCoords(location: string | undefined): [number, number] | null {
+  if (!location) return null;
+  const loc = location.toLowerCase();
+  for (const [city, coords] of Object.entries(CITY_COORDS)) {
+    if (loc.includes(city)) return coords;
+  }
+  return null;
+}
+
 export default function HomePage() {
   const { data: schools = [] } = useSchools();
   const { data: events = [] } = useEvents();
@@ -65,15 +98,60 @@ export default function HomePage() {
   const { data: news = [] } = useNews();
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  /* ── Location-based filtering state ────────────────────── */
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationRadius, setLocationRadius] = useState(10); // km
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "granted" | "denied">("idle");
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) { setLocationStatus("denied"); return; }
+    setLocationStatus("loading");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationEnabled(true);
+        setLocationStatus("granted");
+      },
+      () => setLocationStatus("denied"),
+      { enableHighAccuracy: false, timeout: 8000 }
+    );
+  };
+
+  /* Filter by distance when location is enabled */
+  const nearbySchools = locationEnabled && userLocation
+    ? schools.filter((s: any) => {
+        const coords = guessCoords(s.location);
+        if (!coords) return true; // include schools without coords
+        return haversineKm(userLocation.lat, userLocation.lng, coords[0], coords[1]) <= locationRadius;
+      })
+    : schools;
+
+  const nearbyTutors = locationEnabled && userLocation
+    ? tutors.filter((t: any) => {
+        const coords = guessCoords(t.location);
+        if (!coords) return true;
+        return haversineKm(userLocation.lat, userLocation.lng, coords[0], coords[1]) <= locationRadius;
+      })
+    : tutors;
+
+  const nearbyEvents = locationEnabled && userLocation
+    ? events.filter((e: any) => {
+        const coords = guessCoords(e.location);
+        if (!coords) return true;
+        return haversineKm(userLocation.lat, userLocation.lng, coords[0], coords[1]) <= locationRadius;
+      })
+    : events;
+
   // Auto-rotate banners
   useEffect(() => {
     const timer = setInterval(() => setCurrentSlide((i) => (i + 1) % bannerSlides.length), 5000);
     return () => clearInterval(timer);
   }, []);
 
-  const topSchools = schools.slice(0, 6);
-  const topTutors = tutors.slice(0, 6);
-  const publicEvents = events.filter((e: any) => e.is_public !== false).slice(0, 6);
+  const topSchools = nearbySchools.slice(0, 6);
+  const topTutors = nearbyTutors.slice(0, 6);
+  const publicEvents = nearbyEvents.filter((e: any) => e.is_public !== false).slice(0, 6);
   const latestNews = news.slice(0, 3);
 
   return (
@@ -176,6 +254,50 @@ export default function HomePage() {
             ))}
           </motion.div>
         </div>
+      </section>
+
+      {/* ═══ LOCATION FILTER BAR ═══════════════════════════════ */}
+      <section className="container mx-auto px-4 mb-8">
+        <FadeIn>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 p-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">Location Filter</span>
+            </div>
+            {!locationEnabled ? (
+              <Button onClick={requestLocation} variant="outline" size="sm"
+                className="rounded-xl border-primary/30 text-primary hover:bg-primary/10 gap-1.5"
+                disabled={locationStatus === "loading"}>
+                {locationStatus === "loading" ? (
+                  <><span className="h-3.5 w-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" /> Detecting...</>
+                ) : locationStatus === "denied" ? (
+                  <><MapPin className="h-3.5 w-3.5" /> Location Denied — Show All</>
+                ) : (
+                  <><MapPin className="h-3.5 w-3.5" /> Enable Nearby Filter</>
+                )}
+              </Button>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Badge className="bg-green-500/10 text-green-500 border-green-500/20 gap-1">
+                  <CheckCircle className="h-3 w-3" /> Location Active
+                </Badge>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Radius:</span>
+                  {[5, 10, 25, 50].map((r) => (
+                    <button key={r} onClick={() => setLocationRadius(r)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${locationRadius === r ? "gradient-primary text-primary-foreground shadow-md" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}>
+                      {r}km
+                    </button>
+                  ))}
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => { setLocationEnabled(false); setLocationStatus("idle"); }}
+                  className="text-xs text-muted-foreground hover:text-foreground h-7">
+                  Clear
+                </Button>
+              </div>
+            )}
+          </div>
+        </FadeIn>
       </section>
 
       {/* ═══ TOP SCHOOLS ══════════════════════════════════════════ */}
