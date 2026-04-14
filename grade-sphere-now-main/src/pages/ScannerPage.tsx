@@ -13,8 +13,26 @@ export default function ScannerPage() {
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cleanupScanner = async () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch {
+        // scanner may already be stopped
+      }
+      scannerRef.current = null;
+    }
+  };
 
   const startScanner = async () => {
+    await cleanupScanner();
     setError(null);
     setResult(null);
     setScanning(true);
@@ -29,14 +47,15 @@ export default function ScannerPage() {
         { fps: 10, qrbox: { width: 250, height: 250 } },
         (decodedText) => {
           setResult(decodedText);
-          scanner.stop().catch(() => {});
+          scanner.stop().then(() => scanner.clear()).catch(() => {});
+          scannerRef.current = null;
           setScanning(false);
 
           // If the QR code contains a school URL, navigate to it
           if (decodedText.includes("/school/")) {
             const slug = decodedText.split("/school/").pop()?.split("?")[0];
-            if (slug) {
-              setTimeout(() => navigate(`/school/${slug}`), 1500);
+            if (slug && /^[a-zA-Z0-9_-]+$/.test(slug)) {
+              timeoutRef.current = setTimeout(() => navigate(`/school/${slug}`), 1500);
             }
           }
         },
@@ -48,18 +67,16 @@ export default function ScannerPage() {
     }
   };
 
-  const stopScanner = () => {
-    if (scannerRef.current) {
-      scannerRef.current.stop().catch(() => {});
-      scannerRef.current = null;
-    }
+  const stopScanner = async () => {
+    await cleanupScanner();
     setScanning(false);
   };
 
   useEffect(() => {
     return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (scannerRef.current) {
-        scannerRef.current.stop().catch(() => {});
+        scannerRef.current.stop().then(() => scannerRef.current?.clear()).catch(() => {});
       }
     };
   }, []);
