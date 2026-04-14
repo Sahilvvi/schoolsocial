@@ -195,6 +195,98 @@ export default function PlansPage() {
             Principals can upload their school with basic details for free. For premium features, verification, and enhanced visibility — choose a plan above.
           </p>
         </motion.div>
+
+        {/* Hostinger-style Detailed Comparison Table */}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="max-w-5xl mx-auto mt-20">
+          <h3 className="text-2xl md:text-3xl font-extrabold text-center mb-3">Detailed Feature <span className="text-gradient">Comparison</span></h3>
+          <p className="text-center text-muted-foreground mb-10">Compare all features side by side to find the right fit for your school</p>
+
+          <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden">
+            {/* Table Header */}
+            <div className="grid grid-cols-4 bg-muted/30">
+              <div className="p-4 md:p-5 border-b border-r border-border/30 font-bold text-sm">Feature</div>
+              {["Starter", "Growth", "Elite"].map((name, i) => (
+                <div key={name} className={`p-4 md:p-5 border-b border-border/30 text-center font-bold text-sm ${i < 2 ? "border-r border-border/30" : ""} ${i === 1 ? "bg-primary/5" : ""}`}>
+                  {name}
+                  {i === 1 && <Badge className="ml-2 gradient-primary text-primary-foreground border-0 text-[10px] py-0">Popular</Badge>}
+                </div>
+              ))}
+            </div>
+
+            {/* Comparison Rows */}
+            {[
+              { category: "Profile & Listing", features: [
+                { name: "School Profile Page", values: ["Basic", "Enhanced", "Featured (Top of Search)"] },
+                { name: "Profile Photos", values: ["5 Photos", "15 Photos", "Unlimited Photos"] },
+                { name: "School Description", values: [true, true, true] },
+                { name: "Contact Information", values: [true, true, true] },
+                { name: "Class-wise Details", values: ["Limited", "Full Details", "Full + Fee Structure"] },
+                { name: "Verified Badge", values: [false, true, true] },
+                { name: "Featured Badge", values: [false, false, true] },
+              ]},
+              { category: "Admission Forms", features: [
+                { name: "Number of Forms", values: ["1 Form", "2 Forms", "3 Forms"] },
+                { name: "Customizable Forms", values: ["Standard Only", "1 Customizable", "2 Customizable"] },
+                { name: "Common Admission Form", values: [true, true, true] },
+                { name: "QR-Based Admission", values: ["Digital QR", "1 Physical QR", "Physical + Profile QR"] },
+                { name: "Response Tracking", values: ["Monthly", "Day-wise + Excel", "Priority + Day-wise + Excel"] },
+                { name: "Priority Lead Alerts", values: [false, false, true] },
+              ]},
+              { category: "Marketing & Engagement", features: [
+                { name: "Job Posting / Hiring", values: [false, true, true] },
+                { name: "Event Posting", values: [false, "Public / Private", "Public / Private + Promotion"] },
+                { name: "Social Media Integration", values: [false, false, true] },
+                { name: "Video Promotion", values: [false, false, true] },
+                { name: "Dedicated Support", values: ["Email", "Email + Chat", "Priority Support"] },
+              ]},
+            ].map((section) => (
+              <div key={section.category}>
+                {/* Section Header */}
+                <div className="grid grid-cols-4">
+                  <div className="col-span-4 p-3 md:p-4 bg-muted/20 border-b border-border/30 font-bold text-sm text-primary flex items-center gap-2">
+                    {section.category === "Profile & Listing" && <Users className="h-4 w-4" />}
+                    {section.category === "Admission Forms" && <FileText className="h-4 w-4" />}
+                    {section.category === "Marketing & Engagement" && <Briefcase className="h-4 w-4" />}
+                    {section.category}
+                  </div>
+                </div>
+                {/* Feature Rows */}
+                {section.features.map((feature) => (
+                  <div key={feature.name} className="grid grid-cols-4 hover:bg-muted/10 transition-colors">
+                    <div className="p-3 md:p-4 border-b border-r border-border/30 text-sm text-muted-foreground">{feature.name}</div>
+                    {feature.values.map((val, i) => (
+                      <div key={i} className={`p-3 md:p-4 border-b border-border/30 text-center text-sm ${i < 2 ? "border-r border-border/30" : ""} ${i === 1 ? "bg-primary/5" : ""}`}>
+                        {val === true ? (
+                          <Check className="h-5 w-5 text-green-500 mx-auto" />
+                        ) : val === false ? (
+                          <X className="h-5 w-5 text-muted-foreground/30 mx-auto" />
+                        ) : (
+                          <span className="font-medium text-foreground">{val}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            {/* Price Row */}
+            <div className="grid grid-cols-4 bg-muted/20">
+              <div className="p-4 md:p-5 border-r border-border/30 font-bold text-sm">Price</div>
+              {plans.map((plan, i) => (
+                <div key={plan.name} className={`p-4 md:p-5 text-center ${i < 2 ? "border-r border-border/30" : ""} ${i === 1 ? "bg-primary/5" : ""}`}>
+                  <span className="text-2xl font-extrabold text-gradient">{plan.price}</span>
+                  <span className="text-sm text-muted-foreground">{plan.period}</span>
+                  <div className="mt-3">
+                    <Button onClick={() => handleBuy(plan.name, plan.price)} disabled={loading === plan.name} size="sm" className="rounded-xl gradient-primary border-0 shadow-lg shadow-primary/20">
+                      {loading === plan.name ? "Processing..." : "Choose Plan"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* ERP Plans */}

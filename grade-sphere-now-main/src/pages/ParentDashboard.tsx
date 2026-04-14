@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClipboardList, Heart, BookOpen, Loader2, MapPin, Star, Trash2, ExternalLink } from "lucide-react";
+import { ClipboardList, Heart, BookOpen, Loader2, MapPin, Star, Trash2, ExternalLink, Baby, GraduationCap, Calendar, FileText, Bell } from "lucide-react";
 import { toast } from "sonner";
 
 function useMyAdmissions(email: string | undefined) {
@@ -126,6 +126,7 @@ export default function ParentDashboard() {
         <Tabs defaultValue="admissions">
           <TabsList className="mb-6">
             <TabsTrigger value="admissions">Admissions</TabsTrigger>
+            <TabsTrigger value="mychild">My Child</TabsTrigger>
             <TabsTrigger value="saved">Saved Schools</TabsTrigger>
             <TabsTrigger value="bookings">Tutor Bookings</TabsTrigger>
           </TabsList>
@@ -176,6 +177,128 @@ export default function ParentDashboard() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="mychild">
+            <div className="space-y-6">
+              {/* My Child Info Card */}
+              <Card className="bg-card/60 backdrop-blur-sm border-border/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Baby className="h-5 w-5 text-primary" />My Child's Profile</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {admissions.length > 0 ? (
+                    <div className="space-y-4">
+                      {admissions.map((a: any) => (
+                        <div key={a.id} className="p-4 rounded-xl bg-accent/20 border border-border/30 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-lg font-bold text-primary-foreground shadow-md">
+                                {a.student_name?.[0]?.toUpperCase() || "S"}
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-foreground">{a.student_name}</h4>
+                                <p className="text-xs text-muted-foreground">Grade {a.grade}</p>
+                              </div>
+                            </div>
+                            <Badge className={statusColor[a.status] || statusColor.pending}>{a.status}</Badge>
+                          </div>
+
+                          {/* School Info */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <GraduationCap className="h-4 w-4 text-primary shrink-0" />
+                              <span>School: <span className="font-medium text-foreground">{a.schools?.name || "—"}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Calendar className="h-4 w-4 text-secondary shrink-0" />
+                              <span>Applied: <span className="font-medium text-foreground">{new Date(a.created_at).toLocaleDateString()}</span></span>
+                            </div>
+                          </div>
+
+                          {/* Quick Actions */}
+                          <div className="flex items-center gap-2 pt-2 border-t border-border/20">
+                            {a.schools?.slug && (
+                              <Link to={`/school/${a.schools.slug}`}>
+                                <Button variant="outline" size="sm" className="rounded-lg text-xs border-primary/30 text-primary hover:bg-primary/10 gap-1">
+                                  <ExternalLink className="h-3 w-3" /> View School
+                                </Button>
+                              </Link>
+                            )}
+                            <Link to="/tutors">
+                              <Button variant="outline" size="sm" className="rounded-lg text-xs border-border/30 gap-1">
+                                <BookOpen className="h-3 w-3" /> Find Tuition
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Baby className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                      <p className="mb-2">No child data available yet.</p>
+                      <p className="text-sm">Apply to a school to start tracking your child's education journey.</p>
+                      <Link to="/schools"><Button className="mt-4 rounded-xl gradient-primary border-0 shadow-lg shadow-primary/20">Browse Schools</Button></Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Education Overview Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-card/60 backdrop-blur-sm border-border/30">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                        <FileText className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">Homework & Notes</h4>
+                        <p className="text-xs text-muted-foreground">Study materials from school</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground bg-accent/20 rounded-lg p-3 border border-border/20">
+                      Homework tracking and study material sharing will be available once your school activates the ERP module.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/60 backdrop-blur-sm border-border/30">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg">
+                        <ClipboardList className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">Exam & Test Details</h4>
+                        <p className="text-xs text-muted-foreground">Upcoming exams and results</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground bg-accent/20 rounded-lg p-3 border border-border/20">
+                      Exam schedules and test results will appear here once the school enables academic tracking.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card/60 backdrop-blur-sm border-border/30">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg">
+                        <Bell className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">School Notifications</h4>
+                        <p className="text-xs text-muted-foreground">Announcements & updates</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground bg-accent/20 rounded-lg p-3 border border-border/20">
+                      Follow your school's page to receive announcements, events, and important updates.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="saved">

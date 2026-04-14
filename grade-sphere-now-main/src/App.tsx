@@ -24,6 +24,7 @@ import AuthPage from "@/pages/AuthPage";
 import NotFound from "@/pages/NotFound";
 import CompareSchoolsPage from "@/pages/CompareSchoolsPage";
 import ParentDashboard from "@/pages/ParentDashboard";
+import HomePage from "@/pages/HomePage";
 
 // Admin
 import AdminLayout from "@/pages/admin/AdminLayout";
@@ -78,7 +79,7 @@ function AppShell() {
         <div className="flex-grow">
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<Navigate to="/schools" replace />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/schools" element={<SchoolsPage />} />
         <Route path="/school/:slug" element={<SchoolProfilePage />} />
         <Route path="/events" element={<EventsPage />} />
