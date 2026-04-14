@@ -25,6 +25,9 @@ import NotFound from "@/pages/NotFound";
 import CompareSchoolsPage from "@/pages/CompareSchoolsPage";
 import ParentDashboard from "@/pages/ParentDashboard";
 import HomePage from "@/pages/HomePage";
+import TeacherProfilePage from "@/pages/TeacherProfilePage";
+import ScannerPage from "@/pages/ScannerPage";
+import SchoolCommunityPage from "@/pages/SchoolCommunityPage";
 
 // Admin
 import AdminLayout from "@/pages/admin/AdminLayout";
@@ -95,6 +98,9 @@ function AppShell() {
         <Route path="/upload-school" element={<UploadSchoolPage />} />
         <Route path="/compare" element={<CompareSchoolsPage />} />
         <Route path="/dashboard" element={<ParentDashboard />} />
+        <Route path="/teacher-profile" element={<TeacherProfilePage />} />
+        <Route path="/scanner" element={<ScannerPage />} />
+        <Route path="/community" element={<SchoolCommunityPage />} />
         <Route path="/auth" element={<AuthPage />} />
 
         {/* Admin routes */}
