@@ -7,7 +7,8 @@ import QRCode from "react-qr-code";
 import {
   MapPin, Star, Award, BookOpen, Briefcase, CheckCircle, ChevronRight, Loader2,
   Image, MessageSquare, GraduationCap, Send, Sparkles, Heart, Calendar, DollarSign, Users, Clock,
-  Phone, Mail, Globe, Shield, Target, Building2, Lightbulb, Trophy, IndianRupee
+  Phone, Mail, Globe, Shield, Target, Building2, Lightbulb, Trophy, IndianRupee,
+  CalendarDays, Play, Instagram, Facebook, ExternalLink, Video
 } from "lucide-react";
 import AskAIChat from "@/components/AskAIChat";
 import QrOrderDialog from "@/components/QrOrderDialog";
@@ -23,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import StarRating from "@/components/StarRating";
 import { useAuth } from "@/hooks/useAuth";
-import { useSchoolBySlug, useReviews, useAddReview, useSubmitAdmission, useJobs, useSubmitJobApplication } from "@/hooks/useData";
+import { useSchoolBySlug, useReviews, useAddReview, useSubmitAdmission, useJobs, useSubmitJobApplication, useEvents } from "@/hooks/useData";
 import { useSavedSchoolIds, useToggleSaveSchool } from "@/hooks/useSaveSchool";
 
 const reviewSchema = z.object({ author: z.string().min(2), rating: z.number().min(1).max(5), comment: z.string().min(10) });
@@ -37,6 +38,7 @@ export default function SchoolProfilePage() {
   const { data: school, isLoading } = useSchoolBySlug(slug);
   const { data: reviews = [] } = useReviews(school?.id);
   const { data: allJobs = [] } = useJobs();
+  const { data: allEvents = [] } = useEvents();
   const { user } = useAuth();
   const addReview = useAddReview();
   const submitAdmission = useSubmitAdmission();
@@ -46,6 +48,7 @@ export default function SchoolProfilePage() {
   const isSaved = school ? savedIds?.has(school.id) ?? false : false;
 
   const schoolJobs = allJobs.filter((j) => j.school_id === school?.id);
+  const schoolEvents = allEvents.filter((e: any) => e.school_id === school?.id || (e.school_name && school?.name && e.school_name === school.name));
 
   const reviewForm = useForm<z.infer<typeof reviewSchema>>({ resolver: zodResolver(reviewSchema), defaultValues: { author: "", rating: 5, comment: "" } });
   const admissionForm = useForm<z.infer<typeof admissionSchema>>({ resolver: zodResolver(admissionSchema), defaultValues: { studentName: "", parentName: "", email: "", phone: "", grade: "" } });
@@ -72,6 +75,7 @@ export default function SchoolProfilePage() {
     { value: "about", icon: BookOpen, label: "About" },
     { value: "fees", icon: IndianRupee, label: "Fees" },
     { value: "gallery", icon: Image, label: "Gallery" },
+    { value: "events", icon: CalendarDays, label: "Events" },
     { value: "reviews", icon: MessageSquare, label: "Reviews" },
     { value: "vacancies", icon: Briefcase, label: "Vacancies" },
     { value: "admission", icon: GraduationCap, label: "Admission" },
@@ -187,6 +191,21 @@ export default function SchoolProfilePage() {
                       <div className="flex items-center gap-3 text-sm text-muted-foreground"><Phone className="h-4 w-4 text-primary shrink-0" /><span>+91 98765 43210</span></div>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground"><MapPin className="h-4 w-4 text-primary shrink-0" /><span>{school.location}</span></div>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground"><Globe className="h-4 w-4 text-primary shrink-0" /><span>www.{school.slug}.edu</span></div>
+                      {/* Social Media Links */}
+                      <div className="pt-4 border-t border-border/30">
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-3">Follow Us</p>
+                        <div className="flex items-center gap-2">
+                          <a href={`https://instagram.com/${school.slug}`} target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                            <Instagram className="h-4 w-4" />
+                          </a>
+                          <a href={`https://facebook.com/${school.slug}`} target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                            <Facebook className="h-4 w-4" />
+                          </a>
+                          <a href={`https://${school.slug}.edu`} target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-lg bg-accent/30 border border-border/30 flex items-center justify-center text-muted-foreground hover:text-primary hover:scale-110 transition-all shadow-sm">
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -244,6 +263,27 @@ export default function SchoolProfilePage() {
               </Card>
             </motion.div>
 
+            {/* Video Showcase */}
+            <motion.div {...fadeUp} transition={{ delay: 0.25 }}>
+              <Card className="bg-card/60 backdrop-blur-sm border-border/30">
+                <CardHeader><CardTitle className="flex items-center gap-2 text-xl"><Video className="h-5 w-5 text-primary" />School Video Tour</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="rounded-2xl overflow-hidden border border-border/30 relative group cursor-pointer aspect-video">
+                    <img src={school.banner} alt={`${school.name} video tour`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-transparent flex items-center justify-center">
+                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="h-16 w-16 rounded-full gradient-primary flex items-center justify-center shadow-2xl shadow-primary/40">
+                        <Play className="h-7 w-7 text-primary-foreground ml-1" />
+                      </motion.div>
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h4 className="text-sm font-bold text-foreground">Take a virtual tour of {school.name}</h4>
+                      <p className="text-xs text-muted-foreground">Explore our campus, classrooms, and facilities</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
             {/* Why Choose */}
             <motion.div {...fadeUp} transition={{ delay: 0.3 }}>
               <Card className="bg-card/60 backdrop-blur-sm border-border/30">
@@ -295,6 +335,40 @@ export default function SchoolProfilePage() {
                 </CardContent>
               </Card>
             </motion.div>
+          </TabsContent>
+
+          {/* EVENTS TAB */}
+          <TabsContent value="events" className="space-y-4">
+            {schoolEvents.length === 0 ? (
+              <div className="text-center py-16">
+                <CalendarDays className="h-12 w-12 text-muted-foreground/20 mx-auto mb-4" />
+                <p className="text-muted-foreground">No events listed for this school currently.</p>
+                <a href="/events"><Button variant="outline" className="mt-4 rounded-xl border-border/40 font-semibold">Browse All Events</Button></a>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {schoolEvents.map((event: any, i: number) => (
+                  <motion.div key={event.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+                    <Card className="bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/20 transition-colors overflow-hidden group">
+                      {event.image && (
+                        <div className="relative overflow-hidden aspect-video">
+                          <img src={event.image} alt={event.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"; }} />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
+                          <div className="absolute bottom-3 left-3">
+                            <Badge className="gradient-primary text-primary-foreground border-0 shadow-lg text-xs">{event.event_date}</Badge>
+                          </div>
+                        </div>
+                      )}
+                      <CardContent className="pt-4">
+                        <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{event.title}</h3>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2"><MapPin className="h-3.5 w-3.5 text-primary" />{event.location}</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed mt-2 line-clamp-2">{event.description}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           {/* GALLERY TAB */}

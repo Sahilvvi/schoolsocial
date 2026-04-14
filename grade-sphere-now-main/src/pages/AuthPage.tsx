@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { GraduationCap, ArrowRight, UserPlus, LogIn, Shield, Zap, Star, Mail, Lock, User, Eye, EyeOff, CheckCircle, Sparkles } from "lucide-react";
+import { GraduationCap, ArrowRight, UserPlus, LogIn, Shield, Zap, Star, Mail, Lock, User, Eye, EyeOff, CheckCircle, Sparkles, School, BookOpen, Users, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
@@ -12,7 +12,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({ email: z.string().email("Please enter a valid email"), password: z.string().min(6, "Password must be at least 6 characters") });
-const signupSchema = z.object({ name: z.string().min(2, "Name is required"), email: z.string().email("Please enter a valid email"), password: z.string().min(6, "Password must be at least 6 characters") });
+const signupSchema = z.object({ name: z.string().min(2, "Name is required"), email: z.string().email("Please enter a valid email"), password: z.string().min(6, "Password must be at least 6 characters"), role: z.string().min(1, "Please select a role") });
+
+const roleOptions = [
+  { value: "parent", label: "Parent", icon: Users, desc: "Find schools & track admissions" },
+  { value: "teacher", label: "Teacher", icon: User, desc: "Find jobs & create your profile" },
+  { value: "school", label: "School", icon: School, desc: "List your school & manage admissions" },
+  { value: "tuition_center", label: "Tuition Center", icon: Building2, desc: "List batches & manage students" },
+];
 
 const benefits = [
   { icon: Star, text: "Access verified school reviews & ratings" },
@@ -47,7 +54,7 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
-  const signupForm = useForm<z.infer<typeof signupSchema>>({ resolver: zodResolver(signupSchema), defaultValues: { name: "", email: "", password: "" } });
+  const signupForm = useForm<z.infer<typeof signupSchema>>({ resolver: zodResolver(signupSchema), defaultValues: { name: "", email: "", password: "", role: "" } });
 
   const handleLogin = async (data: z.infer<typeof loginSchema>) => {
     const { error } = await signIn(data.email, data.password);
@@ -65,7 +72,11 @@ export default function AuthPage() {
     const { error } = await signUp(data.email, data.password, data.name);
     if (error) { toast.error(error.message); return; }
     toast.success("Account created successfully! 🎉");
-    navigate("/schools");
+    // Navigate based on role
+    if (data.role === "school") { navigate("/upload-school"); }
+    else if (data.role === "teacher") { navigate("/jobs"); }
+    else if (data.role === "tuition_center") { navigate("/tuition-enquiry"); }
+    else { navigate("/schools"); }
   };
 
   const passToggle = showPass
@@ -204,6 +215,39 @@ export default function AuthPage() {
                   <motion.div key="signup" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.2 }}>
                     <Form {...signupForm}>
                       <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
+                        {/* Role Selection */}
+                        <FormField control={signupForm.control} name="role" render={({ field }) => (
+                          <FormItem>
+                            <div className="grid grid-cols-2 gap-2">
+                              {roleOptions.map((role) => {
+                                const isSelected = field.value === role.value;
+                                const RoleIcon = role.icon;
+                                return (
+                                  <button
+                                    key={role.value}
+                                    type="button"
+                                    onClick={() => field.onChange(role.value)}
+                                    className={`flex items-center gap-2.5 p-3 rounded-xl border-2 text-left transition-all duration-200 ${
+                                      isSelected
+                                        ? "border-primary/50 bg-primary/10 shadow-md shadow-primary/10"
+                                        : "border-border/30 bg-muted/10 hover:border-border/60 hover:bg-muted/20"
+                                    }`}
+                                  >
+                                    <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? "gradient-primary shadow-md" : "bg-muted/30"}`}>
+                                      <RoleIcon className={`h-4 w-4 ${isSelected ? "text-primary-foreground" : "text-muted-foreground"}`} />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className={`text-xs font-bold leading-tight ${isSelected ? "text-primary" : "text-foreground"}`}>{role.label}</p>
+                                      <p className="text-[10px] text-muted-foreground leading-tight truncate">{role.desc}</p>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <FormMessage className="text-xs ml-1 mt-1" />
+                          </FormItem>
+                        )} />
+
                         <FormField control={signupForm.control} name="name" render={({ field }) => (
                           <FormItem>
                             <FormControl>
