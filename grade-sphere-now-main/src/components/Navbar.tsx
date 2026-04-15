@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   GraduationCap, Menu, X, User, LogOut,
   School, CalendarDays, Briefcase, BookOpen, Newspaper,
-  Crown, MessageSquare, ChevronDown, Upload, Settings, LayoutDashboard, GitCompareArrows,
+  Crown, MessageSquare, ChevronDown, Upload, LayoutDashboard, GitCompareArrows,
   QrCode, Globe, UserCircle
 } from "lucide-react";
 import GlobalSearch from "@/components/GlobalSearch";
@@ -140,29 +140,50 @@ export default function Navbar() {
           <NotificationBell />
           <ThemeToggle />
 
-          <div className="flex items-center gap-2">
-            {user ? (
-              <Link to="/school-panel">
-                <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">School Panel</span>
-                </Button>
-              </Link>
-            ) : (
-              <Link to="/erp">
-                <Button size="sm" className="h-8 rounded-lg bg-muted border-0 text-foreground shadow-sm hover:bg-muted/80 transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
-                  <Settings className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">ERP Login</span>
-                </Button>
-              </Link>
-            )}
-          </div>
+          {user && user.user_metadata?.role === "school" && (
+            <Link to="/school-panel">
+              <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">School Panel</span>
+              </Button>
+            </Link>
+          )}
+          {user && user.user_metadata?.role === "parent" && (
+            <Link to="/dashboard">
+              <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">My Dashboard</span>
+              </Button>
+            </Link>
+          )}
+          {user && user.user_metadata?.role === "teacher" && (
+            <Link to="/teacher-profile">
+              <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">My Profile</span>
+              </Button>
+            </Link>
+          )}
+          {user && user.user_metadata?.role === "tuition_center" && (
+            <Link to="/tuition-dashboard">
+              <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Tuition Panel</span>
+              </Button>
+            </Link>
+          )}
 
           {/* Auth */}
           <div className="ml-2 pl-2 border-l border-border/40">
             {user ? (
               <div className="flex items-center gap-1.5">
-              <Link to="/dashboard">
+              <Link to={
+                user.user_metadata?.role === "school" ? "/school-panel" :
+                user.user_metadata?.role === "teacher" ? "/teacher-profile" :
+                user.user_metadata?.role === "tuition_center" ? "/tuition-dashboard" :
+                user.user_metadata?.role === "admin" ? "/admin" :
+                "/dashboard"
+              }>
                 <div className="h-7 w-7 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground shadow-md cursor-pointer">
                   {user.email?.[0]?.toUpperCase()}
                 </div>
