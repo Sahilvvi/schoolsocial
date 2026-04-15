@@ -1,13 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DUMMY_SCHOOLS, DUMMY_EVENTS, DUMMY_JOBS, DUMMY_TUTORS, DUMMY_NEWS,
+  DUMMY_REVIEWS, DUMMY_ADMISSIONS, DUMMY_JOB_APPLICATIONS, DUMMY_TUTOR_BOOKINGS,
+  DUMMY_TUITION_ENQUIRIES, DUMMY_QR_ORDERS, DUMMY_BATCHES,
+  getDummyCount, getDummyTableData,
+} from "@/data/dummyData";
+
+// Helper: return dummy data when Supabase returns empty or errors
+function withFallback<T>(data: T[] | null | undefined, fallback: T[]): T[] {
+  return data && data.length > 0 ? data : fallback;
+}
 
 export function useSchools() {
   return useQuery({
     queryKey: ["schools"],
     queryFn: async () => {
       const { data, error } = await supabase.from("schools").select("*").order("is_featured", { ascending: false }).order("rating", { ascending: false });
-      if (error) throw error;
-      return data;
+      if (error) return DUMMY_SCHOOLS;
+      return withFallback(data, DUMMY_SCHOOLS);
     },
   });
 }
@@ -17,7 +28,11 @@ export function useSchoolBySlug(slug: string | undefined) {
     queryKey: ["school", slug],
     queryFn: async () => {
       const { data, error } = await supabase.from("schools").select("*").eq("slug", slug!).single();
-      if (error) throw error;
+      if (error || !data) {
+        const dummy = DUMMY_SCHOOLS.find((s) => s.slug === slug);
+        if (dummy) return dummy;
+        throw error || new Error("School not found");
+      }
       return data;
     },
     enabled: !!slug,
@@ -29,8 +44,8 @@ export function useReviews(schoolId: string | undefined) {
     queryKey: ["reviews", schoolId],
     queryFn: async () => {
       const { data, error } = await supabase.from("reviews").select("*").eq("school_id", schoolId!).order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      if (error) return DUMMY_REVIEWS.filter((r) => r.school_id === schoolId);
+      return withFallback(data, DUMMY_REVIEWS.filter((r) => r.school_id === schoolId));
     },
     enabled: !!schoolId,
   });
@@ -65,8 +80,8 @@ export function useJobs() {
     queryKey: ["jobs"],
     queryFn: async () => {
       const { data, error } = await supabase.from("jobs").select("*").order("posted_date", { ascending: false });
-      if (error) throw error;
-      return data;
+      if (error) return DUMMY_JOBS;
+      return withFallback(data, DUMMY_JOBS);
     },
   });
 }
@@ -86,8 +101,8 @@ export function useTutors() {
     queryKey: ["tutors"],
     queryFn: async () => {
       const { data, error } = await supabase.from("tutors").select("*").order("rating", { ascending: false });
-      if (error) throw error;
-      return data;
+      if (error) return DUMMY_TUTORS;
+      return withFallback(data, DUMMY_TUTORS);
     },
   });
 }
@@ -107,8 +122,8 @@ export function useEvents() {
     queryKey: ["events"],
     queryFn: async () => {
       const { data, error } = await supabase.from("events").select("*").order("event_date", { ascending: true });
-      if (error) throw error;
-      return data;
+      if (error) return DUMMY_EVENTS;
+      return withFallback(data, DUMMY_EVENTS);
     },
   });
 }
@@ -118,7 +133,79 @@ export function useNews() {
     queryKey: ["news"],
     queryFn: async () => {
       const { data, error } = await supabase.from("news").select("*").order("published_date", { ascending: false });
-      if (error) throw error;
+      if (error) return DUMMY_NEWS;
+      return withFallback(data, DUMMY_NEWS);
+    },
+  });
+}
+
+// ─── Additional hooks used by admin pages ───
+
+export function useAdmissions() {
+  return useQuery({
+    queryKey: ["admissions"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("admissions").select("*").order("created_at", { ascending: false });
+      if (error) return DUMMY_ADMISSIONS;
+      return withFallback(data, DUMMY_ADMISSIONS);
+    },
+  });
+}
+
+export function useJobApplications() {
+  return useQuery({
+    queryKey: ["job_applications"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("job_applications").select("*").order("created_at", { ascending: false });
+      if (error) return DUMMY_JOB_APPLICATIONS;
+      return withFallback(data, DUMMY_JOB_APPLICATIONS);
+    },
+  });
+}
+
+export function useTutorBookings() {
+  return useQuery({
+    queryKey: ["tutor_bookings"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tutor_bookings").select("*").order("created_at", { ascending: false });
+      if (error) return DUMMY_TUTOR_BOOKINGS;
+      return withFallback(data, DUMMY_TUTOR_BOOKINGS);
+    },
+  });
+}
+
+export function useTuitionEnquiries() {
+  return useQuery({
+    queryKey: ["tuition_enquiries"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tuition_enquiries").select("*").order("created_at", { ascending: false });
+      if (error) return DUMMY_TUITION_ENQUIRIES;
+      return withFallback(data, DUMMY_TUITION_ENQUIRIES);
+    },
+  });
+}
+
+// Count helper with dummy fallback
+export function useCount(table: string) {
+  return useQuery({
+    queryKey: [table, "count"],
+    queryFn: async () => {
+      const { count, error } = await supabase.from(table as any).select("*", { count: "exact", head: true });
+      if (error || count === 0 || count === null) return getDummyCount(table);
+      return count;
+    },
+  });
+}
+
+// Admissions by day for admin chart
+export function useAdmissionsByDay() {
+  return useQuery({
+    queryKey: ["admissions-by-day"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("admissions").select("created_at").order("created_at", { ascending: true });
+      if (error || !data || data.length === 0) {
+        return DUMMY_ADMISSIONS.map((a) => ({ created_at: a.created_at }));
+      }
       return data;
     },
   });

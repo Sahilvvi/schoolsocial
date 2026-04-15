@@ -1,5 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DUMMY_ATTENDANCE, DUMMY_FEE_RECORDS, DUMMY_HOMEWORK, DUMMY_BATCHES,
+  DUMMY_NOTIFICATIONS, DUMMY_QR_ORDERS,
+} from "@/data/dummyData";
+
+function withFallback<T>(data: T[] | null | undefined, fallback: T[]): T[] {
+  return data && data.length > 0 ? data : fallback;
+}
 
 // Attendance
 export function useAttendance(schoolId: string, date?: string) {
@@ -9,8 +17,9 @@ export function useAttendance(schoolId: string, date?: string) {
       let q = supabase.from("attendance_records").select("*").eq("school_id", schoolId);
       if (date) q = q.eq("attendance_date", date);
       const { data, error } = await q.order("person_name");
-      if (error) throw error;
-      return data;
+      const fallback = DUMMY_ATTENDANCE.filter((a) => a.school_id === schoolId && (!date || a.attendance_date === date));
+      if (error) return fallback;
+      return withFallback(data, fallback);
     },
     enabled: !!schoolId,
   });
@@ -34,8 +43,9 @@ export function useFeeRecords(schoolId: string) {
     queryKey: ["fee-records", schoolId],
     queryFn: async () => {
       const { data, error } = await supabase.from("fee_records").select("*").eq("school_id", schoolId).order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      const fallback = DUMMY_FEE_RECORDS.filter((f) => f.school_id === schoolId);
+      if (error) return fallback;
+      return withFallback(data, fallback);
     },
     enabled: !!schoolId,
   });
@@ -59,8 +69,9 @@ export function useHomework(schoolId: string) {
     queryKey: ["homework", schoolId],
     queryFn: async () => {
       const { data, error } = await supabase.from("homework_notes").select("*").eq("school_id", schoolId).order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      const fallback = DUMMY_HOMEWORK.filter((h) => h.school_id === schoolId);
+      if (error) return fallback;
+      return withFallback(data, fallback);
     },
     enabled: !!schoolId,
   });
@@ -86,8 +97,9 @@ export function useTuitionBatches(tutorId?: string) {
       let q = supabase.from("tuition_batches").select("*");
       if (tutorId) q = q.eq("tutor_id", tutorId);
       const { data, error } = await q.order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      const fallback = tutorId ? DUMMY_BATCHES.filter((b) => b.tutor_id === tutorId) : DUMMY_BATCHES;
+      if (error) return fallback;
+      return withFallback(data, fallback);
     },
   });
 }
@@ -110,8 +122,9 @@ export function useNotifications(userId?: string) {
     queryKey: ["notifications", userId],
     queryFn: async () => {
       const { data, error } = await supabase.from("notifications").select("*").eq("user_id", userId!).order("created_at", { ascending: false }).limit(50);
-      if (error) throw error;
-      return data;
+      const fallback = DUMMY_NOTIFICATIONS.filter((n) => n.user_id === userId);
+      if (error) return fallback;
+      return withFallback(data, fallback);
     },
     enabled: !!userId,
   });
@@ -134,8 +147,8 @@ export function useQrOrders() {
     queryKey: ["qr-orders"],
     queryFn: async () => {
       const { data, error } = await supabase.from("qr_orders").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      if (error) return DUMMY_QR_ORDERS;
+      return withFallback(data, DUMMY_QR_ORDERS);
     },
   });
 }

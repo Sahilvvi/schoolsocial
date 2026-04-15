@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ClipboardList, Eye, Star, Calendar, Briefcase, Image, QrCode, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { DUMMY_ADMISSIONS, DUMMY_SCHOOL_VIEWS, DUMMY_REVIEWS, DUMMY_EVENTS, DUMMY_JOBS } from "@/data/dummyData";
 
 export default function SPDashboard() {
   const { school } = useOutletContext<any>();
@@ -14,7 +15,8 @@ export default function SPDashboard() {
     queryKey: ["sp-admissions", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("admissions").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
     },
   });
 
@@ -22,7 +24,8 @@ export default function SPDashboard() {
     queryKey: ["sp-views", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("school_views").select("id").eq("school_id", school.id);
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_SCHOOL_VIEWS.filter((v) => v.school_id === school.id);
     },
   });
 
@@ -30,7 +33,8 @@ export default function SPDashboard() {
     queryKey: ["sp-reviews", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("reviews").select("id, rating, author, comment, created_at, status").eq("school_id", school.id).order("created_at", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_REVIEWS.filter((r) => r.school_id === school.id);
     },
   });
 
@@ -38,7 +42,8 @@ export default function SPDashboard() {
     queryKey: ["sp-events", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("events").select("id, title, event_date").eq("school_id", school.id).order("event_date", { ascending: true }).limit(5);
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_EVENTS.filter((e) => e.school_id === school.id).slice(0, 5);
     },
   });
 
@@ -46,7 +51,8 @@ export default function SPDashboard() {
     queryKey: ["sp-jobs-count", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("jobs").select("id").eq("school_id", school.id);
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_JOBS.filter((j) => j.school_id === school.id);
     },
   });
 

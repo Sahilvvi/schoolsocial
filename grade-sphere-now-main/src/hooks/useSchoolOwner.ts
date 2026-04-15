@@ -1,12 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { DEMO_USERS, DEMO_SCHOOL_OWNERSHIP } from "@/data/dummyData";
 
 export function useSchoolOwner() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["school-owner", user?.id],
     queryFn: async () => {
+      // Demo school owner bypass
+      if (user?.id === DEMO_USERS.school.id) {
+        return DEMO_SCHOOL_OWNERSHIP;
+      }
+
       const { data, error } = await supabase
         .from("school_owners")
         .select("*, schools(*)")

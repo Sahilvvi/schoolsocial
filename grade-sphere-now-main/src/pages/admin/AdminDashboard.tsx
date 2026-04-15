@@ -1,34 +1,10 @@
 import { motion } from "framer-motion";
 import { School, Calendar, Briefcase, BookOpen, Newspaper, ClipboardList, Users, MessageSquare, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSchools, useEvents, useJobs, useTutors, useNews } from "@/hooks/useData";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useSchools, useEvents, useJobs, useTutors, useNews, useCount, useAdmissionsByDay } from "@/hooks/useData";
 import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useMemo } from "react";
-
-function useCount(table: string) {
-  return useQuery({
-    queryKey: [table, "count"],
-    queryFn: async () => {
-      const { count, error } = await supabase.from(table as any).select("*", { count: "exact", head: true });
-      if (error) return 0;
-      return count || 0;
-    },
-  });
-}
-
-function useAdmissionsByDay() {
-  return useQuery({
-    queryKey: ["admissions-by-day"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("admissions").select("created_at").order("created_at", { ascending: true });
-      if (error) return [];
-      return data;
-    },
-  });
-}
 
 export default function AdminDashboard() {
   const { data: schools = [] } = useSchools();

@@ -4,20 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useTuitionEnquiries } from "@/hooks/useData";
 import { useAdminDelete, useAdminUpdate } from "@/hooks/useAdminCrud";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function AdminTuitionEnquiries() {
-  const { data: enquiries = [], isLoading } = useQuery({
-    queryKey: ["tuition_enquiries"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("tuition_enquiries").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: enquiries = [], isLoading } = useTuitionEnquiries();
   const updateMut = useAdminUpdate("tuition_enquiries");
   const deleteMut = useAdminDelete("tuition_enquiries");
 

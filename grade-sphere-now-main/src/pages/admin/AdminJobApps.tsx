@@ -4,19 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useJobApplications } from "@/hooks/useData";
 import { useAdminDelete } from "@/hooks/useAdminCrud";
 
 export default function AdminJobApps() {
-  const { data: apps = [], isLoading } = useQuery({
-    queryKey: ["job_applications"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("job_applications").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: apps = [], isLoading } = useJobApplications();
   const deleteMut = useAdminDelete("job_applications");
   const handleDelete = async (id: string) => { if (!confirm("Delete?")) return; try { await deleteMut.mutateAsync(id); toast.success("Deleted"); } catch (e: any) { toast.error(e.message); } };
 
