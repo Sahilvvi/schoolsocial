@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Save, BookOpen, Users, Clock, IndianRupee, TrendingUp, Plus, Trash2 } from "lucide-react";
 
 export default function TuPBatches() {
-  const { batches: initialBatches } = useOutletContext<any>();
+  const { batches: initialBatches, updateBatches } = useOutletContext<any>();
   const [batches, setBatches] = useState(initialBatches.map((b: any) => ({ ...b })));
 
   const updateBatch = (index: number, key: string, value: any) => {
@@ -30,6 +30,7 @@ export default function TuPBatches() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    if (updateBatches) updateBatches(batches);
     toast.success("Batches updated!");
   };
 

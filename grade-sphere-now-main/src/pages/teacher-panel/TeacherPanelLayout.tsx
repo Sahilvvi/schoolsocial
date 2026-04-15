@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isDemoEmail } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 const navItems = [
   { label: "Dashboard", path: "/teacher-panel", icon: LayoutDashboard },
@@ -60,7 +61,9 @@ const defaultTeacher = {
 export default function TeacherPanelLayout() {
   const { user, loading, signOut } = useAuth();
   const location = useLocation();
-  const [teacherData, setTeacherData] = useState(defaultTeacher);
+  const [teacherData, setTeacherData] = useState(() =>
+    getDemoData("teacher-profile", defaultTeacher)
+  );
 
   if (loading) {
     return (
@@ -73,7 +76,11 @@ export default function TeacherPanelLayout() {
   if (!user) return <Navigate to="/auth" replace />;
 
   const updateTeacher = (updates: Partial<typeof defaultTeacher>) => {
-    setTeacherData(prev => ({ ...prev, ...updates }));
+    setTeacherData(prev => {
+      const next = { ...prev, ...updates };
+      setDemoData("teacher-profile", next);
+      return next;
+    });
   };
 
   return (

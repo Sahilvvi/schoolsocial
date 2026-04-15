@@ -12,10 +12,10 @@ import {
 } from "lucide-react";
 
 export default function PPChildren() {
-  const { admissions, homework } = useOutletContext<any>();
+  const { admissions, homework, children: savedChildren, updateChildren } = useOutletContext<any>();
 
   const [children, setChildren] = useState(
-    admissions.map((a: any) => ({
+    savedChildren || admissions.map((a: any) => ({
       id: a.id,
       name: a.student_name,
       grade: a.grade,
@@ -45,6 +45,7 @@ export default function PPChildren() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    if (updateChildren) updateChildren(children);
     toast.success("Children profiles updated!");
   };
 

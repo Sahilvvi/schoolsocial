@@ -6,7 +6,7 @@ import { Heart, MapPin, Star, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function PPSaved() {
-  const { saved } = useOutletContext<any>();
+  const { saved, updateSavedSchools } = useOutletContext<any>();
 
   return (
     <div>
@@ -41,7 +41,13 @@ export default function PPSaved() {
                     <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-primary/30 text-primary hover:bg-primary/10"><ExternalLink className="h-3.5 w-3.5" /></Button>
                   </Link>
                   <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10"
-                    onClick={() => toast.info("Remove saved school (demo mode)")}>
+                    onClick={() => {
+                      if (updateSavedSchools) {
+                        const updated = saved.filter((item: any) => item.id !== s.id);
+                        updateSavedSchools(updated);
+                      }
+                      toast.success("School removed from saved");
+                    }}>
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>

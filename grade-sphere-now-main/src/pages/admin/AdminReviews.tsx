@@ -9,11 +9,23 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Check, X, Trash2, Loader2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { DUMMY_REVIEWS, DUMMY_SCHOOLS } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 function useAllReviews() {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ["admin-reviews"],
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("admin-reviews", null);
+        if (stored) return stored;
+        const fallback = DUMMY_REVIEWS.map((r) => ({
+          ...r,
+          schools: { name: DUMMY_SCHOOLS.find((s) => s.id === r.school_id)?.name ?? "Unknown School" },
+        }));
+        setDemoData("admin-reviews", fallback);
+        return fallback;
+      }
       const { data, error } = await supabase
         .from("reviews")
         .select("*, schools(name)")
@@ -49,7 +61,12 @@ export default function AdminReviews() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("admin-reviews", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Review updated");
     },
   });
@@ -64,7 +81,12 @@ export default function AdminReviews() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("admin-reviews", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Review deleted");
     },
   });

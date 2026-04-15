@@ -10,6 +10,7 @@ import {
   DUMMY_BATCHES, DUMMY_TUITION_ENQUIRIES, DUMMY_TUTOR_BOOKINGS,
   DUMMY_TUTORS, DUMMY_NOTIFICATIONS
 } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 const navItems = [
   { label: "Dashboard", path: "/tuition-panel", icon: LayoutDashboard },
@@ -36,11 +37,19 @@ const defaultCenter = {
 export default function TuitionPanelLayout() {
   const { user, loading, signOut } = useAuth();
   const location = useLocation();
-  const [centerData, setCenterData] = useState(defaultCenter);
+  const [centerData, setCenterData] = useState(() =>
+    getDemoData("tuition-profile", defaultCenter)
+  );
 
-  const batches = DUMMY_BATCHES;
-  const enquiries = DUMMY_TUITION_ENQUIRIES;
-  const bookings = DUMMY_TUTOR_BOOKINGS;
+  const [batches, setBatches] = useState(() =>
+    getDemoData("tuition-batches", DUMMY_BATCHES)
+  );
+  const [enquiries, setEnquiries] = useState(() =>
+    getDemoData("tuition-enquiries", DUMMY_TUITION_ENQUIRIES)
+  );
+  const [bookings, setBookings] = useState(() =>
+    getDemoData("tuition-bookings", DUMMY_TUTOR_BOOKINGS)
+  );
   const tutors = DUMMY_TUTORS.slice(0, 4);
   const notifications = DUMMY_NOTIFICATIONS.filter(n => n.user_id === "demo-tuition-001").length > 0
     ? DUMMY_NOTIFICATIONS.filter(n => n.user_id === "demo-tuition-001")
@@ -62,7 +71,26 @@ export default function TuitionPanelLayout() {
   if (!user) return <Navigate to="/auth" replace />;
 
   const updateCenter = (updates: Partial<typeof defaultCenter>) => {
-    setCenterData(prev => ({ ...prev, ...updates }));
+    setCenterData(prev => {
+      const next = { ...prev, ...updates };
+      setDemoData("tuition-profile", next);
+      return next;
+    });
+  };
+
+  const updateBatches = (newBatches: any[]) => {
+    setBatches(newBatches);
+    setDemoData("tuition-batches", newBatches);
+  };
+
+  const updateEnquiries = (newEnquiries: any[]) => {
+    setEnquiries(newEnquiries);
+    setDemoData("tuition-enquiries", newEnquiries);
+  };
+
+  const updateBookings = (newBookings: any[]) => {
+    setBookings(newBookings);
+    setDemoData("tuition-bookings", newBookings);
   };
 
   return (
@@ -108,7 +136,7 @@ export default function TuitionPanelLayout() {
       </aside>
 
       <main className="flex-1 ml-64 p-8 min-h-screen">
-        <Outlet context={{ centerData, updateCenter, batches, enquiries, bookings, tutors, notifications }} />
+        <Outlet context={{ centerData, updateCenter, batches, updateBatches, enquiries, updateEnquiries, bookings, updateBookings, tutors, notifications }} />
       </main>
     </div>
   );

@@ -15,6 +15,7 @@ import { Calendar, Plus, Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { DUMMY_EVENTS } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPEvents() {
   const { school } = useOutletContext<any>();
@@ -29,6 +30,13 @@ export default function SPEvents() {
   const { data: events = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("sp-events", null);
+        if (stored) return stored;
+        const fallback = DUMMY_EVENTS.filter((e) => e.school_id === school.id);
+        setDemoData("sp-events", fallback);
+        return fallback;
+      }
       const { data } = await supabase.from("events").select("*").eq("school_id", school.id).order("event_date", { ascending: false });
       if (data && data.length > 0) return data;
       return DUMMY_EVENTS.filter((e) => e.school_id === school.id);
@@ -58,7 +66,12 @@ export default function SPEvents() {
       }
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-events", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success(editing ? "Event updated" : "Event created");
       resetForm();
     },
@@ -75,7 +88,12 @@ export default function SPEvents() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-events", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Event deleted");
     },
   });

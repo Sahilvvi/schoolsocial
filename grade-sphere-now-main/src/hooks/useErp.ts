@@ -6,6 +6,7 @@ import {
   DUMMY_ATTENDANCE, DUMMY_FEE_RECORDS, DUMMY_HOMEWORK, DUMMY_BATCHES,
   DUMMY_NOTIFICATIONS, DUMMY_QR_ORDERS,
 } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 function withFallback<T>(data: T[] | null | undefined, fallback: T[]): T[] {
   return data && data.length > 0 ? data : fallback;
@@ -180,9 +181,16 @@ export function useMarkNotificationRead() {
 
 // QR Orders
 export function useQrOrders() {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ["qr-orders"],
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("admin-qr-orders", null);
+        if (stored) return stored;
+        setDemoData("admin-qr-orders", DUMMY_QR_ORDERS);
+        return DUMMY_QR_ORDERS;
+      }
       const { data, error } = await supabase.from("qr_orders").select("*").order("created_at", { ascending: false });
       if (error) return DUMMY_QR_ORDERS;
       return withFallback(data, DUMMY_QR_ORDERS);

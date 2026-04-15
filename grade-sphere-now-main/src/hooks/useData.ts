@@ -8,6 +8,7 @@ import {
   DUMMY_TUITION_ENQUIRIES, DUMMY_QR_ORDERS, DUMMY_BATCHES,
   getDummyCount, getDummyTableData,
 } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 // Helper: return dummy data when Supabase returns empty or errors
 function withFallback<T>(data: T[] | null | undefined, fallback: T[]): T[] {
@@ -171,9 +172,16 @@ export function useNews() {
 // ─── Additional hooks used by admin pages ───
 
 export function useAdmissions() {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ["admissions"],
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("admin-admissions", null);
+        if (stored) return stored;
+        setDemoData("admin-admissions", DUMMY_ADMISSIONS);
+        return DUMMY_ADMISSIONS;
+      }
       const { data, error } = await supabase.from("admissions").select("*").order("created_at", { ascending: false });
       if (error) return DUMMY_ADMISSIONS;
       return withFallback(data, DUMMY_ADMISSIONS);

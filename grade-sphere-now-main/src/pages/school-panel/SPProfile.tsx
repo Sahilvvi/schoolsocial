@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Save, MapPin, School, BookOpen, Upload } from "lucide-react";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPProfile() {
   const { school } = useOutletContext<any>();
@@ -19,16 +20,20 @@ export default function SPProfile() {
   const qc = useQueryClient();
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
+  // Load persisted demo profile or fall back to outlet context
+  const demoProfile = isDemoUserId(user?.id) ? getDemoData<any | null>("sp-profile", null) : null;
+  const profileSource = demoProfile || school;
+
   const [form, setForm] = useState({
-    name: school.name || "",
-    location: school.location || "",
-    board: school.board || "",
-    fees: school.fees || "",
-    description: school.description || "",
-    about: school.about || "",
-    banner: school.banner || "",
-    facilities: (school.facilities || []).join(", "),
-    achievements: (school.achievements || []).join(", "),
+    name: profileSource.name || "",
+    location: profileSource.location || "",
+    board: profileSource.board || "",
+    fees: profileSource.fees || "",
+    description: profileSource.description || "",
+    about: profileSource.about || "",
+    banner: profileSource.banner || "",
+    facilities: (profileSource.facilities || []).join(", "),
+    achievements: (profileSource.achievements || []).join(", "),
   });
 
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
@@ -55,6 +60,8 @@ export default function SPProfile() {
           if (!old) return old;
           return { ...old, ...payload };
         });
+        // Persist to localStorage
+        setDemoData("sp-profile", payload);
         return;
       }
       const { error } = await supabase.from("schools").update(payload).eq("id", school.id);

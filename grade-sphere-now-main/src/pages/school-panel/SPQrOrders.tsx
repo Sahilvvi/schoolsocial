@@ -16,6 +16,7 @@ import { QrCode, Plus, Package } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { DUMMY_QR_ORDERS } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPQrOrders() {
   const { school } = useOutletContext<any>();
@@ -29,6 +30,13 @@ export default function SPQrOrders() {
   const { data: orders = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("sp-qr-orders", null);
+        if (stored) return stored;
+        const fallback = DUMMY_QR_ORDERS.filter((o) => o.school_id === school.id);
+        setDemoData("sp-qr-orders", fallback);
+        return fallback;
+      }
       const { data } = await supabase.from("qr_orders").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (data && data.length > 0) return data;
       return DUMMY_QR_ORDERS.filter((o) => o.school_id === school.id);
@@ -47,7 +55,12 @@ export default function SPQrOrders() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-qr-orders", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("QR order placed!");
       setForm({ order_type: "laminated", contact_name: "", contact_phone: "", shipping_address: "" });
       setOpen(false);
