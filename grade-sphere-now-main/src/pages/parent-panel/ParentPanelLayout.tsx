@@ -67,8 +67,8 @@ export default function ParentPanelLayout() {
   );
   const [children, setChildren] = useState(() =>
     getDemoData("parent-children", [
-      { id: "child-1", name: "Arjun Patel", age: 12, grade: "Class 7", school: "Delhi Public School" },
-      { id: "child-2", name: "Ishaan Kumar", age: 8, grade: "Class 3", school: "Modern School" },
+      { id: "child-1", name: "Arjun Patel", grade: "Class 7", school: "Delhi Public School", schoolSlug: "delhi-public-school", status: "approved", dob: "", bloodGroup: "", allergies: "" },
+      { id: "child-2", name: "Ishaan Kumar", grade: "Class 3", school: "Modern School", schoolSlug: "modern-school", status: "approved", dob: "", bloodGroup: "", allergies: "" },
     ])
   );
 
