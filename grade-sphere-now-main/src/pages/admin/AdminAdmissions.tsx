@@ -5,20 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useAdmissions } from "@/hooks/useData";
 import { useAdminDelete, useAdminUpdate } from "@/hooks/useAdminCrud";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function AdminAdmissions() {
-  const { data: admissions = [], isLoading } = useQuery({
-    queryKey: ["admissions"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("admissions").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: admissions = [], isLoading } = useAdmissions();
   const updateMut = useAdminUpdate("admissions");
   const deleteMut = useAdminDelete("admissions");
 

@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, Plus, Trash2, Edit, MapPin, IndianRupee } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { DUMMY_JOBS, DUMMY_JOB_APPLICATIONS } from "@/data/dummyData";
 
 export default function SPJobs() {
   const { school } = useOutletContext<any>();
@@ -25,7 +26,8 @@ export default function SPJobs() {
     queryKey: ["sp-jobs", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("jobs").select("*").eq("school_id", school.id).order("posted_date", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_JOBS.filter((j) => j.school_id === school.id);
     },
   });
 
@@ -36,7 +38,8 @@ export default function SPJobs() {
     queryFn: async () => {
       if (!jobIds.length) return [];
       const { data } = await supabase.from("job_applications").select("*").in("job_id", jobIds).order("created_at", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_JOB_APPLICATIONS.filter((a) => jobIds.includes(a.job_id));
     },
     enabled: jobIds.length > 0,
   });

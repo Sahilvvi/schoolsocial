@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Check, X, Trash2, Loader2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { DUMMY_REVIEWS, DUMMY_SCHOOLS } from "@/data/dummyData";
 
 function useAllReviews() {
   return useQuery({
@@ -15,7 +16,12 @@ function useAllReviews() {
         .from("reviews")
         .select("*, schools(name)")
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error || !data || data.length === 0) {
+        return DUMMY_REVIEWS.map((r) => ({
+          ...r,
+          schools: { name: DUMMY_SCHOOLS.find((s) => s.id === r.school_id)?.name ?? "Unknown School" },
+        }));
+      }
       return data;
     },
   });

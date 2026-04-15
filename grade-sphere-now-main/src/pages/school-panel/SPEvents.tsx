@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar, Plus, Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { DUMMY_EVENTS } from "@/data/dummyData";
 
 export default function SPEvents() {
   const { school } = useOutletContext<any>();
@@ -24,7 +25,8 @@ export default function SPEvents() {
     queryKey: ["sp-events-full", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("events").select("*").eq("school_id", school.id).order("event_date", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_EVENTS.filter((e) => e.school_id === school.id);
     },
   });
 

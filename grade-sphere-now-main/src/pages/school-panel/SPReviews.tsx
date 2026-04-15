@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Filter } from "lucide-react";
 import { format } from "date-fns";
+import { DUMMY_REVIEWS } from "@/data/dummyData";
 
 export default function SPReviews() {
   const { school } = useOutletContext<any>();
@@ -16,7 +17,8 @@ export default function SPReviews() {
     queryKey: ["sp-reviews-full", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("reviews").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_REVIEWS.filter((r) => r.school_id === school.id);
     },
   });
 

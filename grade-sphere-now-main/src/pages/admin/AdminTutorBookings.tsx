@@ -5,19 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useTutorBookings } from "@/hooks/useData";
 import { useAdminDelete, useAdminUpdate } from "@/hooks/useAdminCrud";
 
 export default function AdminTutorBookings() {
-  const { data: bookings = [], isLoading } = useQuery({
-    queryKey: ["tutor_bookings"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("tutor_bookings").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: bookings = [], isLoading } = useTutorBookings();
   const updateMut = useAdminUpdate("tutor_bookings");
   const deleteMut = useAdminDelete("tutor_bookings");
 

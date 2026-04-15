@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Search, Download } from "lucide-react";
+import { DUMMY_ADMISSIONS } from "@/data/dummyData";
 
 export default function SPAdmissions() {
   const { school } = useOutletContext<any>();
@@ -20,7 +21,7 @@ export default function SPAdmissions() {
     queryKey: ["sp-admissions-full", school.id],
     queryFn: async () => {
       const { data, error } = await supabase.from("admissions").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error || !data || data.length === 0) return DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
       return data;
     },
   });

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format, subDays, startOfDay } from "date-fns";
+import { DUMMY_SCHOOL_VIEWS } from "@/data/dummyData";
 
 export default function SPAnalytics() {
   const { school } = useOutletContext<any>();
@@ -12,7 +13,8 @@ export default function SPAnalytics() {
     queryKey: ["sp-analytics-views", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("school_views").select("viewed_at").eq("school_id", school.id);
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_SCHOOL_VIEWS.filter((v) => v.school_id === school.id);
     },
   });
 

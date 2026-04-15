@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { QrCode, Plus, Package } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { DUMMY_QR_ORDERS } from "@/data/dummyData";
 
 export default function SPQrOrders() {
   const { school } = useOutletContext<any>();
@@ -26,7 +27,8 @@ export default function SPQrOrders() {
     queryKey: ["sp-qr-orders", school.id],
     queryFn: async () => {
       const { data } = await supabase.from("qr_orders").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
-      return data || [];
+      if (data && data.length > 0) return data;
+      return DUMMY_QR_ORDERS.filter((o) => o.school_id === school.id);
     },
   });
 

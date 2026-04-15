@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { DEMO_USERS, isDemoEmail } from "@/data/dummyData";
 
 const loginSchema = z.object({ email: z.string().email("Please enter a valid email"), password: z.string().min(6, "Password must be at least 6 characters") });
 const signupSchema = z.object({ name: z.string().min(2, "Name is required"), email: z.string().email("Please enter a valid email"), password: z.string().min(6, "Password must be at least 6 characters"), role: z.string().min(1, "Please select a role") });
@@ -60,6 +61,19 @@ export default function AuthPage() {
     const { error } = await signIn(data.email, data.password);
     if (error) { toast.error(error.message); return; }
     toast.success("Welcome back! 🎉");
+
+    // Route demo users by role
+    if (isDemoEmail(data.email)) {
+      const demoUser = Object.values(DEMO_USERS).find((u) => u.email === data.email);
+      if (demoUser) {
+        if (demoUser.role === "admin") { navigate("/admin"); return; }
+        if (demoUser.role === "school") { navigate("/school-panel"); return; }
+        if (demoUser.role === "parent") { navigate("/dashboard"); return; }
+        if (demoUser.role === "teacher") { navigate("/teacher-profile"); return; }
+        if (demoUser.role === "tuition_center") { navigate("/tutors"); return; }
+      }
+    }
+
     // Check roles: admin first, then school owner, then default
     const { data: roleData } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
     if (roleData) { navigate("/admin"); return; }
@@ -284,20 +298,35 @@ export default function AuthPage() {
                 )}
               </AnimatePresence>
 
-              {/* Demo Login */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (mode !== "login") setMode("login");
-                  loginForm.setValue("email", "admin@dps.in");
-                  loginForm.setValue("password", "school123");
-                  setTimeout(() => loginForm.handleSubmit(handleLogin)(), 100);
-                }}
-                className="w-full flex items-center justify-center gap-2 h-[48px] rounded-2xl border border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
-              >
-                <GraduationCap className="h-4 w-4" />
-                Try Demo — School Owner Login
-              </button>
+              {/* Demo Credentials */}
+              <div className="mt-4 space-y-2">
+                <p className="text-[11px] text-muted-foreground/60 text-center font-semibold uppercase tracking-wider">Quick Demo Login</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { key: "admin" as const, label: "Admin Panel", icon: Shield, color: "text-red-500" },
+                    { key: "school" as const, label: "School Panel", icon: School, color: "text-blue-500" },
+                    { key: "parent" as const, label: "Parent", icon: Users, color: "text-green-500" },
+                    { key: "teacher" as const, label: "Teacher", icon: User, color: "text-purple-500" },
+                    { key: "tuition" as const, label: "Tuition Center", icon: Building2, color: "text-orange-500" },
+                  ] as const).map((d) => (
+                    <button
+                      key={d.key}
+                      type="button"
+                      onClick={() => {
+                        const demo = DEMO_USERS[d.key];
+                        if (mode !== "login") setMode("login");
+                        loginForm.setValue("email", demo.email);
+                        loginForm.setValue("password", demo.password);
+                        setTimeout(() => loginForm.handleSubmit(handleLogin)(), 100);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-border/40 bg-muted/10 hover:bg-primary/5 hover:border-primary/30 transition-all text-left"
+                    >
+                      <d.icon className={`h-3.5 w-3.5 ${d.color} shrink-0`} />
+                      <span className="text-xs font-semibold text-foreground/70">{d.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Divider */}
               <div className="flex items-center gap-4 my-7">
