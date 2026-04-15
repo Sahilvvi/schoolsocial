@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,12 +15,15 @@ import { DUMMY_ADMISSIONS } from "@/data/dummyData";
 
 export default function SPAdmissions() {
   const { school } = useOutletContext<any>();
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [filter, setFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  const queryKey = ["sp-admissions-full", school.id];
+
   const { data: admissions = [], isLoading } = useQuery({
-    queryKey: ["sp-admissions-full", school.id],
+    queryKey,
     queryFn: async () => {
       const { data, error } = await supabase.from("admissions").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (error || !data || data.length === 0) return DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
@@ -28,11 +33,17 @@ export default function SPAdmissions() {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) =>
+          old.map((a) => (a.id === id ? { ...a, status } : a)),
+        );
+        return;
+      }
       const { error } = await supabase.from("admissions").update({ status }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sp-admissions-full", school.id] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success("Status updated");
     },
   });

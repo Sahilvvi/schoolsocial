@@ -1,24 +1,63 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Filter } from "lucide-react";
+import { Star, Check, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { DUMMY_REVIEWS } from "@/data/dummyData";
 
 export default function SPReviews() {
   const { school } = useOutletContext<any>();
+  const { user } = useAuth();
+  const qc = useQueryClient();
   const [filter, setFilter] = useState<string>("all");
 
+  const queryKey = ["sp-reviews-full", school.id];
+
   const { data: reviews = [], isLoading } = useQuery({
-    queryKey: ["sp-reviews-full", school.id],
+    queryKey,
     queryFn: async () => {
       const { data } = await supabase.from("reviews").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (data && data.length > 0) return data;
       return DUMMY_REVIEWS.filter((r) => r.school_id === school.id);
+    },
+  });
+
+  const updateReviewStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) =>
+          old.map(r => r.id === id ? { ...r, status } : r),
+        );
+        return;
+      }
+      const { error } = await supabase.from("reviews").update({ status } as any).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      toast.success("Review updated");
+    },
+  });
+
+  const deleteReview = useMutation({
+    mutationFn: async (id: string) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) => old.filter(r => r.id !== id));
+        return;
+      }
+      const { error } = await supabase.from("reviews").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      toast.success("Review removed");
     },
   });
 
@@ -29,7 +68,7 @@ export default function SPReviews() {
     pending: reviews.filter(r => r.status === "pending").length,
     rejected: reviews.filter(r => r.status === "rejected").length,
   };
-  const avgRating = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : "0";
+  const avgRating = reviews.length ? (reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length).toFixed(1) : "0";
 
   const statusColor = (s: string): "default" | "destructive" | "secondary" => 
     s === "approved" ? "default" : s === "rejected" ? "destructive" : "secondary";
@@ -47,7 +86,7 @@ export default function SPReviews() {
         <div>
           <h1 className="text-2xl font-bold">Reviews</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Average rating: <span className="font-semibold text-yellow-500">{avgRating}</span> ⭐ from {reviews.length} reviews
+            Average rating: <span className="font-semibold text-yellow-500">{avgRating}</span> from {reviews.length} reviews
           </p>
         </div>
       </div>
@@ -93,6 +132,19 @@ export default function SPReviews() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {r.status !== "approved" && (
+                      <Button size="icon" variant="outline" className="h-8 w-8 rounded-lg text-emerald-600 hover:bg-emerald-500/10" onClick={() => updateReviewStatus.mutate({ id: r.id, status: "approved" })}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {r.status !== "rejected" && (
+                      <Button size="icon" variant="outline" className="h-8 w-8 rounded-lg text-orange-600 hover:bg-orange-500/10" onClick={() => updateReviewStatus.mutate({ id: r.id, status: "rejected" })}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg text-destructive" onClick={() => deleteReview.mutate(r.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                     <Badge variant={statusColor(r.status)}>{r.status}</Badge>
                     <span className="text-xs text-muted-foreground">{format(new Date(r.created_at), "dd MMM yyyy")}</span>
                   </div>

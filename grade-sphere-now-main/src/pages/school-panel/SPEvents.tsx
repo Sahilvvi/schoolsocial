@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,13 +18,16 @@ import { DUMMY_EVENTS } from "@/data/dummyData";
 
 export default function SPEvents() {
   const { school } = useOutletContext<any>();
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ title: "", description: "", location: "", event_date: "", image: "" });
 
+  const queryKey = ["sp-events-full", school.id];
+
   const { data: events = [], isLoading } = useQuery({
-    queryKey: ["sp-events-full", school.id],
+    queryKey,
     queryFn: async () => {
       const { data } = await supabase.from("events").select("*").eq("school_id", school.id).order("event_date", { ascending: false });
       if (data && data.length > 0) return data;
@@ -33,6 +38,17 @@ export default function SPEvents() {
   const createEvent = useMutation({
     mutationFn: async (ev: any) => {
       const payload = { ...ev, school_id: school.id, school_name: school.name };
+      if (isDemoUserId(user?.id)) {
+        if (editing) {
+          qc.setQueryData<any[]>(queryKey, (old = []) =>
+            old.map(item => item.id === editing.id ? { ...item, ...payload } : item),
+          );
+        } else {
+          const fake = { ...payload, id: `demo-${Date.now()}`, is_public: true, created_at: new Date().toISOString() };
+          qc.setQueryData<any[]>(queryKey, (old = []) => [fake, ...old]);
+        }
+        return;
+      }
       if (editing) {
         const { error } = await supabase.from("events").update(payload).eq("id", editing.id);
         if (error) throw error;
@@ -42,7 +58,7 @@ export default function SPEvents() {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sp-events-full", school.id] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success(editing ? "Event updated" : "Event created");
       resetForm();
     },
@@ -51,11 +67,15 @@ export default function SPEvents() {
 
   const deleteEvent = useMutation({
     mutationFn: async (id: string) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) => old.filter(item => item.id !== id));
+        return;
+      }
       const { error } = await supabase.from("events").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sp-events-full", school.id] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success("Event deleted");
     },
   });

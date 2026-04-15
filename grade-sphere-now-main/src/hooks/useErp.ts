@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
+import { isDemoUserId } from "./useDemoMode";
 import {
   DUMMY_ATTENDANCE, DUMMY_FEE_RECORDS, DUMMY_HOMEWORK, DUMMY_BATCHES,
   DUMMY_NOTIFICATIONS, DUMMY_QR_ORDERS,
@@ -27,13 +29,23 @@ export function useAttendance(schoolId: string, date?: string) {
 
 export function useMarkAttendance() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (record: { school_id: string; person_name: string; person_type: string; attendance_date: string; status: string; class_name?: string; remarks?: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...record, id: `demo-${Date.now()}`, created_at: new Date().toISOString() };
+        qc.setQueriesData<any[]>({ queryKey: ["attendance"] }, (old = []) => {
+          const idx = old.findIndex((a) => a.person_name === record.person_name && a.attendance_date === record.attendance_date);
+          if (idx >= 0) { const next = [...old]; next[idx] = { ...next[idx], ...record }; return next; }
+          return [fake, ...old];
+        });
+        return fake;
+      }
       const { data, error } = await supabase.from("attendance_records").upsert(record, { onConflict: "school_id,person_name,attendance_date" }).select().single();
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["attendance"] }),
+    onSuccess: () => { if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: ["attendance"] }); },
   });
 }
 
@@ -53,13 +65,19 @@ export function useFeeRecords(schoolId: string) {
 
 export function useAddFeeRecord() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (record: { school_id: string; person_name: string; person_type: string; amount: number; fee_type: string; status: string; due_date?: string; remarks?: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...record, id: `demo-${Date.now()}`, created_at: new Date().toISOString() };
+        qc.setQueriesData<any[]>({ queryKey: ["fee-records"] }, (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("fee_records").insert(record).select().single();
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["fee-records"] }),
+    onSuccess: () => { if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: ["fee-records"] }); },
   });
 }
 
@@ -79,13 +97,19 @@ export function useHomework(schoolId: string) {
 
 export function useAddHomework() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (record: { school_id: string; title: string; description: string; subject: string; class_name: string; doc_type: string; file_url?: string; created_by: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...record, id: `demo-${Date.now()}`, created_at: new Date().toISOString() };
+        qc.setQueriesData<any[]>({ queryKey: ["homework"] }, (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("homework_notes").insert(record).select().single();
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["homework"] }),
+    onSuccess: () => { if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: ["homework"] }); },
   });
 }
 
@@ -106,13 +130,19 @@ export function useTuitionBatches(tutorId?: string) {
 
 export function useAddBatch() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (batch: { tutor_id: string; batch_name: string; subject: string; schedule: string; max_students: number; fee_per_month: number }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...batch, id: `demo-${Date.now()}`, is_active: true, current_students: 0, created_at: new Date().toISOString() };
+        qc.setQueriesData<any[]>({ queryKey: ["tuition-batches"] }, (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("tuition_batches").insert(batch).select().single();
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tuition-batches"] }),
+    onSuccess: () => { if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: ["tuition-batches"] }); },
   });
 }
 
@@ -132,12 +162,19 @@ export function useNotifications(userId?: string) {
 
 export function useMarkNotificationRead() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueriesData<any[]>({ queryKey: ["notifications"] }, (old = []) =>
+          old.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+        );
+        return;
+      }
       const { error } = await supabase.from("notifications").update({ is_read: true } as any).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+    onSuccess: () => { if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: ["notifications"] }); },
   });
 }
 
@@ -155,12 +192,18 @@ export function useQrOrders() {
 
 export function useCreateQrOrder() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (order: { school_id: string; order_type: string; shipping_address: string; contact_phone: string; contact_name: string; user_id?: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...order, id: `demo-${Date.now()}`, status: "pending", created_at: new Date().toISOString() };
+        qc.setQueryData<any[]>(["qr-orders"], (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("qr_orders").insert(order).select().single();
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["qr-orders"] }),
+    onSuccess: () => { if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: ["qr-orders"] }); },
   });
 }

@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { QrCode, Package, Truck, CheckCircle2, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { QrCode, Package, Loader2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useQrOrders } from "@/hooks/useErp";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusColors: Record<string, string> = {
   pending: "bg-amber-500/10 text-amber-600 border-amber-500/20",
@@ -18,9 +18,17 @@ const statusColors: Record<string, string> = {
 
 export default function AdminQrOrders() {
   const { data: orders = [], isLoading } = useQrOrders();
+  const { user } = useAuth();
   const qc = useQueryClient();
 
   const updateStatus = async (id: string, status: string) => {
+    if (isDemoUserId(user?.id)) {
+      qc.setQueryData<any[]>(["qr-orders"], (old = []) =>
+        old.map(o => o.id === id ? { ...o, status } : o),
+      );
+      toast.success("Status updated");
+      return;
+    }
     const { error } = await supabase.from("qr_orders").update({ status } as any).eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success("Status updated");
