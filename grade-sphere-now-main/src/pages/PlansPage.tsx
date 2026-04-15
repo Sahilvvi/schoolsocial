@@ -9,8 +9,8 @@ import { initiatePayment } from "@/hooks/useRazorpay";
 
 const plans = [
   {
-    name: "Starter",
-    price: "₹1,999",
+    name: "Basic",
+    price: "₹2,499",
     period: "/year",
     icon: Zap,
     color: "from-blue-500 to-cyan-500",
@@ -28,8 +28,8 @@ const plans = [
     ],
   },
   {
-    name: "Growth",
-    price: "₹2,999",
+    name: "Elite",
+    price: "₹3,999",
     period: "/year",
     icon: Rocket,
     color: "from-violet-500 to-purple-500",
@@ -47,8 +47,8 @@ const plans = [
     ],
   },
   {
-    name: "Elite",
-    price: "₹3,500",
+    name: "Pro",
+    price: "₹4,999",
     period: "/year",
     icon: Crown,
     color: "from-amber-500 to-orange-500",
@@ -75,15 +75,15 @@ const erpModules = [
 ];
 
 const erpPlans = [
-  { name: "Basic ERP", price: "₹11,999", desc: "With Starter market plan (without ID Card, Report Card)", icon: Zap },
-  { name: "Elite ERP", price: "₹14,999", desc: "With Growth market plan + ID Card generation", icon: Rocket },
-  { name: "Super ERP", price: "₹19,999", desc: "With Elite market plan + ID Card + Report Card", icon: Crown },
+  { name: "Basic ERP", price: "₹11,999", desc: "With Basic market plan (without ID Card, Report Card)", icon: Zap },
+  { name: "Elite ERP", price: "₹14,999", desc: "With Elite market plan + ID Card generation", icon: Rocket },
+  { name: "Super ERP", price: "₹19,999", desc: "With Pro market plan + ID Card + Report Card", icon: Crown },
 ];
 
 const tuitionPlans = [
   {
     name: "Basic",
-    price: "₹499",
+    price: "₹1,499",
     gst: "+ GST",
     features: [
       { text: "Search Results / Verified Listing", included: true },
@@ -97,7 +97,7 @@ const tuitionPlans = [
   },
   {
     name: "Pro",
-    price: "₹999",
+    price: "₹2,999",
     gst: "+ GST + ₹99/month",
     features: [
       { text: "Priority Listing + Verified Tag", included: true },
@@ -205,7 +205,7 @@ export default function PlansPage() {
             {/* Table Header */}
             <div className="grid grid-cols-4 bg-muted/30">
               <div className="p-4 md:p-5 border-b border-r border-border/30 font-bold text-sm">Feature</div>
-              {["Starter", "Growth", "Elite"].map((name, i) => (
+              {["Basic", "Elite", "Pro"].map((name, i) => (
                 <div key={name} className={`p-4 md:p-5 border-b border-border/30 text-center font-bold text-sm ${i < 2 ? "border-r border-border/30" : ""} ${i === 1 ? "bg-primary/5" : ""}`}>
                   {name}
                   {i === 1 && <Badge className="ml-2 gradient-primary text-primary-foreground border-0 text-[10px] py-0">Popular</Badge>}
