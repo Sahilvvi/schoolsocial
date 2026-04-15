@@ -222,7 +222,7 @@ export default function TuitionDashboard() {
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
                         <div className="h-16 w-16 rounded-xl overflow-hidden border border-border/30 shrink-0">
-                          <img src={tutor.image} alt={tutor.name} className="w-full h-full object-cover"
+                          <img src={tutor.avatar} alt={tutor.name} className="w-full h-full object-cover"
                             onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80"; }} />
                         </div>
                         <div className="flex-1">
@@ -240,8 +240,8 @@ export default function TuitionDashboard() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2 mt-3">
-                            <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5 text-primary">{tutor.mode}</Badge>
-                            <span className="text-xs font-semibold text-gradient">{tutor.fee}</span>
+                            <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5 text-primary">In-Person & Online</Badge>
+                            <span className="text-xs font-semibold text-gradient">{tutor.hourly_rate}</span>
                           </div>
                         </div>
                       </div>

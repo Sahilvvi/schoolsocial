@@ -83,7 +83,7 @@ export default function AuthPage() {
   };
 
   const handleSignup = async (data: z.infer<typeof signupSchema>) => {
-    const { error } = await signUp(data.email, data.password, data.name);
+    const { error } = await signUp(data.email, data.password, data.name, data.role);
     if (error) { toast.error(error.message); return; }
     toast.success("Account created successfully! 🎉");
     // Navigate based on role
