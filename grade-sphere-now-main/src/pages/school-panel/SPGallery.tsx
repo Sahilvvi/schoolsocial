@@ -28,8 +28,17 @@ export default function SPGallery() {
     setUploading(true);
     try {
       if (isDemoUserId(user?.id)) {
-        // Demo mode: use local blob URLs
-        const newUrls = Array.from(files).map(f => URL.createObjectURL(f));
+        // Demo mode: convert to base64 data URIs so they survive page refresh
+        const newUrls: string[] = [];
+        for (const file of Array.from(files)) {
+          const dataUri = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          newUrls.push(dataUri);
+        }
         const updated = [...localGallery, ...newUrls];
         setLocalGallery(updated);
         setDemoData("sp-gallery", updated);
