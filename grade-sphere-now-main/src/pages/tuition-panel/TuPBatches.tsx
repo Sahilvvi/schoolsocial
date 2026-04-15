@@ -84,9 +84,9 @@ export default function TuPBatches() {
               {/* Occupancy bar */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 bg-muted/30 rounded-full h-2">
-                  <div className="h-2 rounded-full gradient-primary transition-all" style={{ width: `${Math.round((batch.current_students / batch.max_students) * 100)}%` }} />
+                  <div className="h-2 rounded-full gradient-primary transition-all" style={{ width: `${batch.max_students > 0 ? Math.round((batch.current_students / batch.max_students) * 100) : 0}%` }} />
                 </div>
-                <span className="text-xs text-muted-foreground font-semibold">{Math.round((batch.current_students / batch.max_students) * 100)}% full</span>
+                <span className="text-xs text-muted-foreground font-semibold">{batch.max_students > 0 ? Math.round((batch.current_students / batch.max_students) * 100) : 0}% full</span>
               </div>
             </CardContent>
           </Card>
