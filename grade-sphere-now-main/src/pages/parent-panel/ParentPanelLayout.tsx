@@ -10,6 +10,7 @@ import {
   isDemoEmail, DUMMY_ADMISSIONS, DUMMY_TUTOR_BOOKINGS, DUMMY_SCHOOLS,
   DUMMY_NOTIFICATIONS, DUMMY_HOMEWORK, DUMMY_FEE_RECORDS
 } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 const navItems = [
   { label: "Dashboard", path: "/parent-panel", icon: LayoutDashboard },
@@ -51,6 +52,26 @@ export default function ParentPanelLayout() {
   const { user, loading, signOut } = useAuth();
   const location = useLocation();
 
+  // Persistent state for parent panel data
+  const [admissions, setAdmissions] = useState(() =>
+    getDemoData("parent-admissions", PARENT_DUMMY_ADMISSIONS)
+  );
+  const [savedSchools, setSavedSchools] = useState(() =>
+    getDemoData("parent-saved", PARENT_DUMMY_SAVED)
+  );
+  const [parentBookings, setParentBookings] = useState(() =>
+    getDemoData("parent-bookings", PARENT_DUMMY_BOOKINGS)
+  );
+  const [fees, setFees] = useState(() =>
+    getDemoData("parent-fees", PARENT_FEES)
+  );
+  const [children, setChildren] = useState(() =>
+    getDemoData("parent-children", [
+      { id: "child-1", name: "Arjun Patel", age: 12, grade: "Class 7", school: "Delhi Public School" },
+      { id: "child-2", name: "Ishaan Kumar", age: 8, grade: "Class 3", school: "Modern School" },
+    ])
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -64,6 +85,27 @@ export default function ParentPanelLayout() {
   const email = user.email;
   const isDemo = isDemoEmail(email || "");
   const displayName = user.user_metadata?.full_name || email?.split("@")[0] || "Parent";
+
+  const updateAdmissions = (newAdmissions: any[]) => {
+    setAdmissions(newAdmissions);
+    setDemoData("parent-admissions", newAdmissions);
+  };
+  const updateSavedSchools = (newSaved: any[]) => {
+    setSavedSchools(newSaved);
+    setDemoData("parent-saved", newSaved);
+  };
+  const updateBookings = (newBookings: any[]) => {
+    setParentBookings(newBookings);
+    setDemoData("parent-bookings", newBookings);
+  };
+  const updateFees = (newFees: any[]) => {
+    setFees(newFees);
+    setDemoData("parent-fees", newFees);
+  };
+  const updateChildren = (newChildren: any[]) => {
+    setChildren(newChildren);
+    setDemoData("parent-children", newChildren);
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -110,12 +152,13 @@ export default function ParentPanelLayout() {
       <main className="flex-1 ml-64 p-8 min-h-screen">
         <Outlet context={{
           user, isDemo, displayName,
-          admissions: PARENT_DUMMY_ADMISSIONS,
-          bookings: PARENT_DUMMY_BOOKINGS,
-          saved: PARENT_DUMMY_SAVED,
+          admissions, updateAdmissions,
+          bookings: parentBookings, updateBookings,
+          saved: savedSchools, updateSavedSchools,
           notifications: PARENT_NOTIFICATIONS,
           homework: PARENT_HOMEWORK,
-          fees: PARENT_FEES,
+          fees, updateFees,
+          children, updateChildren,
         }} />
       </main>
     </div>

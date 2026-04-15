@@ -7,13 +7,20 @@ import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Upload, Trash2, Loader2 } from "lucide-react";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPGallery() {
   const { school } = useOutletContext<any>();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [uploading, setUploading] = useState(false);
-  const [localGallery, setLocalGallery] = useState<string[]>(school.gallery || []);
+  const [localGallery, setLocalGallery] = useState<string[]>(() => {
+    if (isDemoUserId(user?.id)) {
+      const stored = getDemoData<string[] | null>("sp-gallery", null);
+      if (stored) return stored;
+    }
+    return school.gallery || [];
+  });
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -21,10 +28,20 @@ export default function SPGallery() {
     setUploading(true);
     try {
       if (isDemoUserId(user?.id)) {
-        // Demo mode: use local blob URLs
-        const newUrls = Array.from(files).map(f => URL.createObjectURL(f));
+        // Demo mode: convert to base64 data URIs so they survive page refresh
+        const newUrls: string[] = [];
+        for (const file of Array.from(files)) {
+          const dataUri = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          newUrls.push(dataUri);
+        }
         const updated = [...localGallery, ...newUrls];
         setLocalGallery(updated);
+        setDemoData("sp-gallery", updated);
         toast.success(`${newUrls.length} image(s) uploaded`);
       } else {
         const newUrls: string[] = [];
@@ -54,6 +71,7 @@ export default function SPGallery() {
     const updated = localGallery.filter(u => u !== url);
     if (isDemoUserId(user?.id)) {
       setLocalGallery(updated);
+      setDemoData("sp-gallery", updated);
       toast.success("Image removed");
       return;
     }

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Search, Download } from "lucide-react";
 import { DUMMY_ADMISSIONS } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPAdmissions() {
   const { school } = useOutletContext<any>();
@@ -25,6 +26,13 @@ export default function SPAdmissions() {
   const { data: admissions = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("sp-admissions", null);
+        if (stored) return stored;
+        const fallback = DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
+        setDemoData("sp-admissions", fallback);
+        return fallback;
+      }
       const { data, error } = await supabase.from("admissions").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (error || !data || data.length === 0) return DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
       return data;
@@ -43,7 +51,12 @@ export default function SPAdmissions() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-admissions", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Status updated");
     },
   });

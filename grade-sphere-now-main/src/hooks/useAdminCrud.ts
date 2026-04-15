@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { isDemoUserId } from "./useDemoMode";
+import { setDemoData } from "@/lib/demoStorage";
 
 /**
  * Demo-aware CRUD hooks.
@@ -25,7 +26,12 @@ export function useAdminInsert<T extends Record<string, unknown>>(table: string)
       return data;
     },
     onSuccess: (_d, _v, _c) => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: [table] });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>([table]);
+        if (current) setDemoData(`admin-${table}`, current);
+      } else {
+        qc.invalidateQueries({ queryKey: [table] });
+      }
     },
   });
 }
@@ -49,7 +55,12 @@ export function useAdminUpdate<T extends Record<string, unknown>>(table: string)
       return data;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: [table] });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>([table]);
+        if (current) setDemoData(`admin-${table}`, current);
+      } else {
+        qc.invalidateQueries({ queryKey: [table] });
+      }
     },
   });
 }
@@ -70,7 +81,12 @@ export function useAdminDelete(table: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey: [table] });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>([table]);
+        if (current) setDemoData(`admin-${table}`, current);
+      } else {
+        qc.invalidateQueries({ queryKey: [table] });
+      }
     },
   });
 }

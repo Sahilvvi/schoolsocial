@@ -12,7 +12,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default function TuPEnquiries() {
-  const { enquiries } = useOutletContext<any>();
+  const { enquiries, updateEnquiries } = useOutletContext<any>();
 
   return (
     <div>
@@ -51,11 +51,23 @@ export default function TuPEnquiries() {
 
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/20">
                 <Button size="sm" className="rounded-lg gradient-primary border-0 shadow-md shadow-primary/20 text-xs h-8 gap-1"
-                  onClick={() => toast.success(`Contacted ${enq.parent_name}`)}>
+                  onClick={() => {
+                    if (updateEnquiries) {
+                      const updated = enquiries.map((e: any) => e.id === enq.id ? { ...e, status: "contacted" } : e);
+                      updateEnquiries(updated);
+                    }
+                    toast.success(`Contacted ${enq.parent_name}`);
+                  }}>
                   <Phone className="h-3 w-3" /> Contact
                 </Button>
                 <Button size="sm" variant="outline" className="rounded-lg border-border/30 text-xs h-8 gap-1"
-                  onClick={() => toast.success("Marked as contacted")}>
+                  onClick={() => {
+                    if (updateEnquiries) {
+                      const updated = enquiries.map((e: any) => e.id === enq.id ? { ...e, status: "contacted" } : e);
+                      updateEnquiries(updated);
+                    }
+                    toast.success("Marked as contacted");
+                  }}>
                   <CheckCircle className="h-3 w-3" /> Mark Contacted
                 </Button>
               </div>

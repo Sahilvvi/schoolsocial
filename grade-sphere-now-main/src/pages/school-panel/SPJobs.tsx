@@ -16,6 +16,7 @@ import { Briefcase, Plus, Trash2, Edit, MapPin, IndianRupee } from "lucide-react
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { DUMMY_JOBS, DUMMY_JOB_APPLICATIONS } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPJobs() {
   const { school } = useOutletContext<any>();
@@ -30,6 +31,13 @@ export default function SPJobs() {
   const { data: jobs = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("sp-jobs", null);
+        if (stored) return stored;
+        const fallback = DUMMY_JOBS.filter((j) => j.school_id === school.id);
+        setDemoData("sp-jobs", fallback);
+        return fallback;
+      }
       const { data } = await supabase.from("jobs").select("*").eq("school_id", school.id).order("posted_date", { ascending: false });
       if (data && data.length > 0) return data;
       return DUMMY_JOBS.filter((j) => j.school_id === school.id);
@@ -72,7 +80,12 @@ export default function SPJobs() {
       }
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-jobs", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success(editing ? "Job updated" : "Job posted");
       resetForm();
     },
@@ -89,7 +102,12 @@ export default function SPJobs() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-jobs", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Job deleted");
     },
   });

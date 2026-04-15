@@ -11,6 +11,7 @@ import { Star, Check, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { DUMMY_REVIEWS } from "@/data/dummyData";
+import { getDemoData, setDemoData } from "@/lib/demoStorage";
 
 export default function SPReviews() {
   const { school } = useOutletContext<any>();
@@ -23,6 +24,13 @@ export default function SPReviews() {
   const { data: reviews = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
+      if (isDemoUserId(user?.id)) {
+        const stored = getDemoData<any[] | null>("sp-reviews", null);
+        if (stored) return stored;
+        const fallback = DUMMY_REVIEWS.filter((r) => r.school_id === school.id);
+        setDemoData("sp-reviews", fallback);
+        return fallback;
+      }
       const { data } = await supabase.from("reviews").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (data && data.length > 0) return data;
       return DUMMY_REVIEWS.filter((r) => r.school_id === school.id);
@@ -41,7 +49,12 @@ export default function SPReviews() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-reviews", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Review updated");
     },
   });
@@ -56,7 +69,12 @@ export default function SPReviews() {
       if (error) throw error;
     },
     onSuccess: () => {
-      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
+      if (isDemoUserId(user?.id)) {
+        const current = qc.getQueryData<any[]>(queryKey);
+        if (current) setDemoData("sp-reviews", current);
+      } else {
+        qc.invalidateQueries({ queryKey });
+      }
       toast.success("Review removed");
     },
   });

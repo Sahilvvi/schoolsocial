@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { isDemoUserId } from "@/hooks/useDemoMode";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { setDemoData } from "@/lib/demoStorage";
 
 const statusColors: Record<string, string> = {
   pending: "bg-amber-500/10 text-amber-600 border-amber-500/20",
@@ -26,6 +27,8 @@ export default function AdminQrOrders() {
       qc.setQueryData<any[]>(["qr-orders"], (old = []) =>
         old.map(o => o.id === id ? { ...o, status } : o),
       );
+      const current = qc.getQueryData<any[]>(["qr-orders"]);
+      if (current) setDemoData("admin-qr-orders", current);
       toast.success("Status updated");
       return;
     }
