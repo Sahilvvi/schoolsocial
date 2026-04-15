@@ -149,7 +149,7 @@ export default function Navbar() {
             </Link>
           )}
           {user && user.user_metadata?.role === "parent" && (
-            <Link to="/dashboard">
+            <Link to="/parent-panel">
               <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">My Dashboard</span>
@@ -157,7 +157,7 @@ export default function Navbar() {
             </Link>
           )}
           {user && user.user_metadata?.role === "teacher" && (
-            <Link to="/teacher-profile">
+            <Link to="/teacher-panel">
               <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">My Profile</span>
@@ -165,7 +165,7 @@ export default function Navbar() {
             </Link>
           )}
           {user && user.user_metadata?.role === "tuition_center" && (
-            <Link to="/tuition-dashboard">
+            <Link to="/tuition-panel">
               <Button size="sm" className="h-8 rounded-lg gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-all font-semibold px-4 cursor-pointer gap-1.5 ml-2">
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Tuition Panel</span>
@@ -179,10 +179,10 @@ export default function Navbar() {
               <div className="flex items-center gap-1.5">
               <Link to={
                 user.user_metadata?.role === "school" ? "/school-panel" :
-                user.user_metadata?.role === "teacher" ? "/teacher-profile" :
-                user.user_metadata?.role === "tuition_center" ? "/tuition-dashboard" :
+                user.user_metadata?.role === "teacher" ? "/teacher-panel" :
+                user.user_metadata?.role === "tuition_center" ? "/tuition-panel" :
                 user.user_metadata?.role === "admin" ? "/admin" :
-                "/dashboard"
+                "/parent-panel"
               }>
                 <div className="h-7 w-7 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground shadow-md cursor-pointer">
                   {user.email?.[0]?.toUpperCase()}
