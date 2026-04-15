@@ -30,6 +30,37 @@ import ScannerPage from "@/pages/ScannerPage";
 import SchoolCommunityPage from "@/pages/SchoolCommunityPage";
 import TuitionDashboard from "@/pages/TuitionDashboard";
 
+// Teacher Panel
+import TeacherPanelLayout from "@/pages/teacher-panel/TeacherPanelLayout";
+import TPDashboard from "@/pages/teacher-panel/TPDashboard";
+import TPProfile from "@/pages/teacher-panel/TPProfile";
+import TPExperience from "@/pages/teacher-panel/TPExperience";
+import TPServices from "@/pages/teacher-panel/TPServices";
+import TPNotes from "@/pages/teacher-panel/TPNotes";
+import TPStudents from "@/pages/teacher-panel/TPStudents";
+import TPSchedule from "@/pages/teacher-panel/TPSchedule";
+import TPJobs from "@/pages/teacher-panel/TPJobs";
+
+// Tuition Panel
+import TuitionPanelLayout from "@/pages/tuition-panel/TuitionPanelLayout";
+import TuPDashboard from "@/pages/tuition-panel/TuPDashboard";
+import TuPProfile from "@/pages/tuition-panel/TuPProfile";
+import TuPBatches from "@/pages/tuition-panel/TuPBatches";
+import TuPEnquiries from "@/pages/tuition-panel/TuPEnquiries";
+import TuPTutors from "@/pages/tuition-panel/TuPTutors";
+import TuPBookings from "@/pages/tuition-panel/TuPBookings";
+import TuPNotifications from "@/pages/tuition-panel/TuPNotifications";
+
+// Parent Panel
+import ParentPanelLayout from "@/pages/parent-panel/ParentPanelLayout";
+import PPDashboard from "@/pages/parent-panel/PPDashboard";
+import PPChildren from "@/pages/parent-panel/PPChildren";
+import PPAdmissions from "@/pages/parent-panel/PPAdmissions";
+import PPSaved from "@/pages/parent-panel/PPSaved";
+import PPBookings from "@/pages/parent-panel/PPBookings";
+import PPFees from "@/pages/parent-panel/PPFees";
+import PPNotifications from "@/pages/parent-panel/PPNotifications";
+
 // Admin
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -73,12 +104,16 @@ function AppShell() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
   const isSchoolPanel = location.pathname.startsWith("/school-panel");
+  const isTeacherPanel = location.pathname.startsWith("/teacher-panel");
+  const isTuitionPanel = location.pathname.startsWith("/tuition-panel");
+  const isParentPanel = location.pathname.startsWith("/parent-panel");
   const isErp = location.pathname.startsWith("/erp");
+  const isPanel = isAdmin || isSchoolPanel || isTeacherPanel || isTuitionPanel || isParentPanel;
 
   return (
     <>
       <ScrollToTop />
-      {!isAdmin && !isSchoolPanel && !isErp && <Navbar />}
+      {!isPanel && !isErp && <Navbar />}
       <div className={!isErp ? "min-h-[80vh] flex flex-col" : ""}>
         <div className="flex-grow">
       <Routes>
@@ -136,11 +171,45 @@ function AppShell() {
           <Route path="qr-orders" element={<SPQrOrders />} />
         </Route>
 
+        {/* Teacher Panel routes */}
+        <Route path="/teacher-panel" element={<TeacherPanelLayout />}>
+          <Route index element={<TPDashboard />} />
+          <Route path="profile" element={<TPProfile />} />
+          <Route path="experience" element={<TPExperience />} />
+          <Route path="services" element={<TPServices />} />
+          <Route path="notes" element={<TPNotes />} />
+          <Route path="students" element={<TPStudents />} />
+          <Route path="schedule" element={<TPSchedule />} />
+          <Route path="jobs" element={<TPJobs />} />
+        </Route>
+
+        {/* Tuition Panel routes */}
+        <Route path="/tuition-panel" element={<TuitionPanelLayout />}>
+          <Route index element={<TuPDashboard />} />
+          <Route path="profile" element={<TuPProfile />} />
+          <Route path="batches" element={<TuPBatches />} />
+          <Route path="enquiries" element={<TuPEnquiries />} />
+          <Route path="tutors" element={<TuPTutors />} />
+          <Route path="bookings" element={<TuPBookings />} />
+          <Route path="notifications" element={<TuPNotifications />} />
+        </Route>
+
+        {/* Parent Panel routes */}
+        <Route path="/parent-panel" element={<ParentPanelLayout />}>
+          <Route index element={<PPDashboard />} />
+          <Route path="children" element={<PPChildren />} />
+          <Route path="admissions" element={<PPAdmissions />} />
+          <Route path="saved" element={<PPSaved />} />
+          <Route path="bookings" element={<PPBookings />} />
+          <Route path="fees" element={<PPFees />} />
+          <Route path="notifications" element={<PPNotifications />} />
+        </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </div>
-      {!isAdmin && !isSchoolPanel && !isErp && <Footer />}
+      {!isPanel && !isErp && <Footer />}
     </>
   );
 }

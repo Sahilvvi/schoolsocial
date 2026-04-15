@@ -68,9 +68,9 @@ export default function AuthPage() {
       if (demoUser) {
         if (demoUser.role === "admin") { navigate("/admin"); return; }
         if (demoUser.role === "school") { navigate("/school-panel"); return; }
-        if (demoUser.role === "parent") { navigate("/dashboard"); return; }
-        if (demoUser.role === "teacher") { navigate("/teacher-profile"); return; }
-        if (demoUser.role === "tuition_center") { navigate("/tuition-dashboard"); return; }
+        if (demoUser.role === "parent") { navigate("/parent-panel"); return; }
+        if (demoUser.role === "teacher") { navigate("/teacher-panel"); return; }
+        if (demoUser.role === "tuition_center") { navigate("/tuition-panel"); return; }
       }
     }
 
