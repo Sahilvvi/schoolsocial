@@ -28,6 +28,7 @@ import HomePage from "@/pages/HomePage";
 import TeacherProfilePage from "@/pages/TeacherProfilePage";
 import ScannerPage from "@/pages/ScannerPage";
 import SchoolCommunityPage from "@/pages/SchoolCommunityPage";
+import TuitionDashboard from "@/pages/TuitionDashboard";
 
 // Admin
 import AdminLayout from "@/pages/admin/AdminLayout";
@@ -98,6 +99,7 @@ function AppShell() {
         <Route path="/upload-school" element={<UploadSchoolPage />} />
         <Route path="/compare" element={<CompareSchoolsPage />} />
         <Route path="/dashboard" element={<ParentDashboard />} />
+        <Route path="/tuition-dashboard" element={<TuitionDashboard />} />
         <Route path="/teacher-profile" element={<TeacherProfilePage />} />
         <Route path="/scanner" element={<ScannerPage />} />
         <Route path="/community" element={<SchoolCommunityPage />} />
