@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,8 +24,10 @@ export default function SPQrOrders() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ order_type: "laminated", contact_name: "", contact_phone: "", shipping_address: "" });
 
+  const queryKey = ["sp-qr-orders", school.id];
+
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ["sp-qr-orders", school.id],
+    queryKey,
     queryFn: async () => {
       const { data } = await supabase.from("qr_orders").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (data && data.length > 0) return data;
@@ -34,15 +37,17 @@ export default function SPQrOrders() {
 
   const createOrder = useMutation({
     mutationFn: async (order: any) => {
-      const { error } = await supabase.from("qr_orders").insert({
-        ...order,
-        school_id: school.id,
-        user_id: user?.id,
-      });
+      const payload = { ...order, school_id: school.id, user_id: user?.id };
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...payload, id: `demo-${Date.now()}`, status: "pending", tracking_number: null, created_at: new Date().toISOString() };
+        qc.setQueryData<any[]>(queryKey, (old = []) => [fake, ...old]);
+        return;
+      }
+      const { error } = await supabase.from("qr_orders").insert(payload);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sp-qr-orders", school.id] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success("QR order placed!");
       setForm({ order_type: "laminated", contact_name: "", contact_phone: "", shipping_address: "" });
       setOpen(false);

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,13 +19,16 @@ import { DUMMY_JOBS, DUMMY_JOB_APPLICATIONS } from "@/data/dummyData";
 
 export default function SPJobs() {
   const { school } = useOutletContext<any>();
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ title: "", description: "", location: "", salary: "", type: "Full-time" });
 
+  const queryKey = ["sp-jobs", school.id];
+
   const { data: jobs = [], isLoading } = useQuery({
-    queryKey: ["sp-jobs", school.id],
+    queryKey,
     queryFn: async () => {
       const { data } = await supabase.from("jobs").select("*").eq("school_id", school.id).order("posted_date", { ascending: false });
       if (data && data.length > 0) return data;
@@ -46,7 +51,18 @@ export default function SPJobs() {
 
   const createJob = useMutation({
     mutationFn: async (job: any) => {
-      const payload = { ...job, school_id: school.id, school_name: school.name };
+      const payload = { ...job, school_id: school.id, school_name: school.name, posted_date: new Date().toISOString().slice(0, 10) };
+      if (isDemoUserId(user?.id)) {
+        if (editing) {
+          qc.setQueryData<any[]>(queryKey, (old = []) =>
+            old.map(item => item.id === editing.id ? { ...item, ...payload } : item),
+          );
+        } else {
+          const fake = { ...payload, id: `demo-${Date.now()}`, created_at: new Date().toISOString() };
+          qc.setQueryData<any[]>(queryKey, (old = []) => [fake, ...old]);
+        }
+        return;
+      }
       if (editing) {
         const { error } = await supabase.from("jobs").update(payload).eq("id", editing.id);
         if (error) throw error;
@@ -56,7 +72,7 @@ export default function SPJobs() {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sp-jobs", school.id] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success(editing ? "Job updated" : "Job posted");
       resetForm();
     },
@@ -65,11 +81,15 @@ export default function SPJobs() {
 
   const deleteJob = useMutation({
     mutationFn: async (id: string) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) => old.filter(item => item.id !== id));
+        return;
+      }
       const { error } = await supabase.from("jobs").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sp-jobs", school.id] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success("Job deleted");
     },
   });

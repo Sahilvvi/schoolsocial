@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Check, X, Trash2, Loader2, MessageSquare } from "lucide-react";
@@ -29,27 +31,40 @@ function useAllReviews() {
 
 export default function AdminReviews() {
   const { data: reviews = [], isLoading } = useAllReviews();
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
 
+  const queryKey = ["admin-reviews"];
+
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) =>
+          old.map(r => r.id === id ? { ...r, status } : r),
+        );
+        return;
+      }
       const { error } = await supabase.from("reviews").update({ status } as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success("Review updated");
     },
   });
 
   const deleteReview = useMutation({
     mutationFn: async (id: string) => {
+      if (isDemoUserId(user?.id)) {
+        qc.setQueryData<any[]>(queryKey, (old = []) => old.filter(r => r.id !== id));
+        return;
+      }
       const { error } = await supabase.from("reviews").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+      if (!isDemoUserId(user?.id)) qc.invalidateQueries({ queryKey });
       toast.success("Review deleted");
     },
   });

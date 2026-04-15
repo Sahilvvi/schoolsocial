@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
+import { isDemoUserId } from "./useDemoMode";
 import {
   DUMMY_SCHOOLS, DUMMY_EVENTS, DUMMY_JOBS, DUMMY_TUTORS, DUMMY_NEWS,
   DUMMY_REVIEWS, DUMMY_ADMISSIONS, DUMMY_JOB_APPLICATIONS, DUMMY_TUTOR_BOOKINGS,
@@ -53,21 +55,34 @@ export function useReviews(schoolId: string | undefined) {
 
 export function useAddReview() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async (review: { school_id: string; author: string; rating: number; comment: string; user_id?: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...review, id: `demo-${Date.now()}`, status: "pending", created_at: new Date().toISOString() };
+        queryClient.setQueryData<any[]>(["reviews", review.school_id], (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("reviews").insert(review).select().single();
       if (error) throw error;
       return data;
     },
     onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["reviews", vars.school_id] });
+      if (!isDemoUserId(user?.id)) queryClient.invalidateQueries({ queryKey: ["reviews", vars.school_id] });
     },
   });
 }
 
 export function useSubmitAdmission() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (admission: { school_id: string; student_name: string; parent_name: string; email: string; phone: string; grade: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...admission, id: `demo-${Date.now()}`, status: "pending", created_at: new Date().toISOString() };
+        qc.setQueryData<any[]>(["admissions"], (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("admissions").insert(admission).select().single();
       if (error) throw error;
       return data;
@@ -87,8 +102,15 @@ export function useJobs() {
 }
 
 export function useSubmitJobApplication() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (app: { job_id: string; name: string; email: string; phone: string; experience: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...app, id: `demo-${Date.now()}`, created_at: new Date().toISOString() };
+        qc.setQueryData<any[]>(["job_applications"], (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("job_applications").insert(app).select().single();
       if (error) throw error;
       return data;
@@ -108,8 +130,15 @@ export function useTutors() {
 }
 
 export function useBookTutor() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (booking: { tutor_id: string; name: string; email: string; message?: string }) => {
+      if (isDemoUserId(user?.id)) {
+        const fake = { ...booking, id: `demo-${Date.now()}`, status: "pending", created_at: new Date().toISOString() };
+        qc.setQueryData<any[]>(["tutor_bookings"], (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("tutor_bookings").insert(booking).select().single();
       if (error) throw error;
       return data;

@@ -1,37 +1,48 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { isDemoUserId } from "@/hooks/useDemoMode";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Upload, Trash2, Loader2 } from "lucide-react";
 
 export default function SPGallery() {
   const { school } = useOutletContext<any>();
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [uploading, setUploading] = useState(false);
-  const gallery: string[] = school.gallery || [];
+  const [localGallery, setLocalGallery] = useState<string[]>(school.gallery || []);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
     setUploading(true);
     try {
-      const newUrls: string[] = [];
-      for (const file of Array.from(files)) {
-        const ext = file.name.split(".").pop();
-        const path = `${school.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: uploadErr } = await supabase.storage.from("school-images").upload(path, file);
-        if (uploadErr) throw uploadErr;
-        const { data: urlData } = supabase.storage.from("school-images").getPublicUrl(path);
-        newUrls.push(urlData.publicUrl);
+      if (isDemoUserId(user?.id)) {
+        // Demo mode: use local blob URLs
+        const newUrls = Array.from(files).map(f => URL.createObjectURL(f));
+        const updated = [...localGallery, ...newUrls];
+        setLocalGallery(updated);
+        toast.success(`${newUrls.length} image(s) uploaded`);
+      } else {
+        const newUrls: string[] = [];
+        for (const file of Array.from(files)) {
+          const ext = file.name.split(".").pop();
+          const path = `${school.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+          const { error: uploadErr } = await supabase.storage.from("school-images").upload(path, file);
+          if (uploadErr) throw uploadErr;
+          const { data: urlData } = supabase.storage.from("school-images").getPublicUrl(path);
+          newUrls.push(urlData.publicUrl);
+        }
+        const updated = [...localGallery, ...newUrls];
+        const { error } = await supabase.from("schools").update({ gallery: updated }).eq("id", school.id);
+        if (error) throw error;
+        setLocalGallery(updated);
+        qc.invalidateQueries({ queryKey: ["school", school.slug] });
+        toast.success(`${newUrls.length} image(s) uploaded`);
       }
-      const updated = [...gallery, ...newUrls];
-      const { error } = await supabase.from("schools").update({ gallery: updated }).eq("id", school.id);
-      if (error) throw error;
-      school.gallery = updated;
-      qc.invalidateQueries({ queryKey: ["school", school.slug] });
-      toast.success(`${newUrls.length} image(s) uploaded`);
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -40,10 +51,15 @@ export default function SPGallery() {
   };
 
   const removeImage = async (url: string) => {
-    const updated = gallery.filter(u => u !== url);
+    const updated = localGallery.filter(u => u !== url);
+    if (isDemoUserId(user?.id)) {
+      setLocalGallery(updated);
+      toast.success("Image removed");
+      return;
+    }
     const { error } = await supabase.from("schools").update({ gallery: updated }).eq("id", school.id);
     if (error) { toast.error(error.message); return; }
-    school.gallery = updated;
+    setLocalGallery(updated);
     qc.invalidateQueries({ queryKey: ["school", school.slug] });
     toast.success("Image removed");
   };
@@ -60,11 +76,11 @@ export default function SPGallery() {
         </label>
       </div>
 
-      {gallery.length === 0 ? (
+      {localGallery.length === 0 ? (
         <p className="text-muted-foreground text-center py-12">No images yet. Upload your school photos!</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {gallery.map((url, i) => (
+          {localGallery.map((url, i) => (
             <div key={i} className="relative group rounded-xl overflow-hidden aspect-video border border-border/30">
               <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
               <button
