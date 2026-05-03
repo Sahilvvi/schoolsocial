@@ -1,23 +1,25 @@
-import app from "./app.js";
-import { seedSuperAdmin } from "./seed.js";
+import app from "./app";
+import { logger } from "./lib/logger";
 
-// Default to 3001 for local development if PORT is not set
-const rawPort = process.env["PORT"] ?? "3001";
+const rawPort = process.env["PORT"];
+
+if (!rawPort) {
+  throw new Error(
+    "PORT environment variable is required but was not provided.",
+  );
+}
+
 const port = Number(rawPort);
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const startServer = async () => {
-  try {
-    await seedSuperAdmin();
-  } catch (err) {
-    console.log("[api-server] DB connection skipped or failed:", err instanceof Error ? err.message : String(err));
+app.listen(port, (err) => {
+  if (err) {
+    logger.error({ err }, "Error listening on port");
+    process.exit(1);
   }
-  app.listen(port, () => {
-    console.log(`[api-server] Running at http://localhost:${port}`);
-  });
-};
 
-startServer();
+  logger.info({ port }, "Server listening");
+});
