@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "gXVmE097VmWrengMBG3vm"
+uri = "file://artifacts/myschool-mobile/assets/images/icon.png"
+type = "image"
+title = "myschool app icon"
+
+[[generated]]
+id = "GNEDm4PLzGWxKqKUB9jG8"
+uri = "file://artifacts/myschool-mobile/assets/images/hero_school.png"
+type = "image"
+title = "school hero image"
+
+[[generated]]
+id = "jwf_wxUtcceTj06JspSVG"
+uri = "file://artifacts/myschool-mobile/assets/images/school_placeholder.png"
+type = "image"
+title = "school building exterior"
