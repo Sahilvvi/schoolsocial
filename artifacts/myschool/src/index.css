@@ -318,16 +318,101 @@
   animation-delay: 4s;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
+/* ── Scroll hide ───────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Premium scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.4); }
+
+/* ── Tilt card ─────────────────────────────────────────────── */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+
+/* ── Premium section reveal ────────────────────────────────── */
+.section-tag {
+  @apply inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-widest;
 }
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 4px;
+
+/* ── Gradient mesh background ──────────────────────────────── */
+.mesh-gradient {
+  background:
+    radial-gradient(ellipse 80% 80% at 20% -10%, hsl(221 83% 53% / 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 90%, hsl(262 83% 58% / 0.08) 0%, transparent 50%),
+    hsl(var(--background));
 }
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5);
+
+/* ── Frosted glass card ────────────────────────────────────── */
+.glass-card {
+  background: hsl(var(--card) / 0.7);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid hsl(var(--border) / 0.5);
 }
+
+/* ── Premium gradient border ───────────────────────────────── */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--hero-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Floating badge ────────────────────────────────────────── */
+.floating-badge {
+  animation: floatBadge 4s ease-in-out infinite;
+}
+.floating-badge-delay {
+  animation: floatBadge 4s ease-in-out infinite 1.5s;
+}
+.floating-badge-slow {
+  animation: floatBadge 5s ease-in-out infinite 0.8s;
+}
+
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+/* ── Marquee for trust strip ───────────────────────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* ── Gradient glow button ──────────────────────────────────── */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: var(--hero-gradient);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  blur: 16px;
+  filter: blur(16px);
+  transition: opacity 0.4s ease;
+}
+.btn-glow:hover::after { opacity: 0.6; }

@@ -43,10 +43,20 @@ artifacts/myschool/src/
 - **Primary**: Blue `hsl(217 91% 60%)` — #3B82F6 family
 - **Secondary**: Purple `hsl(250 80% 64%)` — #7C3AED family
 - **Font**: Inter (body) + Plus Jakarta Sans (headings)
-- **Mobile nav**: Fixed bottom tab bar (Home, Schools, Compare, Events, Profile) — shown on <md screens
+- **Mobile nav**: Fixed bottom tab bar (Home, Schools, Compare, Events, Profile) — shown on <lg screens
 - **Desktop nav**: Sticky top navbar with logo + links + search + auth
-- **Cards**: Rounded-2xl, subtle shadow, hover lift effect
+- **Cards**: Rounded-2xl, subtle shadow, hover lift effect with `whileHover={{ y: -8 }}`
 - **Dashboard panels**: Dark slate sidebar + light main content area
+- **Animations**: Framer Motion `whileInView` scroll reveals on all major sections, spring hover effects on cards/buttons
+- **CSS utilities**: `.mesh-gradient`, `.glass-card`, `.gradient-primary`, `.text-gradient`, `.floating-badge`, `.no-scrollbar`, `.section-tag`, `.animate-marquee`
+
+## New Features (Premium UI Overhaul — May 2026)
+
+- **AnimatedCounter**: `src/components/AnimatedCounter.tsx` — scroll-triggered number counter with cubic easing
+- **SchoolFinderQuiz**: `src/components/SchoolFinderQuiz.tsx` — 4-step AI-guided school finder modal accessible from the homepage hero; navigates to `/schools` with filters applied
+- **Premium Hero**: Full mesh-gradient hero with floating glassmorphism stat cards, animated trust badges, "Find My Perfect School" quiz trigger
+- **Scroll Reveals**: All major sections use Framer Motion `whileInView` animations via local `Reveal` wrapper component
+- **Premium Pages Redesigned**: HomePage, EventsPage, TutorsPage — all with Apple-level typography, gradient headings, stat strips, animated card grids
 
 ## Routing
 
