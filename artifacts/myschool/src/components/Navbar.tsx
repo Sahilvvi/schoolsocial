@@ -79,7 +79,7 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`hidden lg:block fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
             ? "glass shadow-xl shadow-background/50"
             : "bg-background/80 backdrop-blur-md"

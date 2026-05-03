@@ -1,20 +1,38 @@
-import { useParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
-  MapPin, Star, Award, BookOpen, Briefcase, CheckCircle, Loader2,
-  Image, MessageSquare, GraduationCap, Sparkles, Heart, DollarSign, Users,
-  Phone, Mail, Globe, Shield, Target, Lightbulb, Trophy, IndianRupee,
-  CalendarDays, Play, Instagram, Facebook, ExternalLink, Video, Search
+  MapPin, Star, CheckCircle, Loader2, Image, MessageSquare,
+  GraduationCap, Heart, Phone, Mail, Globe, IndianRupee,
+  CalendarDays, Search, ArrowLeft, Share2, ChevronRight,
+  Bus, Monitor, FlaskConical, LibraryBig, Dumbbell, Laptop,
+  Camera, Stethoscope, Navigation, Edit
 } from "lucide-react";
 import AskAIChat from "@/components/AskAIChat";
 import QrOrderDialog from "@/components/QrOrderDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useSchoolBySlug, useReviews, useJobs, useEvents } from "@/hooks/useData";
 import { useSavedSchoolIds, useToggleSaveSchool } from "@/hooks/useSaveSchool";
+
+/* ─── Facility icon map ─────────────────────────────────── */
+const FACILITY_ICONS: Record<string, React.ElementType> = {
+  "Transport": Bus, "Smart Classrooms": Monitor, "Science Labs": FlaskConical,
+  "Library": LibraryBig, "Sports": Dumbbell, "Sports Complex": Dumbbell,
+  "Sports Ground": Dumbbell, "Computer Lab": Laptop, "CCTV Security": Camera,
+  "Medical Room": Stethoscope, "Swimming Pool": Dumbbell,
+  "Basketball Court": Dumbbell, "Auditorium": Monitor, "Music Room": Monitor,
+  "Art Studio": Edit, "Dance Room": Dumbbell, "Robotics Lab": Laptop,
+  "Cafeteria": LibraryBig, "Olympic Pool": Dumbbell, "Playground": Dumbbell,
+};
+
+function FacilityIcon({ name }: { name: string }) {
+  const Icon = FACILITY_ICONS[name] || CheckCircle;
+  return <Icon className="h-5 w-5 text-blue-600" />;
+}
 
 const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5 } };
 
@@ -25,269 +43,547 @@ export default function SchoolProfilePage() {
   const { data: allJobs = [] } = useJobs();
   const { data: allEvents = [] } = useEvents();
   const { user } = useAuth();
-  
+
   const { data: savedIds } = useSavedSchoolIds();
   const toggleSave = useToggleSaveSchool();
   const isSaved = school ? savedIds?.has(school.id) ?? false : false;
 
+  const [activeTab, setActiveTab] = useState("about");
+  const [showFullAbout, setShowFullAbout] = useState(false);
+
   const schoolJobs = allJobs.filter((j) => j.school_id === school?.id);
   const schoolEvents = allEvents.filter((e: any) => e.school_id === school?.id || (e.school_name && school?.name && e.school_name === school.name));
 
-  if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
-  if (!school) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground font-bold text-xl">School not found.</p></div>;
+  if (isLoading) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+    </div>
+  );
+  if (!school) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <p className="text-gray-500 font-bold text-xl">School not found.</p>
+    </div>
+  );
 
-  const avgRating = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : Number(school.rating).toFixed(1);
+  const avgRating = reviews.length
+    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
+    : Number(school.rating).toFixed(1);
 
   const classFees = (school as any).class_fees || [];
+  const gallery = school.gallery ?? [];
+  const facilities = school.facilities ?? [];
 
   return (
-    <div className="min-h-screen bg-background pb-20 lg:pb-0">
-      {/* ═══ HERO BANNER ═══ */}
-      <div className="relative h-[50vh] md:h-[60vh] overflow-hidden bg-card">
-        <motion.img
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          src={school.banner}
-          alt={school.name}
-          className="w-full h-full object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"; }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        
-        {/* Actions Top Right */}
-        <div className="absolute top-6 right-6 flex gap-3 z-20">
-          {user && (
-            <Button
-              size="icon"
-              className={`h-12 w-12 rounded-full backdrop-blur-md shadow-xl transition-all hover:scale-110 ${isSaved ? "bg-rose-500 text-white border-0" : "bg-black/20 text-white border border-white/20 hover:bg-rose-500"}`}
-              onClick={() => toggleSave.mutate({ schoolId: school.id, saved: isSaved })}
-            >
-              <Heart className={`h-6 w-6 ${isSaved ? "fill-current" : ""}`} />
-            </Button>
-          )}
+    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
+
+      {/* ══════════════════════════════════════════════════════════
+          MOBILE LAYOUT
+      ══════════════════════════════════════════════════════════ */}
+      <div className="lg:hidden bg-white">
+
+        {/* Mobile Top Header */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 px-4 h-14 flex items-center gap-3">
+          <Link to="/schools" className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-gray-100">
+            <ArrowLeft className="h-5 w-5 text-gray-700" />
+          </Link>
+          <h1 className="flex-1 font-bold text-gray-900 text-base truncate">{school.name}</h1>
+          <button
+            onClick={() => user && toggleSave.mutate({ schoolId: school.id, saved: isSaved })}
+            className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100"
+          >
+            <Heart className={`h-5 w-5 ${isSaved ? "fill-red-500 text-red-500" : "text-gray-500"}`} />
+          </button>
+          <button className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100">
+            <Share2 className="h-5 w-5 text-gray-500" />
+          </button>
         </div>
 
-        {/* Content Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 z-10 container mx-auto">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+        {/* Hero Image */}
+        <div className="pt-14">
+          <div className="relative">
+            <img
+              src={school.banner}
+              alt={school.name}
+              className="w-full h-52 object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"; }}
+            />
+            <div className="absolute bottom-2 right-3 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded-full">
+              1/{gallery.length > 0 ? gallery.length + 1 : 1}
+            </div>
+          </div>
+
+          {/* School Info Card */}
+          <div className="bg-white px-4 py-4 border-b border-gray-100">
+            <div className="flex items-start gap-3">
+              {/* School crest */}
+              <div className="h-14 w-14 rounded-full bg-blue-100 border-2 border-blue-200 flex items-center justify-center shrink-0 overflow-hidden">
+                <GraduationCap className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="font-extrabold text-gray-900 text-base">{school.name}</h2>
+                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-white" /> {avgRating}
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1">
+                  <MapPin className="h-3 w-3 shrink-0" /> {school.location}
+                </p>
+                {school.is_verified && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <CheckCircle className="h-3.5 w-3.5 text-blue-600" />
+                    <span className="text-[11px] text-blue-600 font-semibold">Verified</span>
+                  </div>
+                )}
+                <p className="text-[11px] text-gray-400 mt-0.5">({school.review_count} Reviews)</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <a href="tel:+911234567890">
+                <button className="w-full flex items-center justify-center gap-1.5 border border-teal-500 text-teal-600 rounded-xl py-2.5 text-xs font-bold hover:bg-teal-50 transition-colors">
+                  <Phone className="h-4 w-4" /> Call Now
+                </button>
+              </a>
+              <Link to={`/school/${school.slug}#enquiry`}>
+                <button className="w-full flex items-center justify-center gap-1.5 border border-teal-500 text-teal-600 rounded-xl py-2.5 text-xs font-bold hover:bg-teal-50 transition-colors">
+                  <MessageSquare className="h-4 w-4" /> Enquiry
+                </button>
+              </Link>
+              <Link to={`/school/${school.slug}#apply`}>
+                <button className="w-full flex items-center justify-center gap-1.5 border border-teal-500 text-teal-600 rounded-xl py-2.5 text-xs font-bold hover:bg-teal-50 transition-colors">
+                  <Edit className="h-4 w-4" /> Apply Now
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Info chips */}
+          <div className="bg-white px-4 py-3 border-b border-gray-100">
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { label: "Board", value: school.board },
+                { label: "Classes", value: "Nursery - 12th" },
+                { label: "Medium", value: "English" },
+                { label: "Established", value: "2005" },
+              ].map((info) => (
+                <div key={info.label} className="flex flex-col items-center text-center p-2">
+                  <p className="text-[10px] text-gray-400 font-medium">{info.label}</p>
+                  <p className="text-xs font-bold text-gray-800 mt-0.5 leading-tight">{info.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab Bar */}
+          <div className="bg-white border-b border-gray-100 overflow-x-auto no-scrollbar sticky top-14 z-40">
+            <div className="flex gap-0 px-2 min-w-max">
+              {["About", "Gallery", "Facilities", "Events", "Community", "Compare"].map((tab) => {
+                const val = tab.toLowerCase();
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(val)}
+                    className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 ${
+                      activeTab === val
+                        ? "text-blue-600 border-blue-600"
+                        : "text-gray-500 border-transparent hover:text-gray-700"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ─── ABOUT Section ─── */}
+          <div className="bg-white mt-2 px-4 py-4">
+            <h3 className="font-extrabold text-gray-900 text-sm mb-3">About School</h3>
+            <p className={`text-sm text-gray-600 leading-relaxed ${!showFullAbout ? "line-clamp-4" : ""}`}>
+              {school.about || school.description}
+            </p>
+            <button onClick={() => setShowFullAbout(!showFullAbout)} className="text-blue-600 text-xs font-semibold mt-1">
+              {showFullAbout ? "Show Less" : "Read More"}
+            </button>
+          </div>
+
+          {/* ─── Gallery Section ─── */}
+          <div className="bg-white mt-2 px-4 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-extrabold text-gray-900 text-sm">Gallery</h3>
+              <button className="text-blue-600 text-xs font-semibold flex items-center gap-0.5">
+                View All <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            {gallery.length > 0 ? (
+              <div className="grid grid-cols-3 gap-1.5">
+                {gallery.slice(0, 6).map((img, i) => (
+                  <div key={i} className="aspect-square rounded-lg overflow-hidden">
+                    <img src={img} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-1.5">
+                {[school.banner, ...(gallery)].concat([
+                  "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=300&q=80",
+                  "https://images.unsplash.com/photo-1562774053-701939374585?w=300&q=80",
+                  "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=300&q=80",
+                  "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=300&q=80",
+                ]).slice(0, 6).map((img, i) => (
+                  <div key={i} className="aspect-square rounded-lg overflow-hidden">
+                    <img src={img} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ─── Facilities Section ─── */}
+          <div className="bg-white mt-2 px-4 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-extrabold text-gray-900 text-sm">Facilities</h3>
+              <button className="text-blue-600 text-xs font-semibold flex items-center gap-0.5">
+                View All <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              {facilities.slice(0, 8).map((f, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5 text-center">
+                  <div className="h-11 w-11 rounded-full bg-blue-50 flex items-center justify-center">
+                    <FacilityIcon name={f} />
+                  </div>
+                  <p className="text-[10px] text-gray-600 font-medium leading-tight">{f}</p>
+                </div>
+              ))}
+              {facilities.length === 0 && (
+                ["Transport", "Smart Classrooms", "Science Labs", "Library", "Sports", "Computer Lab", "CCTV Security", "Medical Room"].map((f) => (
+                  <div key={f} className="flex flex-col items-center gap-1.5 text-center">
+                    <div className="h-11 w-11 rounded-full bg-blue-50 flex items-center justify-center">
+                      <FacilityIcon name={f} />
+                    </div>
+                    <p className="text-[10px] text-gray-600 font-medium leading-tight">{f}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* ─── Admissions Open Card ─── */}
+          <div className="mx-4 mt-2 mb-2 rounded-2xl border-2 border-green-500 bg-white overflow-hidden">
+            <div className="bg-green-50 px-4 py-3 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <GraduationCap className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-extrabold text-gray-900 text-sm">Admissions Open 2024-25</p>
+                <p className="text-xs text-gray-500">Apply now for a bright future!</p>
+              </div>
+            </div>
+            <div className="px-4 py-3">
+              <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-xl py-3 transition-colors">
+                Apply Now
+              </button>
+            </div>
+          </div>
+
+          {/* ─── Events & Activities ─── */}
+          <div className="bg-white mt-2 px-4 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-extrabold text-gray-900 text-sm">Events &amp; Activities</h3>
+              <Link to="/events" className="text-blue-600 text-xs font-semibold flex items-center gap-0.5">
+                View All <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {(schoolEvents.length > 0 ? schoolEvents : [
+                { title: "Annual Day Celebration", event_date: "2025-01-15" },
+                { title: "Sports Day", event_date: "2024-11-26" },
+                { title: "Science Exhibition", event_date: "2024-10-10" },
+              ] as any[]).slice(0, 3).map((ev: any, i: number) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <p className="text-xs font-semibold text-gray-800">{ev.title}</p>
+                  <p className="text-[11px] text-gray-400">
+                    {new Date(ev.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ─── Contact Us ─── */}
+          <div className="bg-white mt-2 px-4 py-4 mb-20">
+            <h3 className="font-extrabold text-gray-900 text-sm mb-3">Contact Us</h3>
+            <div className="space-y-2.5">
+              <div className="flex items-start gap-3 text-xs text-gray-600">
+                <MapPin className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
+                <span>{school.location}</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-600">
+                <Phone className="h-4 w-4 text-gray-400 shrink-0" />
+                <span>+91 01234 56789</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-600">
+                <Phone className="h-4 w-4 text-gray-400 shrink-0" />
+                <span>+91 98765 43210</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-600">
+                <Mail className="h-4 w-4 text-gray-400 shrink-0" />
+                <span>info@{school.slug}.edu.in</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-600">
+                <Globe className="h-4 w-4 text-gray-400 shrink-0" />
+                <span>www.{school.slug}.edu</span>
+              </div>
+            </div>
+            {/* Map placeholder */}
+            <div className="mt-3 h-28 rounded-xl overflow-hidden bg-gray-100 flex items-end justify-end">
+              <img
+                src={`https://maps.googleapis.com/maps/api/staticmap?center=${school.lat},${school.lng}&zoom=14&size=400x120&markers=color:red%7C${school.lat},${school.lng}&key=placeholder`}
+                alt="Map"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const el = e.target as HTMLImageElement;
+                  el.style.display = "none";
+                  el.parentElement!.style.background = "linear-gradient(135deg, #e0f2fe, #bfdbfe)";
+                }}
+              />
+              <div className="absolute bottom-1 right-1 bg-red-500 rounded-full h-6 w-6 flex items-center justify-center">
+                <MapPin className="h-3.5 w-3.5 text-white fill-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed Bottom Action Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3 grid grid-cols-3 gap-2">
+          <a href="tel:+911234567890">
+            <button className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors">
+              <Phone className="h-4 w-4" /> Call Now
+            </button>
+          </a>
+          <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors">
+            <MessageSquare className="h-4 w-4" /> Enquiry
+          </button>
+          <a href={`https://www.google.com/maps?q=${school.lat},${school.lng}`} target="_blank" rel="noopener noreferrer">
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors">
+              <Navigation className="h-4 w-4" /> Directions
+            </button>
+          </a>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+          DESKTOP LAYOUT
+      ══════════════════════════════════════════════════════════ */}
+      <div className="hidden lg:block">
+        {/* Hero Banner */}
+        <div className="relative h-[55vh] overflow-hidden bg-gray-200">
+          <motion.img
+            initial={{ scale: 1.05 }} animate={{ scale: 1 }} transition={{ duration: 1.5, ease: "easeOut" }}
+            src={school.banner} alt={school.name}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"; }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent" />
+
+          <div className="absolute top-6 right-6 flex gap-3 z-20">
+            {user && (
+              <button
+                className={`h-12 w-12 rounded-full backdrop-blur-md shadow-xl flex items-center justify-center transition-all hover:scale-110 ${isSaved ? "bg-rose-500 text-white" : "bg-black/20 text-white border border-white/20 hover:bg-rose-500"}`}
+                onClick={() => toggleSave.mutate({ schoolId: school.id, saved: isSaved })}
+              >
+                <Heart className={`h-6 w-6 ${isSaved ? "fill-current" : ""}`} />
+              </button>
+            )}
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 z-10 container mx-auto">
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <Badge className="gradient-primary text-white border-0 shadow-lg px-4 py-1.5 text-sm font-bold uppercase tracking-widest">{school.board}</Badge>
-              <Badge variant="outline" className="bg-background/80 backdrop-blur-md border-border/50 text-foreground px-3 py-1.5 font-bold shadow-md">
-                <Star className="h-4 w-4 fill-amber-500 text-amber-500 mr-1.5" /> {avgRating} ({school.review_count})
+              <Badge className="bg-blue-600 text-white border-0 shadow-lg px-4 py-1.5 text-sm font-bold uppercase tracking-widest">{school.board}</Badge>
+              <Badge variant="outline" className="bg-white/90 backdrop-blur-md border-0 text-gray-900 px-3 py-1.5 font-bold shadow-md">
+                <Star className="h-4 w-4 fill-amber-500 text-amber-500 mr-1.5" /> {avgRating} ({school.review_count} Reviews)
               </Badge>
               {school.is_verified && (
-                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5 font-bold shadow-md">
+                <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-400/30 px-3 py-1.5 font-bold">
                   <CheckCircle className="h-4 w-4 mr-1.5" /> Verified
                 </Badge>
               )}
             </div>
-            
-            <h1 className="text-4xl md:text-6xl font-extrabold text-foreground leading-tight mb-4 drop-shadow-md">{school.name}</h1>
-            
-            <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-foreground/90">
-              <span className="flex items-center gap-2 bg-background/50 backdrop-blur-md px-4 py-2 rounded-xl border border-border/50 shadow-sm"><MapPin className="h-5 w-5 text-primary" />{school.location}</span>
-              <span className="flex items-center gap-2 bg-background/50 backdrop-blur-md px-4 py-2 rounded-xl border border-border/50 shadow-sm"><DollarSign className="h-5 w-5 text-primary" />{school.fees} / yr</span>
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">{school.name}</h1>
+            <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/90">
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20">
+                <MapPin className="h-5 w-5 text-blue-400" />{school.location}
+              </span>
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20">
+                <IndianRupee className="h-5 w-5 text-blue-400" />{school.fees} / yr
+              </span>
               <AskAIChat schoolName={school.name} schoolAbout={school.about} schoolFees={school.fees} schoolBoard={school.board} schoolFacilities={school.facilities ?? []} />
             </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* ═══ MAIN CONTENT ═══ */}
-      <div className="container mx-auto px-4 py-12">
-        <Tabs defaultValue="about" className="space-y-12">
-          {/* Custom Tabs List */}
-          <div className="sticky top-[60px] lg:top-[64px] z-30 -mx-4 px-4 py-4 bg-background/95 backdrop-blur-xl border-b border-border/50">
-            <TabsList className="flex gap-2 h-auto bg-transparent p-0 w-full justify-start overflow-x-auto no-scrollbar">
-              {[
-                { value: "about", icon: BookOpen, label: "Overview" },
-                { value: "fees", icon: IndianRupee, label: "Fees & Structure" },
-                { value: "gallery", icon: Image, label: "Gallery" },
-                { value: "reviews", icon: MessageSquare, label: "Reviews" },
-                { value: "admission", icon: GraduationCap, label: "Apply Now" }
-              ].map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="rounded-xl gap-2.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-bold text-sm px-6 py-3.5 shrink-0 bg-card border border-border/50 hover:bg-muted/50 text-muted-foreground"
-                >
-                  <tab.icon className="h-4 w-4" />
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
           </div>
+        </div>
 
-          {/* === OVERVIEW TAB === */}
-          <TabsContent value="about" className="space-y-8">
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Left Column - Main Details */}
-              <div className="lg:col-span-2 space-y-8">
-                <motion.section {...fadeUp}>
-                  <Card className="bg-card rounded-3xl border-border/50 shadow-sm overflow-hidden">
-                    <div className="p-8 pb-6 border-b border-border/50">
-                      <h2 className="text-2xl font-extrabold flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                        </div>
-                        About School
-                      </h2>
-                    </div>
-                    <CardContent className="p-8">
-                      <p className="text-muted-foreground leading-relaxed text-lg font-medium">{school.about || school.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.section>
-
-                <motion.section {...fadeUp} transition={{ delay: 0.1 }}>
-                  <Card className="bg-card rounded-3xl border-border/50 shadow-sm overflow-hidden">
-                    <div className="p-8 pb-6 border-b border-border/50">
-                      <h2 className="text-2xl font-extrabold flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-                          <Sparkles className="h-5 w-5 text-secondary" />
-                        </div>
-                        Facilities
-                      </h2>
-                    </div>
-                    <CardContent className="p-8">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {(school.facilities ?? []).map((f, i) => (
-                          <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-background border border-border/50 hover:border-primary/30 transition-colors font-semibold text-foreground text-sm">
-                            <div className="h-8 w-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0">
-                              <CheckCircle className="h-4 w-4 text-primary" />
-                            </div>
-                            {f}
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.section>
-              </div>
-
-              {/* Right Column - Sidebar */}
-              <div className="space-y-8">
-                <motion.section {...fadeUp} transition={{ delay: 0.2 }}>
-                  <Card className="bg-card rounded-3xl border-border/50 shadow-sm overflow-hidden">
-                    <div className="p-6 pb-4 border-b border-border/50">
-                      <h3 className="font-extrabold text-lg">Contact Info</h3>
-                    </div>
-                    <CardContent className="p-6 space-y-6">
-                      <div className="flex items-start gap-4 text-sm font-medium text-foreground">
-                        <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center shrink-0"><MapPin className="h-5 w-5 text-primary" /></div>
-                        <div className="pt-2">{school.location}</div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm font-medium text-foreground">
-                        <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center shrink-0"><Phone className="h-5 w-5 text-primary" /></div>
-                        <div>+91 98765 43210</div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm font-medium text-foreground">
-                        <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center shrink-0"><Mail className="h-5 w-5 text-primary" /></div>
-                        <div>admissions@{school.slug}.edu</div>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm font-medium text-foreground">
-                        <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center shrink-0"><Globe className="h-5 w-5 text-primary" /></div>
-                        <a href="#" className="hover:text-primary transition-colors hover:underline">www.{school.slug}.edu</a>
-                      </div>
-
-                      <div className="pt-6 border-t border-border/50 flex justify-center gap-4">
-                        <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-border/50 text-foreground hover:bg-primary/5 hover:text-primary"><Facebook className="h-5 w-5" /></Button>
-                        <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-border/50 text-foreground hover:bg-primary/5 hover:text-primary"><Instagram className="h-5 w-5" /></Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.section>
-
-                <motion.section {...fadeUp} transition={{ delay: 0.3 }}>
-                  <Card className="gradient-primary rounded-3xl border-0 shadow-xl shadow-primary/20 text-white overflow-hidden text-center">
-                    <CardContent className="p-8">
-                      <GraduationCap className="h-12 w-12 mx-auto mb-4 opacity-80" />
-                      <h3 className="font-extrabold text-2xl mb-2">Ready to Apply?</h3>
-                      <p className="text-white/80 font-medium mb-6">Start your admission journey today.</p>
-                      <Button className="w-full bg-white text-primary hover:bg-gray-100 font-extrabold h-14 rounded-2xl shadow-lg">
-                        Apply Now
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.section>
-              </div>
+        {/* Desktop Tabs */}
+        <div className="bg-white border-b border-gray-200 sticky top-16 z-30">
+          <div className="container mx-auto px-4">
+            <div className="flex gap-0 overflow-x-auto no-scrollbar">
+              {[
+                { value: "about", label: "About" },
+                { value: "fees", label: "Fees & Structure" },
+                { value: "gallery", label: "Gallery" },
+                { value: "reviews", label: "Reviews" },
+                { value: "admission", label: "Apply Now" },
+              ].map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={`px-6 py-4 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
+                    activeTab === tab.value ? "text-blue-600 border-blue-600" : "text-gray-500 border-transparent hover:text-gray-700"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-          </TabsContent>
+          </div>
+        </div>
 
-          {/* === FEES TAB === */}
-          <TabsContent value="fees">
-            <Card className="bg-card rounded-3xl border-border/50 shadow-sm max-w-4xl mx-auto">
-              <div className="p-8 border-b border-border/50">
-                <h2 className="text-2xl font-extrabold flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                    <IndianRupee className="h-5 w-5 text-green-500" />
-                  </div>
-                  Fee Structure
-                </h2>
-              </div>
-              <CardContent className="p-8">
-                {classFees.length > 0 ? (
-                  <div className="space-y-4">
-                    {classFees.map((item: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between p-6 rounded-2xl bg-background border border-border/50 shadow-sm hover:border-primary/30 transition-colors">
-                        <span className="font-extrabold text-lg text-foreground">{item.class}</span>
-                        <div className="text-right">
-                          <span className="font-extrabold text-xl text-primary">{item.fee}</span>
-                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Per Year</p>
+        {/* Desktop Content */}
+        <div className="container mx-auto px-4 py-12">
+          {activeTab === "about" && (
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                  <h2 className="text-2xl font-extrabold mb-4 text-gray-900">About School</h2>
+                  <p className="text-gray-600 leading-relaxed">{school.about || school.description}</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                  <h2 className="text-2xl font-extrabold mb-6 text-gray-900">Facilities</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {facilities.map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100 font-semibold text-gray-700 text-sm">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                          <CheckCircle className="h-4 w-4 text-blue-600" />
                         </div>
+                        {f}
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <IndianRupee className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground font-bold text-lg">Fee structure not publicly available.</p>
-                    <Button variant="outline" className="mt-4 rounded-xl font-bold border-border/50">Request Fee Details</Button>
+                </div>
+                {/* Gallery preview */}
+                {gallery.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-extrabold text-gray-900">Gallery</h2>
+                      <button onClick={() => setActiveTab("gallery")} className="text-sm text-blue-600 font-semibold flex items-center gap-1">
+                        View All <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {gallery.slice(0, 6).map((img, i) => (
+                        <div key={i} className="aspect-video rounded-xl overflow-hidden">
+                          <img src={img} alt="Gallery" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* === GALLERY TAB === */}
-          <TabsContent value="gallery">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(school.gallery ?? []).map((img, i) => (
-                <div key={i} className="aspect-video rounded-3xl overflow-hidden border border-border/50 shadow-sm group relative">
-                  <img src={img} alt="Gallery" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Search className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-6">
+                {/* Contact */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <h3 className="font-extrabold text-lg text-gray-900 mb-4">Contact Info</h3>
+                  <div className="space-y-4 text-sm">
+                    {[
+                      { icon: MapPin, value: school.location },
+                      { icon: Phone, value: "+91 98765 43210" },
+                      { icon: Mail, value: `admissions@${school.slug}.edu` },
+                      { icon: Globe, value: `www.${school.slug}.edu` },
+                    ].map(({ icon: Icon, value }) => (
+                      <div key={value} className="flex items-start gap-3 text-gray-700">
+                        <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                          <Icon className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <span className="pt-2 text-sm">{value}</span>
+                      </div>
+                    ))}
                   </div>
+                </div>
+                {/* Admissions CTA */}
+                <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-6 text-white text-center">
+                  <GraduationCap className="h-12 w-12 mx-auto mb-3 opacity-80" />
+                  <h3 className="font-extrabold text-xl mb-2">Admissions Open</h3>
+                  <p className="text-white/80 text-sm mb-4">Apply now for 2024-25 academic year</p>
+                  <button className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-sm rounded-xl py-3 transition-colors">
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "fees" && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 max-w-3xl mx-auto">
+              <h2 className="text-2xl font-extrabold mb-6 text-gray-900">Fee Structure</h2>
+              {classFees.length > 0 ? (
+                <div className="space-y-4">
+                  {classFees.map((item: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between p-6 rounded-xl bg-gray-50 border border-gray-100">
+                      <span className="font-extrabold text-lg text-gray-900">{item.class}</span>
+                      <span className="font-extrabold text-xl text-blue-600">{item.fee}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <IndianRupee className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 font-bold text-lg mb-4">Fee structure not publicly available.</p>
+                  <button className="border border-blue-600 text-blue-600 rounded-xl px-6 py-2.5 font-semibold text-sm hover:bg-blue-50">Request Fee Details</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "gallery" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {gallery.map((img, i) => (
+                <div key={i} className="aspect-video rounded-2xl overflow-hidden border border-gray-100 shadow-sm group relative">
+                  <img src={img} alt="Gallery" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 </div>
               ))}
             </div>
-          </TabsContent>
+          )}
 
-          {/* Placeholder for other tabs (Reviews/Admission) - keeping it simple for the scope */}
-          <TabsContent value="reviews">
-            <Card className="bg-card rounded-3xl border-border/50 p-12 text-center shadow-sm">
-              <MessageSquare className="h-16 w-16 text-muted-foreground/30 mx-auto mb-6" />
-              <h2 className="text-2xl font-extrabold mb-2">Verified Parent Reviews</h2>
-              <p className="text-muted-foreground font-medium mb-6">See what other parents are saying about {school.name}.</p>
-              <Button className="rounded-xl gradient-primary font-bold px-8 h-12 shadow-md">Write a Review</Button>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="admission">
-             <Card className="bg-card rounded-3xl border-border/50 p-12 text-center shadow-sm">
-              <GraduationCap className="h-16 w-16 text-primary mx-auto mb-6" />
-              <h2 className="text-3xl font-extrabold mb-4">Start Your Application</h2>
-              <p className="text-muted-foreground font-medium max-w-lg mx-auto mb-8">Submit your details to initiate the admission process for the upcoming academic year.</p>
+          {activeTab === "reviews" && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
+              <MessageSquare className="h-16 w-16 text-gray-300 mx-auto mb-6" />
+              <h2 className="text-2xl font-extrabold mb-2 text-gray-900">Verified Parent Reviews</h2>
+              <p className="text-gray-500 font-medium mb-6">See what other parents are saying about {school.name}.</p>
+              <button className="bg-blue-600 text-white font-bold px-8 py-3 rounded-xl text-sm hover:bg-blue-700 transition-colors">Write a Review</button>
+            </div>
+          )}
+
+          {activeTab === "admission" && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
+              <GraduationCap className="h-16 w-16 text-blue-600 mx-auto mb-6" />
+              <h2 className="text-3xl font-extrabold mb-4 text-gray-900">Start Your Application</h2>
+              <p className="text-gray-500 font-medium max-w-lg mx-auto mb-8">Submit your details to initiate the admission process for the upcoming academic year.</p>
               <form className="max-w-md mx-auto space-y-4 text-left">
-                <div className="space-y-2"><label className="font-bold text-sm">Student Name</label><input type="text" className="w-full h-12 rounded-xl bg-background border border-border/60 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none" /></div>
-                <div className="space-y-2"><label className="font-bold text-sm">Parent Email</label><input type="email" className="w-full h-12 rounded-xl bg-background border border-border/60 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none" /></div>
-                <Button className="w-full h-14 rounded-xl gradient-primary font-extrabold text-lg shadow-xl shadow-primary/20 mt-4">Submit Application</Button>
+                <div className="space-y-2">
+                  <label className="font-bold text-sm text-gray-700">Student Name</label>
+                  <input type="text" className="w-full h-12 rounded-xl bg-gray-50 border border-gray-200 px-4 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-bold text-sm text-gray-700">Parent Email</label>
+                  <input type="email" className="w-full h-12 rounded-xl bg-gray-50 border border-gray-200 px-4 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none text-sm" />
+                </div>
+                <button className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm transition-colors mt-2">Submit Application</button>
               </form>
-            </Card>
-          </TabsContent>
-
-        </Tabs>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
