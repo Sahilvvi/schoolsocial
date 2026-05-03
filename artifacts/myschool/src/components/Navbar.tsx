@@ -20,11 +20,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const primaryLinks = [
-  { to: "/schools", label: "Schools", icon: School },
-  { to: "/events", label: "Events", icon: CalendarDays },
-  { to: "/jobs", label: "Vacancies", icon: Briefcase },
-  { to: "/tutors", label: "Tutors", icon: BookOpen },
-  { to: "/news", label: "News", icon: Newspaper },
+  { to: "/schools",   label: "Schools",   icon: School },
+  { to: "/tutors",    label: "Tuitions",  icon: BookOpen },
+  { to: "/compare",   label: "Compare",   icon: GitCompareArrows },
+  { to: "/events",    label: "Events",    icon: CalendarDays },
+  { to: "/news",      label: "Blogs",     icon: Newspaper },
+  { to: "/community", label: "Community", icon: Globe },
 ];
 
 const moreLinks = [
