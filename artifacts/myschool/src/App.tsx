@@ -29,6 +29,7 @@ import TeacherProfilePage from "@/pages/TeacherProfilePage";
 import ScannerPage from "@/pages/ScannerPage";
 import SchoolCommunityPage from "@/pages/SchoolCommunityPage";
 import TuitionDashboard from "@/pages/TuitionDashboard";
+import TuitionCenterPage from "@/pages/TuitionCenterPage";
 
 // Teacher Panel
 import TeacherPanelLayout from "@/pages/teacher-panel/TeacherPanelLayout";
@@ -131,6 +132,7 @@ function AppShell() {
             <Route path="/erp/*" element={<ErpApp />} />
             <Route path="/plans" element={<PlansPage />} />
             <Route path="/tuition-enquiry" element={<TuitionEnquiryPage />} />
+            <Route path="/tuition/:id" element={<TuitionCenterPage />} />
             <Route path="/upload-school" element={<UploadSchoolPage />} />
             <Route path="/compare" element={<CompareSchoolsPage />} />
             <Route path="/dashboard" element={<ParentDashboard />} />

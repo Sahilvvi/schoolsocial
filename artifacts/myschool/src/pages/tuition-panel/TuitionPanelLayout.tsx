@@ -243,7 +243,7 @@ export default function TuitionPanelLayout() {
           <div className="flex-1" />
 
           {/* View Center Profile */}
-          <Link to={`/`} className="hidden sm:flex items-center gap-1.5 text-sm text-blue-600 font-medium hover:text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors whitespace-nowrap">
+          <Link to="/tuition/bright-future" className="hidden sm:flex items-center gap-1.5 text-sm text-blue-600 font-medium hover:text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors whitespace-nowrap">
             View Center Profile <ExternalLink className="h-3.5 w-3.5" />
           </Link>
 
