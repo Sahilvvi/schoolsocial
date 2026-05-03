@@ -194,7 +194,7 @@ export default function Navbar() {
                 </DropdownMenu>
               ) : (
                 <Link to="/auth">
-                  <Button className="rounded-xl shadow-lg shadow-primary/20 font-bold gradient-primary border-0 text-white hover:opacity-90 h-10 px-6 transition-transform hover:scale-105 active:scale-95">
+                  <Button className="rounded-full shadow-lg shadow-primary/30 font-bold gradient-primary border-0 text-white hover:opacity-90 h-10 px-6 transition-transform hover:scale-105 active:scale-95 btn-shine">
                     Sign In
                   </Button>
                 </Link>

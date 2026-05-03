@@ -20,6 +20,27 @@ const MOBILE_STUDENT_URL = "https://images.unsplash.com/photo-1503676260728-1c00
 const QUICK_FILTERS = ["Nearby", "CBSE", "ICSE", "State Board", "Nursery", "Primary", "High School"];
 const BOARDS = ["All Boards", "CBSE", "ICSE", "State Board", "IB", "IGCSE"];
 
+const CHIP_COLORS = [
+  "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100",
+  "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100",
+  "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100",
+  "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100",
+  "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100",
+  "bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100",
+  "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100",
+];
+
+const MARQUEE_ITEMS = [
+  { label: "500+ Schools Listed",        icon: School,       color: "from-blue-500 to-blue-600"      },
+  { label: "Govt. Verified Schools",     icon: BadgeCheck,   color: "from-emerald-500 to-teal-500"   },
+  { label: "25,000+ Parents Trust Us",   icon: Users,        color: "from-purple-500 to-indigo-600"  },
+  { label: "4.8★ Avg Rating",            icon: Star,         color: "from-amber-500 to-orange-500"   },
+  { label: "300+ Tuition Centers",       icon: BookOpen,     color: "from-orange-500 to-rose-500"    },
+  { label: "Free School Comparison",     icon: Scale,        color: "from-sky-500 to-cyan-600"       },
+  { label: "200+ Events",                icon: CalendarDays, color: "from-violet-500 to-purple-600"  },
+  { label: "Instant Apply",              icon: Zap,          color: "from-green-500 to-emerald-600"  },
+];
+
 const CATEGORIES = [
   { to: "/schools",   label: "Schools",   bg: "from-blue-500 to-blue-600",    icon: School,       glow: "shadow-blue-500/30"   },
   { to: "/tutors",    label: "Tuitions",  bg: "from-orange-500 to-orange-600", icon: BookOpen,    glow: "shadow-orange-500/30" },
@@ -116,7 +137,7 @@ export default function HomePage() {
               <Bell className="h-5 w-5 text-foreground" />
               <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-rose-500 rounded-full ring-2 ring-background" />
             </button>
-            <Link to="/auth" className="gradient-primary text-white text-xs font-bold px-4 py-1.5 rounded-xl shadow-md shadow-primary/20">
+            <Link to="/auth" className="gradient-primary text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md shadow-primary/20 btn-shine">
               Sign In
             </Link>
           </div>
@@ -174,7 +195,7 @@ export default function HomePage() {
                   </select>
                 </div>
               </div>
-              <button type="submit" className="w-full gradient-primary text-white font-bold text-sm rounded-2xl py-3.5 shadow-lg shadow-primary/30 hover:opacity-90 transition-opacity">
+              <button type="submit" className="w-full gradient-primary text-white font-bold text-sm rounded-full py-3.5 shadow-lg shadow-primary/30 hover:opacity-90 transition-opacity btn-shine">
                 Search Schools
               </button>
             </form>
@@ -254,7 +275,7 @@ export default function HomePage() {
                 <p className="font-extrabold text-white text-sm leading-tight mb-0.5">School or Tuition Owner?</p>
                 <p className="text-white/70 text-[11px] leading-snug mb-2">Get discovered by thousands of parents.</p>
                 <Link to="/upload-school">
-                  <button className="bg-white text-blue-700 text-[11px] font-extrabold rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-sm">
+                  <button className="bg-white text-blue-700 text-[11px] font-extrabold rounded-full px-3 py-1.5 flex items-center gap-1 shadow-sm">
                     List Your Institution <ArrowRight className="h-3 w-3" />
                   </button>
                 </Link>
@@ -407,17 +428,17 @@ export default function HomePage() {
                     </select>
                   </div>
                   <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                    className="gradient-primary text-white font-extrabold text-sm px-8 py-4 shrink-0 transition-all shadow-lg shadow-primary/20 m-1.5 rounded-xl">
+                    className="gradient-primary text-white font-extrabold text-sm px-8 py-4 shrink-0 transition-all shadow-lg shadow-primary/30 m-1.5 rounded-full btn-shine">
                     Search
                   </motion.button>
                 </motion.form>
 
                 {/* Quick Chips */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex flex-wrap gap-2">
-                  {QUICK_FILTERS.map((chip) => (
-                    <motion.button key={chip} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                  {QUICK_FILTERS.map((chip, idx) => (
+                    <motion.button key={chip} whileHover={{ scale: 1.06, y: -1 }} whileTap={{ scale: 0.95 }}
                       onClick={() => navigate(`/schools?q=${chip}`)}
-                      className="text-xs font-semibold text-muted-foreground border border-border/50 rounded-full px-4 py-1.5 hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all bg-card/50">
+                      className={`text-xs font-bold border rounded-full px-4 py-1.5 transition-all ${CHIP_COLORS[idx % CHIP_COLORS.length]}`}>
                       {chip}
                     </motion.button>
                   ))}
@@ -441,7 +462,7 @@ export default function HomePage() {
                   <Dialog>
                     <DialogTrigger asChild>
                       <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                        className="flex items-center gap-2 text-xs font-bold text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 px-4 py-2 rounded-full transition-all">
+                        className="flex items-center gap-2 text-xs font-bold text-white gradient-primary px-4 py-2 rounded-full shadow-md shadow-primary/30 hover:opacity-90 btn-shine transition-all">
                         <Sparkles className="h-3.5 w-3.5" /> Find My Perfect School
                       </motion.button>
                     </DialogTrigger>
@@ -499,20 +520,38 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ─── CATEGORY ICONS ───────────────────────────────────────── */}
-        <section className="py-12 border-y border-border/30 bg-card/30 backdrop-blur-sm">
+        {/* ─── MARQUEE TRUST STRIP ──────────────────────────────────── */}
+        <div className="overflow-hidden border-y border-border/30 bg-muted/30 py-4">
+          <div className="flex animate-marquee gap-10">
+            {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <span key={i} className="inline-flex items-center gap-2.5 text-sm font-bold text-slate-600 whitespace-nowrap shrink-0">
+                  <span className={`h-7 w-7 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-sm shrink-0`}>
+                    <Icon className="h-3.5 w-3.5 text-white" />
+                  </span>
+                  {item.label}
+                  <span className="text-slate-300 ml-2">·</span>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ─── CATEGORY PILLS ───────────────────────────────────────── */}
+        <section className="py-8 border-b border-border/30 bg-card/20">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-6 gap-6">
+            <div className="flex flex-wrap justify-center gap-3">
               {CATEGORIES.map((cat, i) => {
                 const Icon = cat.icon;
                 return (
-                  <Reveal key={cat.label} delay={i * 0.07}>
-                    <Link to={cat.to} className="flex flex-col items-center gap-3 group text-center">
-                      <motion.div whileHover={{ scale: 1.12, y: -4 }} whileTap={{ scale: 0.95 }}
-                        className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${cat.bg} shadow-lg ${cat.glow} flex items-center justify-center transition-shadow`}>
-                        <Icon className="h-7 w-7 text-white" />
+                  <Reveal key={cat.label} delay={i * 0.06}>
+                    <Link to={cat.to}>
+                      <motion.div whileHover={{ scale: 1.06, y: -3 }} whileTap={{ scale: 0.96 }}
+                        className={`flex items-center gap-2.5 bg-gradient-to-r ${cat.bg} text-white px-7 py-3.5 rounded-full shadow-lg ${cat.glow} cursor-pointer btn-shine`}>
+                        <Icon className="h-4 w-4 text-white shrink-0" />
+                        <span className="font-extrabold text-sm whitespace-nowrap">{cat.label}</span>
                       </motion.div>
-                      <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{cat.label}</p>
                     </Link>
                   </Reveal>
                 );
@@ -522,21 +561,23 @@ export default function HomePage() {
         </section>
 
         {/* ─── ANIMATED STATS ───────────────────────────────────────── */}
-        <section className="py-14 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-3 lg:grid-cols-6 gap-4">
+        <section className="py-16 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1445 100%)" }}>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,_hsl(221_83%_53%_/_0.18)_0%,_transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_50%,_hsl(262_83%_58%_/_0.12)_0%,_transparent_55%)]" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-3 lg:grid-cols-6 gap-6">
               {STATS.map((s, i) => {
                 const Icon = s.icon;
                 return (
                   <Reveal key={s.label} delay={i * 0.08}>
-                    <div className="group flex flex-col items-center text-center p-5 rounded-2xl bg-card border border-border/40 hover:border-primary/30 shadow-sm hover:shadow-md transition-all duration-300">
-                      <div className="h-12 w-12 gradient-primary rounded-xl flex items-center justify-center mb-3 shadow-md shadow-primary/20 group-hover:scale-110 transition-transform">
+                    <div className="group flex flex-col items-center text-center">
+                      <div className="h-12 w-12 bg-white/10 border border-white/20 rounded-2xl flex items-center justify-center mb-3 group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300">
                         <Icon className="h-5 w-5 text-white" />
                       </div>
-                      <p className="text-2xl font-extrabold text-foreground">
+                      <p className="text-3xl font-extrabold text-white tabular-nums">
                         <AnimatedCounter target={s.target} suffix={s.suffix} />
                       </p>
-                      <p className="text-xs text-muted-foreground font-medium mt-0.5">{s.label}</p>
+                      <p className="text-xs text-white/55 font-medium mt-1">{s.label}</p>
                     </div>
                   </Reveal>
                 );
@@ -617,7 +658,7 @@ export default function HomePage() {
                   </ul>
                   <Link to="/compare">
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                      className="w-full gradient-primary text-white font-extrabold text-sm rounded-2xl px-4 py-3.5 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                      className="w-full gradient-primary text-white font-extrabold text-sm rounded-full px-4 py-3.5 shadow-lg shadow-primary/30 flex items-center justify-center gap-2 btn-shine">
                       Compare Schools <ArrowRight className="h-4 w-4" />
                     </motion.button>
                   </Link>
@@ -647,7 +688,7 @@ export default function HomePage() {
                           <p className="text-[11px] text-muted-foreground mb-1">{school.board} · {school.location}</p>
                           <p className="text-xs font-extrabold text-foreground mb-3">{school.fees}</p>
                           <Link to={`/school/${school.slug}`} className="mt-auto">
-                            <button className="w-full border-2 border-primary text-primary hover:gradient-primary hover:text-white text-xs font-bold rounded-xl py-2 transition-all">View Profile</button>
+                            <button className="w-full border-2 border-primary text-primary hover:gradient-primary hover:text-white text-xs font-bold rounded-full py-2 transition-all">View Profile</button>
                           </Link>
                         </div>
                       </div>
@@ -662,7 +703,7 @@ export default function HomePage() {
                       </div>
                       <p className="text-sm font-bold text-primary text-center mb-1">Add School to Compare</p>
                       <p className="text-[11px] text-muted-foreground text-center mb-4">Up to 3 schools at once</p>
-                      <button className="gradient-primary text-white text-xs font-extrabold rounded-xl px-5 py-2.5 shadow-md shadow-primary/20">
+                      <button className="gradient-primary text-white text-xs font-extrabold rounded-full px-5 py-2.5 shadow-md shadow-primary/30 btn-shine">
                         Start Comparing
                       </button>
                     </div>
@@ -794,7 +835,7 @@ export default function HomePage() {
                   ))}
                   <Reveal delay={0.2}>
                     <Link to="/community">
-                      <motion.button whileHover={{ scale: 1.01 }} className="w-full border-2 border-dashed border-primary/30 rounded-2xl py-4 text-sm font-bold text-primary hover:bg-primary/5 hover:border-primary/50 transition-all">
+                      <motion.button whileHover={{ scale: 1.01 }} className="w-full border-2 border-dashed border-primary/30 rounded-full py-4 text-sm font-bold text-primary hover:bg-primary/5 hover:border-primary/50 transition-all">
                         + Join the Community
                       </motion.button>
                     </Link>
@@ -838,8 +879,8 @@ export default function HomePage() {
                     <div className="flex flex-col items-center gap-3 shrink-0">
                       <Link to="/upload-school">
                         <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-                          className="bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-base rounded-2xl px-8 py-4 shadow-xl whitespace-nowrap transition-colors">
-                          List Your Institution
+                          className="bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-base rounded-full px-10 py-4 shadow-xl whitespace-nowrap transition-colors btn-shine">
+                          List Your Institution →
                         </motion.button>
                       </Link>
                       <p className="text-white/60 text-xs font-medium">Free forever · No credit card</p>

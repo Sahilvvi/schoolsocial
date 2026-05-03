@@ -411,8 +411,41 @@
   border-radius: inherit;
   z-index: -1;
   opacity: 0;
-  blur: 16px;
   filter: blur(16px);
   transition: opacity 0.4s ease;
 }
-.btn-glow:hover::after { opacity: 0.6; }
+.btn-glow:hover::after {
+  opacity: 0.35;
+}
+
+/* ── Shimmer sweep on hover ────────────────────────────────── */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  z-index: 1;
+}
+.btn-shine:hover::before {
+  animation: shine-sweep 0.65s ease;
+}
+@keyframes shine-sweep {
+  to { left: 150%; }
+}
+
+/* ── Reverse marquee ───────────────────────────────────────── */
+.animate-marquee-reverse {
+  animation: marquee 30s linear infinite reverse;
+}
+.animate-marquee-fast {
+  animation: marquee 15s linear infinite;
+}
