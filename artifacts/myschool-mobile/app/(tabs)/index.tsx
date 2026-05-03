@@ -68,7 +68,8 @@ export default function HomeScreen() {
 
   const handleCategoryPress = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (id === "schools" || id === "compare") router.push("/(tabs)/schools" as any);
+    if (id === "schools") router.push("/(tabs)/schools" as any);
+    else if (id === "compare") router.push("/compare" as any);
     else if (id === "tutors") router.push("/(tabs)/tutors" as any);
     else if (id === "events") router.push("/(tabs)/events" as any);
     else if (id === "jobs") router.push("/jobs" as any);
@@ -108,7 +109,7 @@ export default function HomeScreen() {
           </Pressable>
           <Pressable
             style={[styles.iconBtn, { backgroundColor: colors.muted }]}
-            onPress={() => router.push("/news" as any)}
+            onPress={() => router.push("/notifications" as any)}
           >
             <Ionicons name="notifications-outline" size={19} color={colors.foreground} />
             <View style={[styles.notifDot, { backgroundColor: "#EF4444" }]} />

@@ -110,9 +110,9 @@ function LoggedInView() {
   const rc = roleConfig[user!.role] ?? { label: user!.role, color: colors.primary, bg: colors.accent };
 
   const parentItems = [
-    { icon: "book-outline", label: "My Admissions", subtitle: "Track application status", onPress: () => router.push("/(tabs)/schools" as any), badge: "2", iconColor: "#2563EB", iconBg: "#EFF6FF" },
+    { icon: "book-outline", label: "My Admissions", subtitle: "Track application status", onPress: () => router.push("/admissions" as any), badge: "2", iconColor: "#2563EB", iconBg: "#EFF6FF" },
     { icon: "calendar-outline", label: "Booked Sessions", subtitle: "Upcoming tutor sessions", onPress: () => router.push("/(tabs)/tutors" as any), badge: "1", iconColor: "#7C3AED", iconBg: "#F5F3FF" },
-    { icon: "heart-outline", label: "Saved Schools", subtitle: "Your shortlisted schools", onPress: () => router.push("/(tabs)/schools" as any), badge: "7", iconColor: "#EF4444", iconBg: "#FEF2F2" },
+    { icon: "heart-outline", label: "Saved Schools", subtitle: "Your shortlisted schools", onPress: () => router.push("/saved" as any), badge: "7", iconColor: "#EF4444", iconBg: "#FEF2F2" },
     { icon: "calendar-outline", label: "Registered Events", subtitle: "School events you joined", onPress: () => router.push("/(tabs)/events" as any), iconColor: "#F59E0B", iconBg: "#FFFBEB" },
   ];
 

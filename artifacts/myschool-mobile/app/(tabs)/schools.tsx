@@ -1,4 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
   FlatList,
@@ -61,10 +63,22 @@ export default function SchoolsScreen() {
           },
         ]}
       >
-        <Text style={[styles.headerTitle, { color: colors.foreground }]}>Schools</Text>
-        <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
-          {filtered.length} results found
-        </Text>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.headerTitle, { color: colors.foreground }]}>Schools</Text>
+          <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>
+            {filtered.length} results found
+          </Text>
+        </View>
+        <Pressable
+          style={[styles.compareShortcut, { backgroundColor: colors.accent, borderColor: colors.primary + "30" }]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/compare" as any);
+          }}
+        >
+          <Ionicons name="git-compare-outline" size={15} color={colors.primary} />
+          <Text style={[styles.compareShortcutText, { color: colors.primary }]}>Compare</Text>
+        </Pressable>
       </View>
 
       <FlatList
@@ -172,10 +186,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingBottom: 12,
     borderBottomWidth: 1,
+    gap: 12,
   },
+  compareShortcut: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  compareShortcutText: { fontSize: 13, fontWeight: "700" as const },
   headerTitle: {
     fontSize: 28,
     fontWeight: "800" as const,
