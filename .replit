@@ -18,3 +18,13 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[[ports]]
+localPort = 19910
+externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://crqcdqrimmvetmbmhapv.supabase.co"
+VITE_SUPABASE_PROJECT_ID = "crqcdqrimmvetmbmhapv"
