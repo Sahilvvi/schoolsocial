@@ -11,7 +11,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: "parent" | "school" | "teacher" | "admin";
+  role: "parent" | "school" | "teacher" | "admin" | "tuition";
   avatar?: string;
 }
 
@@ -59,6 +59,15 @@ const DEMO_USERS: Record<string, { password: string; user: User }> = {
       email: "admin@myschool.demo",
       name: "Admin User",
       role: "admin",
+    },
+  },
+  "tuition@myschool.demo": {
+    password: "Demo@1234",
+    user: {
+      id: "tuition-1",
+      email: "tuition@myschool.demo",
+      name: "Bright Future Academy",
+      role: "tuition",
     },
   },
 };

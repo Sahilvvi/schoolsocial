@@ -274,26 +274,60 @@ function LoggedInView() {
   );
 }
 
+const DEMO_PANELS = [
+  { key: "parent",  label: "Parent",   icon: "people-outline",    color: "#2563EB", bg: "#EFF6FF",  email: "parent@myschool.demo"  },
+  { key: "school",  label: "School",   icon: "school-outline",    color: "#7C3AED", bg: "#F5F3FF",  email: "school@myschool.demo"  },
+  { key: "teacher", label: "Teacher",  icon: "person-outline",    color: "#10B981", bg: "#ECFDF5",  email: "teacher@myschool.demo" },
+  { key: "tuition", label: "Tuition",  icon: "book-outline",      color: "#F59E0B", bg: "#FFFBEB",  email: "tuition@myschool.demo" },
+  { key: "admin",   label: "Admin",    icon: "shield-outline",    color: "#EF4444", bg: "#FEF2F2",  email: "admin@myschool.demo"   },
+] as const;
+
+const SIGNUP_ROLES = [
+  { value: "parent",  label: "Parent",         icon: "people-outline",  desc: "Find schools & track admissions",     color: "#2563EB", bg: "#EFF6FF" },
+  { value: "teacher", label: "Teacher",         icon: "person-outline",  desc: "Find jobs & create your profile",     color: "#10B981", bg: "#ECFDF5" },
+  { value: "school",  label: "School",          icon: "school-outline",  desc: "List school & manage admissions",     color: "#7C3AED", bg: "#F5F3FF" },
+  { value: "tuition", label: "Tuition Center",  icon: "book-outline",    desc: "List batches & manage students",      color: "#F59E0B", bg: "#FFFBEB" },
+] as const;
+
 function LoggedOutView() {
   const { signIn } = useAuth();
   const colors = useColors();
   const insets = useSafeAreaInsets();
+
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Signup-only state
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupRole, setSignupRole] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : 0;
 
+  const resetAll = () => {
+    setEmail(""); setPassword(""); setError("");
+    setSignupName(""); setSignupEmail(""); setSignupPassword(""); setSignupRole("");
+    setForgotEmail(""); setForgotSent(false);
+  };
+
+  const switchMode = (m: "login" | "signup" | "forgot") => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    resetAll();
+    setMode(m);
+  };
+
   const handleSignIn = async () => {
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    const result = await signIn(email.trim(), password);
+    if (!email.trim() || !password) { setError("Please fill in all fields"); return; }
+    setLoading(true); setError("");
+    const result = await signIn(email.trim().toLowerCase(), password);
     setLoading(false);
     if (result.error) {
       setError(result.error);
@@ -301,6 +335,30 @@ function LoggedOutView() {
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
+  };
+
+  const handleQuickLogin = async (demoEmail: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setLoading(true); setError("");
+    if (mode !== "login") setMode("login");
+    const result = await signIn(demoEmail, "Demo@1234");
+    setLoading(false);
+    if (result.error) setError(result.error);
+    else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
+  const handleSignUp = () => {
+    if (!signupRole) { setError("Please choose your role"); return; }
+    if (!signupName.trim()) { setError("Please enter your name"); return; }
+    if (!signupEmail.trim()) { setError("Please enter your email"); return; }
+    if (signupPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
+    Alert.alert("Account Created!", "For this demo, please sign in with a demo account below.", [{ text: "OK", onPress: () => switchMode("login") }]);
+  };
+
+  const handleForgot = () => {
+    if (!forgotEmail.trim()) { setError("Please enter your email"); return; }
+    setForgotSent(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   return (
@@ -313,99 +371,266 @@ function LoggedOutView() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
+        {/* ── Header ── */}
         <View style={[styles.authHeaderArea, { paddingTop: topPad + 20, backgroundColor: colors.background }]}>
+          <View style={[styles.authLogoIcon, { backgroundColor: colors.primary }]}>
+            <Ionicons name="school" size={22} color="#fff" />
+          </View>
           <Text style={[styles.logoText, { color: colors.foreground }]}>
             My<Text style={{ color: colors.primary }}>School</Text>
           </Text>
           <Text style={[styles.authTagline, { color: colors.mutedForeground }]}>India's #1 School Discovery Platform</Text>
         </View>
 
-        {/* Welcome card */}
-        <View style={[styles.welcomeCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.welcomeIconRow]}>
-            <View style={[styles.welcomeIcon, { backgroundColor: "#EFF6FF" }]}>
-              <Ionicons name="school" size={28} color="#2563EB" />
+        {/* ── Role panels — quick login cards ── */}
+        {mode !== "forgot" && (
+          <View style={styles.panelsSection}>
+            <Text style={[styles.panelsLabel, { color: colors.mutedForeground }]}>QUICK DEMO LOGIN</Text>
+            <View style={styles.panelsGrid}>
+              {DEMO_PANELS.map((p) => (
+                <Pressable
+                  key={p.key}
+                  style={[styles.panelCard, { backgroundColor: p.bg, borderColor: p.color + "30" }]}
+                  onPress={() => handleQuickLogin(p.email)}
+                  disabled={loading}
+                >
+                  <View style={[styles.panelCardIcon, { backgroundColor: p.color + "20" }]}>
+                    <Ionicons name={p.icon as any} size={18} color={p.color} />
+                  </View>
+                  <Text style={[styles.panelCardLabel, { color: p.color }]}>{p.label}</Text>
+                </Pressable>
+              ))}
             </View>
-            <View style={[styles.welcomeIcon, { backgroundColor: "#F5F3FF" }]}>
-              <Ionicons name="person" size={28} color="#7C3AED" />
-            </View>
-            <View style={[styles.welcomeIcon, { backgroundColor: "#ECFDF5" }]}>
-              <Ionicons name="calendar" size={28} color="#10B981" />
-            </View>
-          </View>
-          <Text style={[styles.welcomeTitle, { color: colors.foreground }]}>Sign in to unlock</Text>
-
-          {[
-            { icon: "school-outline", text: "Discover 500+ verified schools", color: "#2563EB" },
-            { icon: "person-outline", text: "Book expert tutors instantly", color: "#7C3AED" },
-            { icon: "book-outline", text: "Track admission applications", color: "#F59E0B" },
-            { icon: "people-outline", text: "Join the parent community", color: "#10B981" },
-          ].map((f, i) => (
-            <View key={i} style={styles.feature}>
-              <View style={[styles.featureIconBox, { backgroundColor: f.color + "18" }]}>
-                <Ionicons name={f.icon as any} size={16} color={f.color} />
-              </View>
-              <Text style={[styles.featureText, { color: colors.foreground }]}>{f.text}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Login form */}
-        <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.formTitle, { color: colors.foreground }]}>Sign In</Text>
-
-          {error ? (
-            <View style={[styles.errorBox, { backgroundColor: "#FEF2F2", borderColor: "#FCA5A5" }]}>
-              <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
-
-          <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
-            <Ionicons name="mail-outline" size={18} color={colors.mutedForeground} />
-            <TextInput
-              style={[styles.input, { color: colors.foreground }]}
-              placeholder="Email address"
-              placeholderTextColor={colors.mutedForeground}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
-            <Ionicons name="lock-closed-outline" size={18} color={colors.mutedForeground} />
-            <TextInput
-              style={[styles.input, { color: colors.foreground }]}
-              placeholder="Password"
-              placeholderTextColor={colors.mutedForeground}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.signInBtn,
-              { backgroundColor: colors.primary, opacity: pressed || loading ? 0.85 : 1 },
-            ]}
-            onPress={handleSignIn}
-            disabled={loading}
-          >
-            <Text style={styles.signInBtnText}>{loading ? "Signing in..." : "Sign In"}</Text>
-          </Pressable>
-
-          <View style={[styles.demoBox, { backgroundColor: colors.accent, borderColor: colors.primary + "25" }]}>
-            <Text style={[styles.demoTitle, { color: colors.primary }]}>Demo Credentials</Text>
-            <Text style={[styles.demoText, { color: colors.mutedForeground }]}>
-              parent@myschool.demo{"\n"}Password: Demo@1234
+            <Text style={[styles.panelHint, { color: colors.mutedForeground }]}>
+              Tap any role above to sign in instantly · Password: Demo@1234
             </Text>
           </View>
-        </View>
+        )}
+
+        {/* ── Mode tabs ── */}
+        {mode !== "forgot" && (
+          <View style={[styles.modeTabs, { backgroundColor: colors.muted }]}>
+            {(["login", "signup"] as const).map((m) => (
+              <Pressable
+                key={m}
+                style={[
+                  styles.modeTab,
+                  mode === m && { backgroundColor: colors.background, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 }
+                ]}
+                onPress={() => switchMode(m)}
+              >
+                <Text style={[styles.modeTabText, { color: mode === m ? colors.primary : colors.mutedForeground }]}>
+                  {m === "login" ? "Sign In" : "Create Account"}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+
+        {/* ── SIGN IN ── */}
+        {mode === "login" && (
+          <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.formTitle, { color: colors.foreground }]}>Welcome back</Text>
+            <Text style={[styles.formSub, { color: colors.mutedForeground }]}>Sign in to access your dashboard</Text>
+
+            {!!error && (
+              <View style={[styles.errorBox, { backgroundColor: "#FEF2F2", borderColor: "#FCA5A5" }]}>
+                <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+              <Ionicons name="mail-outline" size={18} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="Email address"
+                placeholderTextColor={colors.mutedForeground}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+
+            <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="Password"
+                placeholderTextColor={colors.mutedForeground}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPass}
+              />
+              <Pressable onPress={() => setShowPass(!showPass)}>
+                <Ionicons name={showPass ? "eye-off-outline" : "eye-outline"} size={18} color={colors.mutedForeground} />
+              </Pressable>
+            </View>
+
+            <Pressable onPress={() => switchMode("forgot")} style={{ alignSelf: "flex-end" as const }}>
+              <Text style={[styles.forgotLink, { color: colors.primary }]}>Forgot password?</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.signInBtn, { backgroundColor: colors.primary, opacity: loading ? 0.8 : 1 }]}
+              onPress={handleSignIn}
+              disabled={loading}
+            >
+              <Text style={styles.signInBtnText}>{loading ? "Signing in..." : "Sign In"}</Text>
+              {!loading && <Ionicons name="arrow-forward" size={18} color="#fff" />}
+            </Pressable>
+          </View>
+        )}
+
+        {/* ── SIGN UP ── */}
+        {mode === "signup" && (
+          <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.formTitle, { color: colors.foreground }]}>Get started</Text>
+            <Text style={[styles.formSub, { color: colors.mutedForeground }]}>Create an account in seconds</Text>
+
+            {!!error && (
+              <View style={[styles.errorBox, { backgroundColor: "#FEF2F2", borderColor: "#FCA5A5" }]}>
+                <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            {/* Role picker */}
+            <Text style={[styles.rolePickerLabel, { color: colors.mutedForeground }]}>I am a…</Text>
+            <View style={styles.roleGrid}>
+              {SIGNUP_ROLES.map((r) => {
+                const selected = signupRole === r.value;
+                return (
+                  <Pressable
+                    key={r.value}
+                    style={[
+                      styles.roleCard,
+                      { borderColor: selected ? r.color : colors.border, backgroundColor: selected ? r.bg : colors.card }
+                    ]}
+                    onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSignupRole(r.value); setError(""); }}
+                  >
+                    <View style={[styles.roleCardIcon, { backgroundColor: r.color + (selected ? "20" : "10") }]}>
+                      <Ionicons name={r.icon as any} size={18} color={r.color} />
+                    </View>
+                    <Text style={[styles.roleCardLabel, { color: selected ? r.color : colors.foreground }]}>{r.label}</Text>
+                    <Text style={[styles.roleCardDesc, { color: colors.mutedForeground }]}>{r.desc}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+              <Ionicons name="person-outline" size={18} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="Full name"
+                placeholderTextColor={colors.mutedForeground}
+                value={signupName}
+                onChangeText={setSignupName}
+                autoCapitalize="words"
+              />
+            </View>
+
+            <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+              <Ionicons name="mail-outline" size={18} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="Email address"
+                placeholderTextColor={colors.mutedForeground}
+                value={signupEmail}
+                onChangeText={setSignupEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.input, { color: colors.foreground }]}
+                placeholder="Create password (min 6 chars)"
+                placeholderTextColor={colors.mutedForeground}
+                value={signupPassword}
+                onChangeText={setSignupPassword}
+                secureTextEntry={!showPass}
+              />
+              <Pressable onPress={() => setShowPass(!showPass)}>
+                <Ionicons name={showPass ? "eye-off-outline" : "eye-outline"} size={18} color={colors.mutedForeground} />
+              </Pressable>
+            </View>
+
+            <Pressable
+              style={[styles.signInBtn, { backgroundColor: colors.primary }]}
+              onPress={handleSignUp}
+            >
+              <Text style={styles.signInBtnText}>Create Account</Text>
+              <Ionicons name="arrow-forward" size={18} color="#fff" />
+            </Pressable>
+          </View>
+        )}
+
+        {/* ── FORGOT PASSWORD ── */}
+        {mode === "forgot" && (
+          <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Pressable onPress={() => switchMode("login")} style={styles.backLink}>
+              <Ionicons name="arrow-back" size={16} color={colors.mutedForeground} />
+              <Text style={[styles.backLinkText, { color: colors.mutedForeground }]}>Back to Sign In</Text>
+            </Pressable>
+
+            {forgotSent ? (
+              <View style={styles.forgotSentWrap}>
+                <View style={[styles.forgotSentIcon, { backgroundColor: "#ECFDF5" }]}>
+                  <Ionicons name="checkmark-circle" size={36} color="#10B981" />
+                </View>
+                <Text style={[styles.formTitle, { color: colors.foreground, textAlign: "center" as const }]}>Reset link sent!</Text>
+                <Text style={[styles.formSub, { color: colors.mutedForeground, textAlign: "center" as const }]}>
+                  Check your inbox and follow the instructions to reset your password.
+                </Text>
+                <Pressable onPress={() => switchMode("login")}>
+                  <Text style={[styles.forgotLink, { color: colors.primary, textAlign: "center" as const, marginTop: 8 }]}>
+                    Back to Sign In
+                  </Text>
+                </Pressable>
+              </View>
+            ) : (
+              <>
+                <Text style={[styles.formTitle, { color: colors.foreground }]}>Forgot password?</Text>
+                <Text style={[styles.formSub, { color: colors.mutedForeground }]}>
+                  Enter your email and we'll send a reset link.
+                </Text>
+
+                {!!error && (
+                  <View style={[styles.errorBox, { backgroundColor: "#FEF2F2", borderColor: "#FCA5A5" }]}>
+                    <Ionicons name="alert-circle-outline" size={16} color="#EF4444" />
+                    <Text style={styles.errorText}>{error}</Text>
+                  </View>
+                )}
+
+                <View style={[styles.inputBox, { backgroundColor: colors.muted, borderColor: colors.border }]}>
+                  <Ionicons name="mail-outline" size={18} color={colors.mutedForeground} />
+                  <TextInput
+                    style={[styles.input, { color: colors.foreground }]}
+                    placeholder="Your email address"
+                    placeholderTextColor={colors.mutedForeground}
+                    value={forgotEmail}
+                    onChangeText={setForgotEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+
+                <Pressable
+                  style={[styles.signInBtn, { backgroundColor: colors.primary }]}
+                  onPress={handleForgot}
+                >
+                  <Text style={styles.signInBtnText}>Send Reset Link</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -626,9 +851,76 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   input: { flex: 1, fontSize: 15, padding: 0 },
-  signInBtn: { borderRadius: 14, paddingVertical: 15, alignItems: "center" },
+  signInBtn: { borderRadius: 14, paddingVertical: 15, alignItems: "center", flexDirection: "row", justifyContent: "center", gap: 8 },
   signInBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" as const },
   demoBox: { borderRadius: 12, borderWidth: 1, padding: 12 },
   demoTitle: { fontSize: 13, fontWeight: "700" as const, marginBottom: 4 },
   demoText: { fontSize: 12, lineHeight: 18 },
+
+  // Auth — panels grid
+  panelsSection: { marginHorizontal: 20, marginBottom: 16 },
+  panelsLabel: { fontSize: 11, fontWeight: "700" as const, letterSpacing: 1, marginBottom: 10 },
+  panelsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  panelCard: {
+    width: "18%",
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    padding: 10,
+    alignItems: "center" as const,
+    gap: 6,
+  },
+  panelCardIcon: { width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  panelCardLabel: { fontSize: 11, fontWeight: "800" as const, textAlign: "center" as const },
+  panelHint: { fontSize: 11, textAlign: "center" as const, marginTop: 8, lineHeight: 16 },
+
+  // Auth — mode tabs
+  modeTabs: {
+    flexDirection: "row",
+    marginHorizontal: 20,
+    marginBottom: 12,
+    borderRadius: 14,
+    padding: 4,
+  },
+  modeTab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modeTabText: { fontSize: 14, fontWeight: "700" as const },
+
+  // Auth — form extras
+  formSub: { fontSize: 13, marginBottom: 4 },
+  forgotLink: { fontSize: 13, fontWeight: "600" as const, marginBottom: 4 },
+  backLink: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 16 },
+  backLinkText: { fontSize: 13, fontWeight: "500" as const },
+
+  // Auth — logo icon
+  authLogoIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 6,
+  },
+
+  // Auth — sign-up role picker
+  rolePickerLabel: { fontSize: 12, fontWeight: "700" as const, letterSpacing: 0.5, marginBottom: 8 },
+  roleGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 4 },
+  roleCard: {
+    width: "47.5%",
+    borderRadius: 14,
+    borderWidth: 2,
+    padding: 12,
+    gap: 6,
+  },
+  roleCardIcon: { width: 34, height: 34, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  roleCardLabel: { fontSize: 13, fontWeight: "800" as const },
+  roleCardDesc: { fontSize: 11, lineHeight: 15 },
+
+  // Auth — forgot sent
+  forgotSentWrap: { alignItems: "center" as const, gap: 10, paddingVertical: 8 },
+  forgotSentIcon: { width: 70, height: 70, borderRadius: 35, alignItems: "center", justifyContent: "center", marginBottom: 4 },
 });
