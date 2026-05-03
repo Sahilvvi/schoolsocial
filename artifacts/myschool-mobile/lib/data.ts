@@ -489,9 +489,9 @@ export const STATS = {
 
 export const CATEGORIES = [
   { id: "schools", label: "Schools", icon: "school-outline", color: "#2563EB" },
-  { id: "tutors", label: "Tutors", icon: "person-outline", color: "#7C3AED" },
+  { id: "tuitions", label: "Tuitions", icon: "book-outline", color: "#7C3AED" },
   { id: "events", label: "Events", icon: "calendar-outline", color: "#F59E0B" },
-  { id: "jobs", label: "Jobs", icon: "briefcase-outline", color: "#10B981" },
+  { id: "tutors", label: "Tutors", icon: "person-outline", color: "#10B981" },
   { id: "news", label: "News", icon: "newspaper-outline", color: "#EF4444" },
   { id: "compare", label: "Compare", icon: "git-compare-outline", color: "#F97316" },
 ];

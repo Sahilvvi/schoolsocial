@@ -121,6 +121,7 @@ function LoggedInView() {
     { icon: "document-text-outline", label: "Manage Admissions", subtitle: "Review applications", onPress: () => {}, badge: "5", iconColor: "#7C3AED", iconBg: "#F5F3FF" },
     { icon: "briefcase-outline", label: "Post a Job", subtitle: "Hire teaching staff", onPress: () => router.push("/jobs" as any), iconColor: "#10B981", iconBg: "#ECFDF5" },
     { icon: "calendar-outline", label: "School Events", subtitle: "Manage upcoming events", onPress: () => router.push("/(tabs)/events" as any), iconColor: "#F59E0B", iconBg: "#FFFBEB" },
+    { icon: "trophy-outline", label: "Plans & Pricing", subtitle: "Upgrade your school listing", onPress: () => router.push("/plans" as any), iconColor: "#F97316", iconBg: "#FFF7ED" },
   ];
 
   const teacherItems = [
@@ -219,12 +220,20 @@ function LoggedInView() {
           iconBg="#FEF2F2"
         />
         <MenuItem
+          icon="book-outline"
+          label="Tuition Centers"
+          subtitle="Coaching centers near you"
+          onPress={() => router.push("/tuitions" as any)}
+          iconColor="#7C3AED"
+          iconBg="#F5F3FF"
+        />
+        <MenuItem
           icon="people-outline"
           label="Community"
           subtitle="Parents, teachers & educators"
           onPress={() => router.push("/community" as any)}
-          iconColor="#7C3AED"
-          iconBg="#F5F3FF"
+          iconColor="#2563EB"
+          iconBg="#EFF6FF"
         />
         <MenuItem
           icon="briefcase-outline"

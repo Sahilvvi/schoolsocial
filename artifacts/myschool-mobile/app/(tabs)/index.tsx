@@ -69,6 +69,7 @@ export default function HomeScreen() {
   const handleCategoryPress = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (id === "schools") router.push("/(tabs)/schools" as any);
+    else if (id === "tuitions") router.push("/tuitions" as any);
     else if (id === "compare") router.push("/compare" as any);
     else if (id === "tutors") router.push("/(tabs)/tutors" as any);
     else if (id === "events") router.push("/(tabs)/events" as any);
@@ -309,7 +310,7 @@ export default function HomeScreen() {
           <Pressable
             key={item.id}
             style={[styles.newsCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push("/news" as any)}
+            onPress={() => router.push(`/article/${item.id}` as any)}
           >
             <View style={[styles.newsAccent, { backgroundColor: item.color }]} />
             <View style={{ flex: 1, padding: 12, gap: 4 }}>
@@ -392,7 +393,7 @@ export default function HomeScreen() {
         </View>
         <Pressable
           style={[styles.ownerCtaBtn, { backgroundColor: colors.primary }]}
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); router.push("/plans" as any); }}
         >
           <Text style={styles.ownerCtaBtnText}>List Free</Text>
         </Pressable>

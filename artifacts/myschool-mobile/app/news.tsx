@@ -139,7 +139,10 @@ export default function NewsScreen() {
           />
         }
         renderItem={({ item }) => (
-          <Pressable style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Pressable
+            onPress={() => { router.push(`/article/${item.id}` as any); }}
+            style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
             <View style={[styles.cardAccent, { backgroundColor: item.color }]} />
             <View style={styles.cardBody}>
               <View style={styles.cardMeta}>
