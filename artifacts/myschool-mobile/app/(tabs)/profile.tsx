@@ -110,14 +110,15 @@ function LoggedInView() {
   const rc = roleConfig[user!.role] ?? { label: user!.role, color: colors.primary, bg: colors.accent };
 
   const parentItems = [
-    { icon: "book-outline", label: "My Admissions", subtitle: "Track application status", onPress: () => router.push("/admissions" as any), badge: "2", iconColor: "#2563EB", iconBg: "#EFF6FF" },
+    { icon: "grid-outline", label: "My Dashboard", subtitle: "Overview of your activity", onPress: () => router.push("/dashboard" as any), iconColor: "#2563EB", iconBg: "#EFF6FF" },
+    { icon: "book-outline", label: "My Admissions", subtitle: "Track application status", onPress: () => router.push("/admissions" as any), badge: "2", iconColor: "#7C3AED", iconBg: "#F5F3FF" },
     { icon: "calendar-outline", label: "Booked Sessions", subtitle: "Upcoming tutor sessions", onPress: () => router.push("/(tabs)/tutors" as any), badge: "1", iconColor: "#7C3AED", iconBg: "#F5F3FF" },
     { icon: "heart-outline", label: "Saved Schools", subtitle: "Your shortlisted schools", onPress: () => router.push("/saved" as any), badge: "7", iconColor: "#EF4444", iconBg: "#FEF2F2" },
     { icon: "calendar-outline", label: "Registered Events", subtitle: "School events you joined", onPress: () => router.push("/(tabs)/events" as any), iconColor: "#F59E0B", iconBg: "#FFFBEB" },
   ];
 
   const schoolItems = [
-    { icon: "analytics-outline", label: "School Dashboard", subtitle: "Views, enquiries & stats", onPress: () => {}, iconColor: "#2563EB", iconBg: "#EFF6FF" },
+    { icon: "grid-outline", label: "School Dashboard", subtitle: "Views, enquiries & analytics", onPress: () => router.push("/dashboard" as any), iconColor: "#2563EB", iconBg: "#EFF6FF" },
     { icon: "document-text-outline", label: "Manage Admissions", subtitle: "Review applications", onPress: () => {}, badge: "5", iconColor: "#7C3AED", iconBg: "#F5F3FF" },
     { icon: "briefcase-outline", label: "Post a Job", subtitle: "Hire teaching staff", onPress: () => router.push("/jobs" as any), iconColor: "#10B981", iconBg: "#ECFDF5" },
     { icon: "calendar-outline", label: "School Events", subtitle: "Manage upcoming events", onPress: () => router.push("/(tabs)/events" as any), iconColor: "#F59E0B", iconBg: "#FFFBEB" },
@@ -163,10 +164,20 @@ function LoggedInView() {
             <Text style={[styles.headerTitle, { color: colors.foreground }]}>Profile</Text>
             <Text style={[styles.headerSub, { color: colors.mutedForeground }]}>Your account & settings</Text>
           </View>
-          <Pressable style={[styles.editBtn, { borderColor: colors.border }]} onPress={() => {}}>
-            <Ionicons name="create-outline" size={16} color={colors.mutedForeground} />
-            <Text style={[styles.editBtnText, { color: colors.mutedForeground }]}>Edit</Text>
-          </Pressable>
+            <View style={styles.headerActions}>
+            <Pressable
+              style={[styles.iconBtn, { backgroundColor: "#7C3AED14", borderColor: "#7C3AED30" }]}
+              onPress={() => router.push("/scanner" as any)}
+            >
+              <Ionicons name="qr-code-outline" size={18} color="#7C3AED" />
+            </Pressable>
+            <Pressable
+              style={[styles.iconBtn, { backgroundColor: colors.primary + "14", borderColor: colors.primary + "30" }]}
+              onPress={() => router.push("/dashboard" as any)}
+            >
+              <Ionicons name="grid-outline" size={18} color={colors.primary} />
+            </Pressable>
+          </View>
         </View>
 
         {/* Profile card */}
@@ -423,6 +434,18 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 26, fontWeight: "800" as const, letterSpacing: -0.7 },
   headerSub: { fontSize: 13, marginTop: 2 },
+  headerActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  iconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+  },
   editBtn: {
     flexDirection: "row",
     alignItems: "center",

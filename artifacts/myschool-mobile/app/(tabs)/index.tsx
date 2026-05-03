@@ -104,6 +104,12 @@ export default function HomeScreen() {
         <View style={styles.topBarActions}>
           <Pressable
             style={[styles.iconBtn, { backgroundColor: colors.muted }]}
+            onPress={() => router.push("/scanner" as any)}
+          >
+            <Ionicons name="qr-code-outline" size={19} color={colors.foreground} />
+          </Pressable>
+          <Pressable
+            style={[styles.iconBtn, { backgroundColor: colors.muted }]}
             onPress={() => router.push("/community" as any)}
           >
             <Ionicons name="chatbubble-ellipses-outline" size={19} color={colors.foreground} />
