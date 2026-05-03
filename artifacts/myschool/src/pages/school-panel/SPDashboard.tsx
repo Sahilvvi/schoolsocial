@@ -173,38 +173,38 @@ export default function SPDashboard() {
       {/* ── STAT CARDS ──────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label:"Profile Views",  value: profileViews.toLocaleString(),   pct:"+18.6%", data: SP_VIEWS,   lineColor:"#a855f7", iconBg:"bg-purple-50", iconColor:"text-purple-500", iconPath:"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 0 0-6 0" },
-          { label:"Enquiries",      value: String(enquiriesCount),           pct:"+22.4%", data: SP_ENQ,     lineColor:"#22c55e", iconBg:"bg-green-50",  iconColor:"text-green-500",  iconPath:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
-          { label:"Applications",   value: String(applicationsCount),        pct:"+12.5%", data: SP_APPS,    lineColor:"#3b82f6", iconBg:"bg-blue-50",   iconColor:"text-blue-500",   iconPath:"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75 M12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" },
-          { label:"Reviews",        value: avgRating.toFixed(1),            isRating: true, data: SP_REVIEWS, lineColor:"#f59e0b", iconBg:"bg-yellow-50", iconColor:"text-yellow-500" },
+          { label:"Profile Views",  value: profileViews.toLocaleString(),   pct:"+18.6%", data: SP_VIEWS,   lineColor:"#a855f7", iconBg:"bg-purple-50 ring-1 ring-purple-100", iconColor:"text-purple-600" },
+          { label:"Enquiries",      value: String(enquiriesCount),           pct:"+22.4%", data: SP_ENQ,     lineColor:"#22c55e", iconBg:"bg-emerald-50 ring-1 ring-emerald-100",iconColor:"text-emerald-600"},
+          { label:"Applications",   value: String(applicationsCount),        pct:"+12.5%", data: SP_APPS,    lineColor:"#3b82f6", iconBg:"bg-blue-50 ring-1 ring-blue-100",     iconColor:"text-blue-600"   },
+          { label:"Reviews",        value: avgRating.toFixed(1),            isRating: true, data: SP_REVIEWS, lineColor:"#f59e0b", iconBg:"bg-amber-50 ring-1 ring-amber-100",    iconColor:"text-amber-600"  },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-            <div className="flex items-start justify-between mb-2">
-              <div className={`h-8 w-8 rounded-lg ${stat.iconBg} flex items-center justify-center`}>
+          <div key={stat.label} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 p-5 group cursor-default">
+            <div className="flex items-start justify-between mb-3">
+              <div className={`h-10 w-10 rounded-xl ${stat.iconBg} flex items-center justify-center`}>
                 {stat.label === "Reviews" ? (
-                  <Star className={`h-4 w-4 ${stat.iconColor}`} />
+                  <Star className={`h-5 w-5 ${stat.iconColor}`} />
                 ) : stat.label === "Enquiries" ? (
-                  <MessageSquare className={`h-4 w-4 ${stat.iconColor}`} />
+                  <MessageSquare className={`h-5 w-5 ${stat.iconColor}`} />
                 ) : stat.label === "Applications" ? (
-                  <FileText className={`h-4 w-4 ${stat.iconColor}`} />
+                  <FileText className={`h-5 w-5 ${stat.iconColor}`} />
                 ) : (
-                  <svg viewBox="0 0 24 24" className={`h-4 w-4 ${stat.iconColor}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg viewBox="0 0 24 24" className={`h-5 w-5 ${stat.iconColor}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
                   </svg>
                 )}
               </div>
-              <span className="text-[11px] text-gray-400 font-medium">{stat.label}</span>
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">{stat.label}</span>
             </div>
-            <p className="text-2xl font-extrabold text-gray-900 mb-0.5">{stat.value}</p>
+            <p className="text-2xl font-extrabold text-slate-900 mb-0.5 tabular-nums">{stat.value}</p>
             {stat.isRating ? (
-              <>
+              <div className="space-y-0.5">
                 <Stars rating={parseFloat(stat.value)} />
-                <p className="text-[11px] text-gray-400 mt-0.5">(128 Reviews)</p>
-              </>
+                <p className="text-[11px] text-slate-400">(128 Reviews)</p>
+              </div>
             ) : (
-              <p className="text-[11px] text-green-600 font-semibold">{stat.pct} this month</p>
+              <p className="text-[11px] text-emerald-600 font-bold">{stat.pct} this month</p>
             )}
-            <div className="mt-2">
+            <div className="mt-3">
               <Sparkline data={stat.data} color={stat.lineColor} />
             </div>
           </div>
@@ -215,18 +215,18 @@ export default function SPDashboard() {
       <div className="grid lg:grid-cols-2 gap-4">
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-          <h2 className="text-sm font-extrabold text-gray-900 mb-3">Quick Actions</h2>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+          <h2 className="text-sm font-extrabold text-slate-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-3 gap-3">
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
               return (
                 <Link key={action.label} to={action.to} className="group">
-                  <div className="flex flex-col items-center gap-2 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all cursor-pointer">
+                  <div className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-100 hover:border-primary/30 hover:bg-primary/4 transition-all cursor-pointer">
                     <div className={`h-10 w-10 rounded-xl ${action.color} flex items-center justify-center group-hover:scale-105 transition-transform`}>
                       <Icon className={`h-5 w-5 ${action.iconColor}`} />
                     </div>
-                    <p className="text-[11px] text-gray-600 font-medium text-center leading-tight">{action.label}</p>
+                    <p className="text-[11px] text-slate-600 font-semibold text-center leading-tight">{action.label}</p>
                   </div>
                 </Link>
               );
@@ -235,23 +235,23 @@ export default function SPDashboard() {
         </div>
 
         {/* Recent Notices */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <h2 className="text-sm font-extrabold text-gray-900">Recent Notices / Posts</h2>
-            <Link to="/school-panel/feed" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h2 className="text-sm font-extrabold text-slate-900">Recent Notices / Posts</h2>
+            <Link to="/school-panel/feed" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">
               View All <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-50">
             {DEMO_NOTICES.map((n) => (
-              <div key={n.title} className="flex gap-3 px-4 py-3 items-start hover:bg-gray-50 transition-colors">
+              <div key={n.title} className="flex gap-3 px-5 py-3.5 items-start hover:bg-slate-50 transition-colors">
                 <img src={n.img} alt="" className="h-12 w-12 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-900 line-clamp-1">{n.title}</p>
-                  <p className="text-[11px] text-gray-500 line-clamp-1 mt-0.5">{n.desc}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{n.date}</p>
+                  <p className="text-xs font-semibold text-slate-900 line-clamp-1">{n.title}</p>
+                  <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{n.desc}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{n.date}</p>
                 </div>
-                <span className="text-[10px] font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded shrink-0 mt-0.5">
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full shrink-0 mt-0.5">
                   Published
                 </span>
               </div>
@@ -264,10 +264,10 @@ export default function SPDashboard() {
       <div className="grid lg:grid-cols-2 gap-4">
 
         {/* Profile Performance dual-line chart */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-extrabold text-gray-900">Profile Performance</h2>
-            <button className="text-[11px] text-gray-500 border border-gray-200 rounded px-2 py-0.5 flex items-center gap-0.5 hover:bg-gray-50">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-extrabold text-slate-900">Profile Performance</h2>
+            <button className="text-[11px] text-slate-500 border border-slate-200 rounded-lg px-2.5 py-1 flex items-center gap-0.5 hover:bg-slate-50 transition-colors font-semibold">
               Last 30 Days <ChevronRight className="h-3 w-3 rotate-90" />
             </button>
           </div>
@@ -299,8 +299,8 @@ export default function SPDashboard() {
         </div>
 
         {/* Profile Completion */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-          <h2 className="text-sm font-extrabold text-gray-900 mb-3">Profile Completion</h2>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+          <h2 className="text-sm font-extrabold text-slate-900 mb-4">Profile Completion</h2>
           <div className="flex items-center gap-6">
             {/* Donut */}
             <div className="relative shrink-0">
@@ -316,8 +316,8 @@ export default function SPDashboard() {
                 </Pie>
               </PieChart>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-xl font-extrabold text-gray-900">{COMPLETION_PCT}%</p>
-                <p className="text-[9px] text-gray-400 font-medium">Completed</p>
+                <p className="text-xl font-extrabold text-slate-900">{COMPLETION_PCT}%</p>
+                <p className="text-[9px] text-slate-400 font-semibold">Done</p>
               </div>
             </div>
             {/* Checklist */}
@@ -325,10 +325,10 @@ export default function SPDashboard() {
               {PROFILE_COMPLETION.map((item) => (
                 <div key={item.label} className="flex items-center gap-2 text-xs">
                   {item.done
-                    ? <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
-                    : <Circle     className="h-4 w-4 text-gray-300 shrink-0" />
+                    ? <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0" />
+                    : <Circle     className="h-4 w-4 text-slate-300 shrink-0" />
                   }
-                  <span className={item.done ? "text-gray-700 font-medium" : "text-gray-400"}>
+                  <span className={item.done ? "text-slate-700 font-semibold" : "text-slate-400"}>
                     {item.label}
                   </span>
                 </div>
@@ -336,7 +336,7 @@ export default function SPDashboard() {
             </div>
           </div>
           <Link to="/school-panel/profile">
-            <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg py-2.5 transition-colors">
+            <button className="w-full mt-4 gradient-primary text-white text-xs font-bold rounded-xl py-2.5 transition-all hover:opacity-90 shadow-md shadow-primary/20">
               Complete Profile
             </button>
           </Link>
@@ -347,25 +347,25 @@ export default function SPDashboard() {
       <div className="grid lg:grid-cols-2 gap-4">
 
         {/* Top Enquiries */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <h2 className="text-sm font-extrabold text-gray-900">Top Enquiries</h2>
-            <Link to="/school-panel/enquiries" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h2 className="text-sm font-extrabold text-slate-900">Top Enquiries</h2>
+            <Link to="/school-panel/enquiries" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">
               View All <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-50">
             {DEMO_ENQUIRIES.map((e) => (
-              <div key={e.name} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+              <div key={e.name} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
                 <div className={`h-9 w-9 rounded-full ${e.color} flex items-center justify-center shrink-0`}>
                   <span className="text-white text-xs font-bold">{e.initials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-900">{e.name}</p>
-                  <p className="text-[11px] text-gray-500">{e.sub}</p>
+                  <p className="text-xs font-semibold text-slate-900">{e.name}</p>
+                  <p className="text-[11px] text-slate-500">{e.sub}</p>
                 </div>
-                <span className="text-[10px] text-gray-400 shrink-0">{e.time}</span>
-                <span className={`text-[10px] font-semibold rounded-full px-2.5 py-0.5 shrink-0 ${e.badgeColor}`}>
+                <span className="text-[10px] text-slate-400 shrink-0">{e.time}</span>
+                <span className={`text-[10px] font-bold rounded-full px-2.5 py-0.5 shrink-0 ${e.badgeColor}`}>
                   {e.badge}
                 </span>
               </div>
@@ -374,26 +374,26 @@ export default function SPDashboard() {
         </div>
 
         {/* Recent Reviews */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-            <h2 className="text-sm font-extrabold text-gray-900">Recent Reviews</h2>
-            <Link to="/school-panel/reviews" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h2 className="text-sm font-extrabold text-slate-900">Recent Reviews</h2>
+            <Link to="/school-panel/reviews" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">
               View All <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-50">
             {DEMO_REVIEWS.map((r) => (
-              <div key={r.name} className="flex gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+              <div key={r.name} className="flex gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
                 <div className={`h-9 w-9 rounded-full ${r.color} flex items-center justify-center shrink-0`}>
                   <span className="text-white text-xs font-bold">{r.initials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-semibold text-gray-900 truncate">{r.name}</p>
-                    <span className="text-[10px] text-gray-400 shrink-0">{r.time}</span>
+                    <p className="text-xs font-semibold text-slate-900 truncate">{r.name}</p>
+                    <span className="text-[10px] text-slate-400 shrink-0">{r.time}</span>
                   </div>
                   <Stars rating={r.rating} />
-                  <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{r.comment}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{r.comment}</p>
                 </div>
               </div>
             ))}
@@ -402,32 +402,38 @@ export default function SPDashboard() {
       </div>
 
       {/* ── BOTTOM UPGRADE BANNER ───────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="min-w-0">
-            <h3 className="text-base font-extrabold text-gray-900">Increase Your School's Visibility</h3>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Upgrade to Premium to get more profile views, featured listings, and better reach to parents and students.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-6 lg:gap-8 shrink-0">
-            {[
-              { icon: "⭐", label: "Featured Listing" },
-              { icon: "🎧", label: "Priority Support" },
-              { icon: "💬", label: "More Enquiries"  },
-              { icon: "📊", label: "Analytics Access" },
-            ].map((f) => (
-              <div key={f.label} className="flex flex-col items-center gap-1 text-center">
-                <span className="text-xl">{f.icon}</span>
-                <p className="text-[10px] text-gray-500 font-medium whitespace-nowrap">{f.label}</p>
+      <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a56db 0%, #7e3af2 100%)" }}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_rgba(255,255,255,0.08)_0%,_transparent_60%)]" />
+        <div className="relative px-6 py-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-1.5 bg-white/15 text-white text-[11px] font-bold px-3 py-1 rounded-full mb-2">
+                <Crown className="h-3 w-3 text-yellow-300" /> Premium Feature
               </div>
-            ))}
+              <h3 className="text-base font-extrabold text-white">Increase Your School's Visibility</h3>
+              <p className="text-xs text-white/70 mt-0.5 max-w-md">
+                Upgrade to Premium for featured listings, priority support, and better reach to thousands of parents.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-5 lg:gap-7 shrink-0">
+              {[
+                { icon: "⭐", label: "Featured Listing" },
+                { icon: "🎧", label: "Priority Support" },
+                { icon: "💬", label: "More Enquiries"  },
+                { icon: "📊", label: "Analytics Access" },
+              ].map((f) => (
+                <div key={f.label} className="flex flex-col items-center gap-1 text-center">
+                  <span className="text-xl">{f.icon}</span>
+                  <p className="text-[10px] text-white/70 font-semibold whitespace-nowrap">{f.label}</p>
+                </div>
+              ))}
+            </div>
+            <Link to="/school-panel/subscription" className="shrink-0">
+              <button className="bg-white text-blue-700 hover:bg-blue-50 text-sm font-bold rounded-xl px-6 py-2.5 transition-colors whitespace-nowrap shadow-lg">
+                Upgrade Now
+              </button>
+            </Link>
           </div>
-          <Link to="/school-panel/subscription" className="shrink-0">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl px-6 py-2.5 transition-colors whitespace-nowrap">
-              Upgrade Now
-            </button>
-          </Link>
         </div>
       </div>
 

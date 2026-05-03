@@ -45,18 +45,34 @@ artifacts/myschool/src/
 - **Font**: Inter (body) + Plus Jakarta Sans (headings)
 - **Mobile nav**: Fixed bottom tab bar (Home, Schools, Compare, Events, Profile) — shown on <lg screens
 - **Desktop nav**: Sticky top navbar with logo + links + search + auth
-- **Cards**: Rounded-2xl, subtle shadow, hover lift effect with `whileHover={{ y: -8 }}`
-- **Dashboard panels**: Dark slate sidebar + light main content area
+- **Cards**: `rounded-2xl border-slate-200/80 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300`
+- **Dashboard sidebars**: All premium white (`bg-white border-r border-slate-200/80 shadow-sm`) with grouped nav sections and active dot indicators
+- **Stat cards**: Colored icon ring (`bg-{color}-50 ring-1 ring-{color}-100`), `tabular-nums`, emerald percentage badge
+- **Welcome banners**: Gradient (`linear-gradient(135deg, ...)`) with SVG illustration, white text
+- **Upgrade banners**: Full gradient with white CTA button, matching welcome banner pattern
 - **Animations**: Framer Motion `whileInView` scroll reveals on all major sections, spring hover effects on cards/buttons
-- **CSS utilities**: `.mesh-gradient`, `.glass-card`, `.gradient-primary`, `.text-gradient`, `.floating-badge`, `.no-scrollbar`, `.section-tag`, `.animate-marquee`
+- **CSS utilities**: `.mesh-gradient`, `.glass-card`, `.gradient-primary`, `.text-gradient`, `.floating-badge`, `.no-scrollbar`, `.section-tag`, `.animate-marquee`, `bg-primary/4`, `bg-primary/8`
 
-## New Features (Premium UI Overhaul — May 2026)
+## Premium UI Overhaul (May 2026)
 
+### Public Pages
 - **AnimatedCounter**: `src/components/AnimatedCounter.tsx` — scroll-triggered number counter with cubic easing
-- **SchoolFinderQuiz**: `src/components/SchoolFinderQuiz.tsx` — 4-step AI-guided school finder modal accessible from the homepage hero; navigates to `/schools` with filters applied
-- **Premium Hero**: Full mesh-gradient hero with floating glassmorphism stat cards, animated trust badges, "Find My Perfect School" quiz trigger
-- **Scroll Reveals**: All major sections use Framer Motion `whileInView` animations via local `Reveal` wrapper component
-- **Premium Pages Redesigned**: HomePage, EventsPage, TutorsPage — all with Apple-level typography, gradient headings, stat strips, animated card grids
+- **SchoolFinderQuiz**: `src/components/SchoolFinderQuiz.tsx` — 4-step AI-guided school finder modal
+- **Premium Hero**: Full mesh-gradient hero with floating glassmorphism stat cards, animated trust badges
+- **Scroll Reveals**: All major sections use Framer Motion `whileInView` animations via local `Reveal` wrapper
+- **Pages**: HomePage, EventsPage, TutorsPage, SchoolsPage, ComparePage, CommunityPage, AuthPage — all premium
+
+### Dashboard Panels (All Upgraded)
+- **AdminLayout** — white sidebar, grouped OVERVIEW/CONTENT/APPLICATIONS/MODERATION nav with icon badges
+- **ParentPanelLayout** — white sidebar, grouped OVERVIEW/MY FAMILY/EDUCATION nav
+- **TeacherPanelLayout** — white sidebar, grouped OVERVIEW/MY PROFILE/STUDENTS & WORK nav
+- **SchoolPanelLayout** — white sidebar (was already white)
+- **TuitionPanelLayout** — white sidebar
+- **AdminDashboard** — premium stat cards (colored rings), bar chart, Quick Access
+- **PPDashboard** (Parent) — premium stat cards, fee/admissions panels with notification badge
+- **SPDashboard** (School) — gradient welcome banner + purple/green/blue/amber stat cards with sparklines + gradient upgrade banner
+- **TPDashboard** (Teacher) — premium stat cards, experience/achievements/skills panels all upgraded
+- **TuPDashboard** (Tuition) — teal/cyan gradient welcome banner + stat cards + batches table + gradient upgrade banner
 
 ## Routing
 

@@ -101,13 +101,14 @@ export default function TuPDashboard() {
     <div className="space-y-5 pb-6">
 
       {/* ── WELCOME BANNER ──────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between p-6">
+      <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg,#0f766e 0%,#0891b2 60%,#3b82f6 100%)" }}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_50%,_rgba(255,255,255,0.07)_0%,_transparent_60%)]" />
+        <div className="flex items-center justify-between px-6 py-5 relative z-10">
           <div className="flex-1">
-            <h1 className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
+            <h1 className="text-white font-extrabold text-xl leading-tight flex flex-wrap items-center gap-2">
               Welcome back, {centerData?.name || "Bright Minds Tuition Center"}! <span>👋</span>
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Here's what's happening at your center today.</p>
+            <p className="text-white/70 text-sm mt-1">Here's what's happening at your center today.</p>
           </div>
           {/* Illustration */}
           <div className="shrink-0 hidden sm:block">
@@ -145,33 +146,30 @@ export default function TuPDashboard() {
       {/* ── STAT CARDS ──────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {[
-          { label: "Profile Views",      value: "1,245", pct: "+18.7%", data: SPARKLINE,  iconBg: "bg-purple-100", icon: <Eye className="h-4 w-4 text-purple-600" />,       lineColor: "#a855f7" },
-          { label: "Enquiries",          value: "65",    pct: "+16.3%", data: SPARKLINE2, iconBg: "bg-green-100",  icon: <MessageSquare className="h-4 w-4 text-green-600" />, lineColor: "#22c55e" },
-          { label: "Student Admissions", value: "28",    pct: "+21.2%", data: SPARKLINE3, iconBg: "bg-blue-100",   icon: <UserCheck className="h-4 w-4 text-blue-600" />,     lineColor: "#3b82f6" },
-          { label: "Total Students",     value: "156",   pct: "+8.4%",  data: SPARKLINE4, iconBg: "bg-orange-100", icon: <Users className="h-4 w-4 text-orange-500" />,       lineColor: "#f97316" },
+          { label: "Profile Views",      value: "1,245", pct: "+18.7%", data: SPARKLINE,  iconBg: "bg-purple-50 ring-1 ring-purple-100", icon: <Eye className="h-4 w-4 text-purple-600" />,        lineColor: "#a855f7" },
+          { label: "Enquiries",          value: "65",    pct: "+16.3%", data: SPARKLINE2, iconBg: "bg-emerald-50 ring-1 ring-emerald-100", icon: <MessageSquare className="h-4 w-4 text-emerald-600" />, lineColor: "#22c55e" },
+          { label: "Student Admissions", value: "28",    pct: "+21.2%", data: SPARKLINE3, iconBg: "bg-blue-50 ring-1 ring-blue-100",     icon: <UserCheck className="h-4 w-4 text-blue-600" />,      lineColor: "#3b82f6" },
+          { label: "Total Students",     value: "156",   pct: "+8.4%",  data: SPARKLINE4, iconBg: "bg-orange-50 ring-1 ring-orange-100",  icon: <Users className="h-4 w-4 text-orange-500" />,        lineColor: "#f97316" },
           { label: "Avg. Rating", value: "4.6", isRating: true, reviews: "86 Reviews" },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-col gap-1">
+          <div key={stat.label} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 p-4 flex flex-col gap-1 cursor-default">
             {"icon" in stat && (
-              <div className="flex items-center justify-between mb-1">
-                <div className={`h-8 w-8 rounded-lg ${stat.iconBg} flex items-center justify-center`}>{stat.icon}</div>
-                <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">{stat.pct}</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className={`h-9 w-9 rounded-xl ${stat.iconBg} flex items-center justify-center`}>{stat.icon}</div>
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{stat.pct}</span>
               </div>
             )}
-            <p className="text-[11px] text-gray-500 font-medium">{stat.label}</p>
-            <p className="text-2xl font-extrabold text-gray-900">{stat.value}</p>
+            <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">{stat.label}</p>
+            <p className="text-2xl font-extrabold text-slate-900 tabular-nums">{stat.value}</p>
             {stat.isRating ? (
               <>
                 <StarRating rating={4.6} />
-                <p className="text-[11px] text-gray-400">{stat.reviews}</p>
+                <p className="text-[11px] text-slate-400">{stat.reviews}</p>
               </>
             ) : (
-              <>
-                <p className="text-[11px] text-green-600 font-medium">{stat.pct} this month</p>
-                <div className="mt-1">
-                  <Sparkline data={stat.data!} color={stat.lineColor!} />
-                </div>
-              </>
+              <div className="mt-1">
+                <Sparkline data={stat.data!} color={stat.lineColor!} />
+              </div>
             )}
           </div>
         ))}
@@ -181,8 +179,8 @@ export default function TuPDashboard() {
       <div className="grid md:grid-cols-2 gap-4">
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-          <h2 className="text-sm font-extrabold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+          <h2 className="text-sm font-extrabold text-slate-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-4 gap-3">
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
@@ -191,7 +189,7 @@ export default function TuPDashboard() {
                   <div className={`h-12 w-12 rounded-xl ${action.color} flex items-center justify-center group-hover:scale-105 transition-transform`}>
                     <Icon className={`h-5 w-5 ${action.iconColor}`} />
                   </div>
-                  <p className="text-[10px] text-gray-600 font-medium text-center leading-tight">{action.label}</p>
+                  <p className="text-[10px] text-slate-600 font-semibold text-center leading-tight">{action.label}</p>
                 </Link>
               );
             })}
@@ -199,21 +197,21 @@ export default function TuPDashboard() {
         </div>
 
         {/* Recent Notices / Posts */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-            <h2 className="text-sm font-extrabold text-gray-900">Recent Notices / Posts</h2>
-            <Link to="/tuition-panel/feed" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h2 className="text-sm font-extrabold text-slate-900">Recent Notices / Posts</h2>
+            <Link to="/tuition-panel/feed" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-50">
             {DEMO_NOTICES.map((notice) => (
-              <div key={notice.title} className="flex gap-3 px-5 py-3 items-start hover:bg-gray-50 transition-colors">
-                <img src={notice.img} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
+              <div key={notice.title} className="flex gap-3 px-5 py-3 items-start hover:bg-slate-50 transition-colors">
+                <img src={notice.img} alt="" className="h-12 w-12 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-900 leading-snug line-clamp-1">{notice.title}</p>
-                  <p className="text-[10px] text-gray-500 line-clamp-1 mt-0.5">{notice.desc}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{notice.date}</p>
+                  <p className="text-xs font-semibold text-slate-900 leading-snug line-clamp-1">{notice.title}</p>
+                  <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{notice.desc}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{notice.date}</p>
                 </div>
-                <span className="text-[10px] font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded shrink-0">{notice.status}</span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full shrink-0">{notice.status}</span>
               </div>
             ))}
           </div>
@@ -224,10 +222,10 @@ export default function TuPDashboard() {
       <div className="grid md:grid-cols-2 gap-4">
 
         {/* Enquiries Overview */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-extrabold text-gray-900">Enquiries Overview</h2>
-            <button className="text-[11px] text-gray-500 border border-gray-200 rounded-lg px-2.5 py-1 flex items-center gap-1 hover:bg-gray-50">
+            <h2 className="text-sm font-extrabold text-slate-900">Enquiries Overview</h2>
+            <button className="text-[11px] text-slate-500 border border-slate-200 rounded-lg px-2.5 py-1 flex items-center gap-1 hover:bg-slate-50 transition-colors font-semibold">
               Last 30 Days <ChevronRight className="h-3 w-3 rotate-90" />
             </button>
           </div>
@@ -248,8 +246,8 @@ export default function TuPDashboard() {
         </div>
 
         {/* Top Enquiry Sources */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-          <h2 className="text-sm font-extrabold text-gray-900 mb-4">Top Enquiry Sources</h2>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5">
+          <h2 className="text-sm font-extrabold text-slate-900 mb-4">Top Enquiry Sources</h2>
           <div className="flex items-center gap-6">
             <div className="relative shrink-0">
               <PieChart width={130} height={130}>
@@ -258,18 +256,18 @@ export default function TuPDashboard() {
                 </Pie>
               </PieChart>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-xl font-extrabold text-gray-900">65</p>
-                <p className="text-[10px] text-gray-400 text-center leading-tight">Total<br/>Enquiries</p>
+                <p className="text-xl font-extrabold text-slate-900">65</p>
+                <p className="text-[10px] text-slate-400 text-center leading-tight">Total<br/>Enquiries</p>
               </div>
             </div>
-            <div className="flex-1 space-y-1.5">
+            <div className="flex-1 space-y-2">
               {PIE_DATA.map((d) => (
                 <div key={d.name} className="flex items-center justify-between text-[11px]">
                   <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                    <span className="text-gray-600">{d.name}</span>
+                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                    <span className="text-slate-600 font-medium">{d.name}</span>
                   </div>
-                  <span className="font-semibold text-gray-800">{d.value}%</span>
+                  <span className="font-bold text-slate-800">{d.value}%</span>
                 </div>
               ))}
             </div>
@@ -278,47 +276,47 @@ export default function TuPDashboard() {
       </div>
 
       {/* ── YOUR BATCHES TABLE ───────────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-          <h2 className="text-sm font-extrabold text-gray-900">Your Batches</h2>
-          <Link to="/tuition-panel/batches" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <h2 className="text-sm font-extrabold text-slate-900">Your Batches</h2>
+          <Link to="/tuition-panel/batches" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-gray-50 text-gray-500 font-semibold">
-                <th className="text-left px-5 py-2.5">Batch Name</th>
-                <th className="text-left px-4 py-2.5">Class / Subject</th>
-                <th className="text-left px-4 py-2.5">Teacher</th>
-                <th className="text-left px-4 py-2.5">Students</th>
-                <th className="text-left px-4 py-2.5">Timings</th>
-                <th className="text-left px-4 py-2.5">Status</th>
+              <tr className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wide">
+                <th className="text-left px-5 py-3">Batch Name</th>
+                <th className="text-left px-4 py-3">Class / Subject</th>
+                <th className="text-left px-4 py-3">Teacher</th>
+                <th className="text-left px-4 py-3">Students</th>
+                <th className="text-left px-4 py-3">Timings</th>
+                <th className="text-left px-4 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-slate-50">
               {DEMO_BATCHES.map((batch) => (
-                <tr key={batch.name} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 font-semibold text-gray-900">{batch.name}</td>
-                  <td className="px-4 py-3 text-gray-500">{batch.class}</td>
+                <tr key={batch.name} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-3 font-semibold text-slate-900">{batch.name}</td>
+                  <td className="px-4 py-3 text-slate-500">{batch.class}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className={`h-6 w-6 rounded-full ${batch.color} flex items-center justify-center text-white text-[9px] font-bold shrink-0`}>{batch.initials}</span>
-                      <span className="text-gray-700 font-medium">{batch.teacher}</span>
+                      <span className="text-slate-700 font-medium">{batch.teacher}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-700 font-semibold">{batch.students}</td>
-                  <td className="px-4 py-3 text-gray-500">{batch.timing}</td>
+                  <td className="px-4 py-3 text-slate-700 font-semibold">{batch.students}</td>
+                  <td className="px-4 py-3 text-slate-500">{batch.timing}</td>
                   <td className="px-4 py-3">
-                    <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Active</span>
+                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Active</span>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="px-5 py-3 border-t border-gray-50">
+        <div className="px-5 py-3 border-t border-slate-100">
           <Link to="/tuition-panel/batches">
-            <button className="flex items-center gap-1.5 text-xs text-blue-600 font-semibold hover:text-blue-700">
+            <button className="flex items-center gap-1.5 text-xs text-primary font-bold hover:text-primary/80 transition-colors">
               <Plus className="h-3.5 w-3.5" /> Add New Batch
             </button>
           </Link>
@@ -329,21 +327,21 @@ export default function TuPDashboard() {
       <div className="grid md:grid-cols-2 gap-4">
 
         {/* Recent Enquiries */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-            <h2 className="text-sm font-extrabold text-gray-900">Recent Enquiries</h2>
-            <Link to="/tuition-panel/enquiries" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h2 className="text-sm font-extrabold text-slate-900">Recent Enquiries</h2>
+            <Link to="/tuition-panel/enquiries" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-50">
             {DEMO_ENQUIRIES.map((enq) => (
-              <div key={enq.name} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
+              <div key={enq.name} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
                 <span className={`h-8 w-8 rounded-full ${enq.color} flex items-center justify-center text-white text-[10px] font-bold shrink-0`}>{enq.initials}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-900">{enq.name}</p>
-                  <p className="text-[11px] text-gray-400">{enq.info}</p>
+                  <p className="text-xs font-semibold text-slate-900">{enq.name}</p>
+                  <p className="text-[11px] text-slate-400">{enq.info}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  <span className="text-[10px] text-gray-400">{enq.ago}</span>
+                  <span className="text-[10px] text-slate-400">{enq.ago}</span>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${enq.statusColor}`}>{enq.status}</span>
                 </div>
               </div>
@@ -352,22 +350,22 @@ export default function TuPDashboard() {
         </div>
 
         {/* Recent Reviews */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-            <h2 className="text-sm font-extrabold text-gray-900">Recent Reviews</h2>
-            <Link to="/tuition-panel/reviews" className="text-xs text-blue-600 font-semibold flex items-center gap-0.5">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+            <h2 className="text-sm font-extrabold text-slate-900">Recent Reviews</h2>
+            <Link to="/tuition-panel/reviews" className="text-xs text-primary font-bold flex items-center gap-0.5 hover:text-primary/80 transition-colors">View All <ChevronRight className="h-3.5 w-3.5" /></Link>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-50">
             {DEMO_REVIEWS.map((rev) => (
-              <div key={rev.name} className="flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
+              <div key={rev.name} className="flex items-start gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
                 <span className={`h-8 w-8 rounded-full ${rev.color} flex items-center justify-center text-white text-[10px] font-bold shrink-0 mt-0.5`}>{rev.initials}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <p className="text-xs font-semibold text-gray-900">{rev.name}</p>
-                    <span className="text-[10px] text-gray-400 shrink-0">{rev.ago}</span>
+                    <p className="text-xs font-semibold text-slate-900">{rev.name}</p>
+                    <span className="text-[10px] text-slate-400 shrink-0">{rev.ago}</span>
                   </div>
                   <StarRating rating={rev.rating} />
-                  <p className="text-[11px] text-gray-500 mt-1 leading-snug line-clamp-2">{rev.text}</p>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug line-clamp-2">{rev.text}</p>
                 </div>
               </div>
             ))}
@@ -376,22 +374,24 @@ export default function TuPDashboard() {
       </div>
 
       {/* ── BOTTOM UPGRADE BANNER ───────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center gap-4">
-        <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-          <TrendingUp className="h-5 w-5 text-purple-600" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-extrabold text-gray-900">Increase Admissions &amp; Grow Your Center</p>
-          <p className="text-[11px] text-gray-500">Get premium features to reach more students and parents.</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Star className="h-4 w-4 text-gray-300" />
-          <MapPin className="h-4 w-4 text-gray-300" />
-          <CheckCircle className="h-4 w-4 text-gray-300" />
-          <ArrowUpRight className="h-4 w-4 text-gray-300" />
-          <Link to="/tuition-panel/subscription">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg px-4 py-2 transition-colors">Upgrade Now</button>
-          </Link>
+      <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg,#1a56db 0%,#7e3af2 100%)" }}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_rgba(255,255,255,0.08)_0%,_transparent_60%)]" />
+        <div className="relative px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="h-11 w-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <TrendingUp className="h-5 w-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-extrabold text-white">Increase Admissions &amp; Grow Your Center</p>
+            <p className="text-[11px] text-white/70 mt-0.5">Get premium features to reach more students and parents across your city.</p>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            {[Star, MapPin, CheckCircle].map((Icon, i) => (
+              <Icon key={i} className="h-4 w-4 text-white/40" />
+            ))}
+            <Link to="/tuition-panel/subscription">
+              <button className="bg-white text-blue-700 hover:bg-blue-50 text-xs font-bold rounded-xl px-5 py-2 transition-colors shadow-lg whitespace-nowrap">Upgrade Now</button>
+            </Link>
+          </div>
         </div>
       </div>
 
