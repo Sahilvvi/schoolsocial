@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   MapPin, Star, CheckCircle, Loader2, Image, MessageSquare,
   GraduationCap, Heart, Phone, Mail, Globe, IndianRupee,
@@ -8,15 +11,27 @@ import {
   Bus, Monitor, FlaskConical, LibraryBig, Dumbbell, Laptop,
   Camera, Stethoscope, Navigation, Edit
 } from "lucide-react";
+import { toast } from "sonner";
 import AskAIChat from "@/components/AskAIChat";
 import QrOrderDialog from "@/components/QrOrderDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
-import { useSchoolBySlug, useReviews, useJobs, useEvents } from "@/hooks/useData";
+import { useSchoolBySlug, useReviews, useJobs, useEvents, useSubmitAdmission } from "@/hooks/useData";
 import { useSavedSchoolIds, useToggleSaveSchool } from "@/hooks/useSaveSchool";
+
+const admissionSchema = z.object({
+  student_name: z.string().min(2, "Student name is required"),
+  parent_name: z.string().min(2, "Parent name is required"),
+  email: z.string().email("Valid email is required"),
+  phone: z.string().min(10, "Valid phone number required"),
+  grade: z.string().min(1, "Please select a grade"),
+});
 
 /* ─── Facility icon map ─────────────────────────────────── */
 const FACILITY_ICONS: Record<string, React.ElementType> = {
@@ -47,6 +62,31 @@ export default function SchoolProfilePage() {
   const { data: savedIds } = useSavedSchoolIds();
   const toggleSave = useToggleSaveSchool();
   const isSaved = school ? savedIds?.has(school.id) ?? false : false;
+
+  const submitAdmission = useSubmitAdmission();
+
+  const admissionForm = useForm<z.infer<typeof admissionSchema>>({
+    resolver: zodResolver(admissionSchema),
+    defaultValues: { student_name: "", parent_name: "", email: "", phone: "", grade: "" },
+  });
+
+  useEffect(() => {
+    if (user) {
+      admissionForm.setValue("email", user.email || "");
+      admissionForm.setValue("parent_name", user.user_metadata?.full_name || "");
+    }
+  }, [user?.id]);
+
+  const onSubmitAdmission = async (values: z.infer<typeof admissionSchema>) => {
+    if (!school) return;
+    try {
+      await submitAdmission.mutateAsync({ school_id: school.id, ...values });
+      toast.success("Application submitted successfully! The school will contact you soon.");
+      admissionForm.reset();
+    } catch {
+      toast.error("Failed to submit application. Please try again.");
+    }
+  };
 
   const [activeTab, setActiveTab] = useState("about");
   const [showFullAbout, setShowFullAbout] = useState(false);
@@ -566,21 +606,97 @@ export default function SchoolProfilePage() {
           )}
 
           {activeTab === "admission" && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
-              <GraduationCap className="h-16 w-16 text-blue-600 mx-auto mb-6" />
-              <h2 className="text-3xl font-extrabold mb-4 text-gray-900">Start Your Application</h2>
-              <p className="text-gray-500 font-medium max-w-lg mx-auto mb-8">Submit your details to initiate the admission process for the upcoming academic year.</p>
-              <form className="max-w-md mx-auto space-y-4 text-left">
-                <div className="space-y-2">
-                  <label className="font-bold text-sm text-gray-700">Student Name</label>
-                  <input type="text" className="w-full h-12 rounded-xl bg-gray-50 border border-gray-200 px-4 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none text-sm" />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-bold text-sm text-gray-700">Parent Email</label>
-                  <input type="email" className="w-full h-12 rounded-xl bg-gray-50 border border-gray-200 px-4 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none text-sm" />
-                </div>
-                <button className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm transition-colors mt-2">Submit Application</button>
-              </form>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
+              <div className="p-8 text-center border-b border-gray-100">
+                <GraduationCap className="h-14 w-14 text-blue-600 mx-auto mb-4" />
+                <h2 className="text-3xl font-extrabold mb-2 text-gray-900">Apply to {school.name}</h2>
+                <p className="text-gray-500 font-medium">Submit your details to initiate the admission process for the upcoming academic year.</p>
+              </div>
+              <div className="p-8">
+                {!user ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 font-medium mb-4">Please sign in to submit your application and track its status in your dashboard.</p>
+                    <Link to="/auth">
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl">Sign In to Apply</Button>
+                    </Link>
+                  </div>
+                ) : (
+                <Form {...admissionForm}>
+                  <form onSubmit={admissionForm.handleSubmit(onSubmitAdmission)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={admissionForm.control} name="student_name" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold text-sm text-gray-700">Student Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Child's full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={admissionForm.control} name="parent_name" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold text-sm text-gray-700">Parent / Guardian Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={admissionForm.control} name="email" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold text-sm text-gray-700">Email Address</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="you@email.com" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={admissionForm.control} name="phone" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold text-sm text-gray-700">Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+91 XXXXX XXXXX" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                    <FormField control={admissionForm.control} name="grade" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold text-sm text-gray-700">Applying for Grade</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 rounded-xl bg-gray-50 border-gray-200">
+                              <SelectValue placeholder="Select grade" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {["Nursery", "LKG", "UKG", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+                              "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12"].map((g) => (
+                              <SelectItem key={g} value={g}>{g}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <Button
+                      type="submit"
+                      className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm mt-2"
+                      disabled={submitAdmission.isPending}
+                    >
+                      {submitAdmission.isPending ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</>
+                      ) : (
+                        "Submit Application"
+                      )}
+                    </Button>
+                  </form>
+                </Form>
+                )}
+              </div>
             </div>
           )}
         </div>

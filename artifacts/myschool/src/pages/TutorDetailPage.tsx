@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useTutors, useBookTutor } from "@/hooks/useData";
 import { useTuitionBatches } from "@/hooks/useErp";
+import { useAuth } from "@/hooks/useAuth";
 
 const bookingSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -47,6 +48,7 @@ const availability = [
 
 export default function TutorDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const { data: tutors = [], isLoading } = useTutors();
   const bookTutor = useBookTutor();
   const { data: batches = [] } = useTuitionBatches(id);
@@ -62,11 +64,27 @@ export default function TutorDetailPage() {
     defaultValues: { name: "", email: "", phone: "", subject: tutor?.subject || "", message: "" },
   });
 
+  useEffect(() => {
+    if (user) {
+      form.setValue("name", user.user_metadata?.full_name || "");
+      form.setValue("email", user.email || "");
+    }
+  }, [user?.id]);
+
   const onBook = async (data: z.infer<typeof bookingSchema>) => {
     if (!tutor) return;
     try {
-      await bookTutor.mutateAsync({ tutor_id: tutor.id, name: data.name, email: data.email, message: data.message || undefined });
-      toast.success(`Booking request sent to ${tutor.name}! 🎉`);
+      const messageParts = [];
+      messageParts.push(`Subject: ${data.subject}`);
+      messageParts.push(`Phone: ${data.phone}`);
+      if (data.message) messageParts.push(data.message);
+      await bookTutor.mutateAsync({
+        tutor_id: tutor.id,
+        name: data.name,
+        email: data.email,
+        message: messageParts.join(" | "),
+      });
+      toast.success(`Booking request sent to ${tutor.name}!`);
       form.reset();
       setBookOpen(false);
     } catch {
@@ -138,6 +156,15 @@ export default function TutorDetailPage() {
                     </DialogTrigger>
                     <DialogContent className="max-w-md bg-card border-border/40">
                       <DialogHeader><DialogTitle className="text-xl font-bold">Book {tutor.name}</DialogTitle></DialogHeader>
+                      {!user ? (
+                        <div className="text-center py-8 space-y-4">
+                          <p className="text-muted-foreground">Please sign in to book a session and track your bookings in your dashboard.</p>
+                          <Link to="/auth" onClick={() => setBookOpen(false)}>
+                            <Button className="gradient-primary text-primary-foreground rounded-xl px-8 font-semibold">Sign In to Book</Button>
+                          </Link>
+                        </div>
+                      ) : (
+                      <>
                       <div className="flex items-center gap-3 mb-4 p-3 bg-accent/20 rounded-xl border border-border/20">
                         <Avatar className="h-12 w-12"><AvatarImage src={tutor.avatar} /><AvatarFallback className="gradient-primary text-primary-foreground">{tutor.name[0]}</AvatarFallback></Avatar>
                         <div><p className="font-semibold">{tutor.name}</p><p className="text-sm text-muted-foreground">{tutor.subject} · {tutor.hourly_rate}</p></div>
@@ -171,6 +198,8 @@ export default function TutorDetailPage() {
                           </Button>
                         </form>
                       </Form>
+                      </>
+                      )}
                     </DialogContent>
                   </Dialog>
                   <div className="flex gap-2">

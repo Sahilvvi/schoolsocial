@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { MapPin, Clock, Search, X, ChevronLeft, ChevronRight, Loader2, BookOpen, Star, Zap, Users, Award, CheckCircle, Phone, ArrowUpRight, Sparkles, GraduationCap } from "lucide-react";
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTutors, useBookTutor } from "@/hooks/useData";
+import { useAuth } from "@/hooks/useAuth";
 
 const PER_PAGE = 6;
 
@@ -42,12 +43,21 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 export default function TutorsPage() {
   const { data: tutors = [], isLoading } = useTutors();
   const bookTutor = useBookTutor();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
   const [bookingName, setBookingName] = useState("");
   const [bookingEmail, setBookingEmail] = useState("");
   const [bookingMessage, setBookingMessage] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setBookingName(user.user_metadata?.full_name || "");
+      setBookingEmail(user.email || "");
+    }
+  }, [user?.id]);
 
   const subjects = [...new Set(tutors.map((t) => t.subject))];
 
@@ -64,8 +74,9 @@ export default function TutorsPage() {
     if (!bookingName || !bookingEmail) { toast.error("Please fill in your name and email."); return; }
     try {
       await bookTutor.mutateAsync({ tutor_id: tutorId, name: bookingName, email: bookingEmail, message: bookingMessage });
+      setOpenDialogId(null);
       toast.success("Booking request sent! The tutor will contact you soon.");
-      setBookingName(""); setBookingEmail(""); setBookingMessage("");
+      setBookingMessage("");
     } catch { toast.error("Failed to send booking. Please try again."); }
   };
 
@@ -210,7 +221,7 @@ export default function TutorsPage() {
                             Profile
                           </Button>
                         </Link>
-                        <Dialog>
+                        <Dialog open={openDialogId === tutor.id} onOpenChange={(open) => setOpenDialogId(open ? tutor.id : null)}>
                           <DialogTrigger asChild>
                             <Button size="sm" className="rounded-xl gradient-primary border-0 font-bold shadow-md shadow-primary/20 text-xs h-9 px-4">
                               Book Now
@@ -220,24 +231,33 @@ export default function TutorsPage() {
                             <DialogHeader>
                               <DialogTitle className="text-xl font-extrabold">Book {tutor.name}</DialogTitle>
                             </DialogHeader>
-                            <div className="space-y-4 pt-2">
-                              <div>
-                                <Label className="text-sm font-semibold mb-1.5 block">Your Name *</Label>
-                                <Input placeholder="Full name" value={bookingName} onChange={(e) => setBookingName(e.target.value)} className="rounded-xl h-12" />
+                            {!user ? (
+                              <div className="py-6 text-center space-y-3">
+                                <p className="text-muted-foreground">You need to be signed in to book a tutor.</p>
+                                <Button asChild className="gradient-primary border-0 font-bold rounded-xl">
+                                  <Link to="/auth">Sign In to Book</Link>
+                                </Button>
                               </div>
-                              <div>
-                                <Label className="text-sm font-semibold mb-1.5 block">Email Address *</Label>
-                                <Input type="email" placeholder="you@example.com" value={bookingEmail} onChange={(e) => setBookingEmail(e.target.value)} className="rounded-xl h-12" />
+                            ) : (
+                              <div className="space-y-4 pt-2">
+                                <div>
+                                  <Label className="text-sm font-semibold mb-1.5 block">Your Name *</Label>
+                                  <Input placeholder="Full name" value={bookingName} onChange={(e) => setBookingName(e.target.value)} className="rounded-xl h-12" />
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-semibold mb-1.5 block">Email Address *</Label>
+                                  <Input type="email" placeholder="you@example.com" value={bookingEmail} onChange={(e) => setBookingEmail(e.target.value)} className="rounded-xl h-12" />
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-semibold mb-1.5 block">Message (optional)</Label>
+                                  <Textarea placeholder="Tell the tutor about your requirements..." value={bookingMessage} onChange={(e) => setBookingMessage(e.target.value)} className="rounded-xl resize-none h-24" />
+                                </div>
+                                <Button onClick={() => handleBook(tutor.id)} disabled={bookTutor.isPending}
+                                  className="w-full gradient-primary border-0 font-extrabold h-12 rounded-xl shadow-lg shadow-primary/20 text-base">
+                                  {bookTutor.isPending ? "Sending..." : "Send Booking Request"}
+                                </Button>
                               </div>
-                              <div>
-                                <Label className="text-sm font-semibold mb-1.5 block">Message (optional)</Label>
-                                <Textarea placeholder="Tell the tutor about your requirements..." value={bookingMessage} onChange={(e) => setBookingMessage(e.target.value)} className="rounded-xl resize-none h-24" />
-                              </div>
-                              <Button onClick={() => handleBook(tutor.id)} disabled={bookTutor.isPending}
-                                className="w-full gradient-primary border-0 font-extrabold h-12 rounded-xl shadow-lg shadow-primary/20 text-base">
-                                {bookTutor.isPending ? "Sending..." : "Send Booking Request"}
-                              </Button>
-                            </div>
+                            )}
                           </DialogContent>
                         </Dialog>
                       </div>

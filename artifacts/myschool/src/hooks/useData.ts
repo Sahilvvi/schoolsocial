@@ -86,6 +86,8 @@ export function useSubmitAdmission() {
       }
       const { data, error } = await supabase.from("admissions").insert(admission).select().single();
       if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["admissions"] });
+      qc.invalidateQueries({ queryKey: ["sp-admissions-full", admission.school_id] });
       return data;
     },
   });
@@ -142,6 +144,7 @@ export function useBookTutor() {
       }
       const { data, error } = await supabase.from("tutor_bookings").insert(booking).select().single();
       if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["tutor_bookings"] });
       return data;
     },
   });
