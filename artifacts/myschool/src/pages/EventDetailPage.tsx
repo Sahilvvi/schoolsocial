@@ -72,7 +72,7 @@ export default function EventDetailPage() {
   if (!event) return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground text-lg">Event not found.</p></div>;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 lg:pb-0">
       {/* Hero Banner */}
       <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <motion.img

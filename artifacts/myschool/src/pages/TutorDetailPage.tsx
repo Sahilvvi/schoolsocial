@@ -78,7 +78,7 @@ export default function TutorDetailPage() {
   if (!tutor) return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground text-lg">Tutor not found.</p></div>;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 lg:pb-0">
       {/* Hero */}
       <div className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsl(174_62%_47%/0.1)_0%,_transparent_60%)]" />

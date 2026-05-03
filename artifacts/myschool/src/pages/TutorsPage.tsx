@@ -70,7 +70,7 @@ export default function TutorsPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 lg:pb-0">
       {/* Hero */}
       <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-20 mesh-gradient">
         <div className="absolute top-32 left-[15%] w-80 h-80 bg-secondary/8 rounded-full blur-[100px] animate-blob animation-delay-2000" />

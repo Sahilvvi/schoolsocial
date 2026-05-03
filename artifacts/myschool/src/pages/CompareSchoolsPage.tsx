@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { X, Plus, Star, MapPin, BadgeCheck, GraduationCap, Check, Minus, Share2, Copy } from "lucide-react";
+import { X, Plus, Star, MapPin, BadgeCheck, GraduationCap, Check, Minus, Share2, GitCompareArrows } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useSchools } from "@/hooks/useData";
 import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -49,22 +50,33 @@ export default function CompareSchoolsPage() {
   }, [selected]);
 
   return (
-    <div className="min-h-screen py-20">
-      <div className="container mx-auto px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
+    <div className="min-h-screen pb-20 lg:pb-0">
+      {/* Hero */}
+      <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsl(217_91%_60%/0.1)_0%,_transparent_60%)]" />
+        <div className="absolute top-24 right-[20%] w-72 h-72 bg-primary/6 rounded-full blur-[100px] animate-blob" />
+        <div className="absolute bottom-10 left-[25%] w-60 h-60 bg-secondary/5 rounded-full blur-[80px] animate-blob animation-delay-2000" />
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary mb-6">
+            <GitCompareArrows className="h-3.5 w-3.5" /> School Comparison
+          </motion.span>
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-extrabold mb-5">
             Compare <span className="text-gradient">Schools</span>
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Select up to 3 schools to compare side by side
-          </p>
+          </motion.h1>
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
+            Select up to 3 schools to compare side by side and make the best choice
+          </motion.p>
           {selectedIds.length >= 2 && (
-            <Button variant="outline" size="sm" className="mt-4 rounded-xl gap-2" onClick={shareLink}>
-              <Share2 className="h-4 w-4" /> Share Comparison
-            </Button>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
+              <Button variant="outline" size="sm" className="rounded-xl gap-2 border-border/40 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:bg-primary/5" onClick={shareLink}>
+                <Share2 className="h-4 w-4" /> Share Comparison
+              </Button>
+            </motion.div>
           )}
-        </motion.div>
+        </div>
+      </section>
 
+      <div className="container mx-auto px-4 pb-16">
         {/* School Selectors */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           {[0, 1, 2].map((slot) => {
@@ -75,36 +87,54 @@ export default function CompareSchoolsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: slot * 0.1 }}
-                className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-4"
+                className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-4 hover:border-primary/20 transition-all duration-300"
               >
                 {school ? (
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <img src={(school as any).banner} alt={school.name} className="h-12 w-12 rounded-xl object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+                      <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 rounded-xl overflow-hidden bg-primary/5 border border-border/30 flex-shrink-0">
+                          <img
+                            src={(school as any).banner}
+                            alt={school.name}
+                            className="h-full w-full object-cover"
+                            onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
+                          />
+                        </div>
                         <div>
-                          <div className="flex items-center gap-1">
-                            <h3 className="font-bold text-sm">{school.name}</h3>
-                            {(school as any).is_verified && <BadgeCheck className="h-3.5 w-3.5 text-blue-500" />}
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <h3 className="font-bold text-sm text-foreground">{school.name}</h3>
+                            {(school as any).is_verified && <BadgeCheck className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />}
                           </div>
-                          <p className="text-xs text-muted-foreground">{school.location}</p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{school.location}</p>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <Badge className="gradient-primary text-primary-foreground border-0 text-[10px] px-2 py-0">{school.board}</Badge>
+                            <span className="flex items-center gap-0.5 text-[11px] text-muted-foreground"><Star className="h-3 w-3 fill-primary text-primary" />{Number(school.rating).toFixed(1)}</span>
+                          </div>
                         </div>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeSchool(school.id)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 hover:bg-destructive/10 hover:text-destructive rounded-lg" onClick={() => removeSchool(school.id)}>
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <Select onValueChange={addSchool}>
-                    <SelectTrigger className="border-dashed border-2 h-16 rounded-xl">
-                      <SelectValue placeholder={<span className="flex items-center gap-2 text-muted-foreground"><Plus className="h-4 w-4" /> Select school {slot + 1}</span>} />
+                    <SelectTrigger className="border-dashed border-2 border-border/40 h-16 rounded-xl bg-transparent hover:border-primary/40 hover:bg-primary/5 transition-all">
+                      <SelectValue placeholder={
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <Plus className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="font-medium">Add School {slot + 1}</span>
+                        </span>
+                      } />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl border-border/40">
                       {schools
                         .filter((s) => !selectedIds.includes(s.id))
                         .map((s) => (
-                          <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                          <SelectItem key={s.id} value={s.id} className="rounded-lg">{s.name}</SelectItem>
                         ))}
                     </SelectContent>
                   </Select>
@@ -116,10 +146,10 @@ export default function CompareSchoolsPage() {
 
         {/* Comparison Table */}
         {selected.length >= 2 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden shadow-xl shadow-primary/5">
             {/* Header */}
-            <div className="grid" style={{ gridTemplateColumns: `200px repeat(${selected.length}, 1fr)` }}>
-              <div className="p-4 bg-muted/30 border-b border-r border-border/30 font-bold text-sm">Criteria</div>
+            <div className="grid" style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
+              <div className="p-4 bg-muted/30 border-b border-r border-border/30 font-bold text-sm text-muted-foreground">Criteria</div>
               {selected.map((s) => (
                 <div key={s!.id} className="p-4 bg-muted/30 border-b border-border/30 text-center">
                   <Link to={`/school/${s!.slug}`} className="font-bold text-sm hover:text-primary transition-colors">{s!.name}</Link>
@@ -129,16 +159,16 @@ export default function CompareSchoolsPage() {
 
             {/* Rows */}
             {[
-              { label: "Board", render: (s: any) => <span className="font-semibold">{s.board}</span> },
-              { label: "Rating", render: (s: any) => <span className="flex items-center justify-center gap-1"><Star className="h-4 w-4 fill-primary text-primary" />{Number(s.rating).toFixed(1)}</span> },
-              { label: "Reviews", render: (s: any) => <span>{s.review_count} reviews</span> },
+              { label: "Board", render: (s: any) => <Badge className="gradient-primary text-primary-foreground border-0 text-xs">{s.board}</Badge> },
+              { label: "Rating", render: (s: any) => <span className="flex items-center justify-center gap-1 font-semibold"><Star className="h-4 w-4 fill-primary text-primary" />{Number(s.rating).toFixed(1)}</span> },
+              { label: "Reviews", render: (s: any) => <span className="text-muted-foreground">{s.review_count} reviews</span> },
               { label: "Fees", render: (s: any) => <span className="font-bold text-gradient">{s.fees}</span> },
-              { label: "Location", render: (s: any) => <span className="flex items-center justify-center gap-1 text-sm"><MapPin className="h-3.5 w-3.5" />{s.location}</span> },
-              { label: "Verified", render: (s: any) => s.is_verified ? <BadgeCheck className="h-5 w-5 text-blue-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground mx-auto" /> },
-              { label: "Featured", render: (s: any) => s.is_featured ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground mx-auto" /> },
-            ].map((row) => (
-              <div key={row.label} className="grid" style={{ gridTemplateColumns: `200px repeat(${selected.length}, 1fr)` }}>
-                <div className="p-4 border-b border-r border-border/30 text-sm font-medium text-muted-foreground">{row.label}</div>
+              { label: "Location", render: (s: any) => <span className="flex items-center justify-center gap-1 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5 text-primary" />{s.location}</span> },
+              { label: "Verified", render: (s: any) => s.is_verified ? <BadgeCheck className="h-5 w-5 text-blue-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/40 mx-auto" /> },
+              { label: "Featured", render: (s: any) => s.is_featured ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/40 mx-auto" /> },
+            ].map((row, idx) => (
+              <div key={row.label} className={`grid ${idx % 2 === 0 ? "" : "bg-muted/10"}`} style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
+                <div className="p-4 border-b border-r border-border/30 text-sm font-semibold text-foreground">{row.label}</div>
                 {selected.map((s) => (
                   <div key={s!.id} className="p-4 border-b border-border/30 text-center text-sm">{row.render(s)}</div>
                 ))}
@@ -148,23 +178,23 @@ export default function CompareSchoolsPage() {
             {/* Facilities comparison */}
             {allFacilities.length > 0 && (
               <>
-                <div className="grid" style={{ gridTemplateColumns: `200px repeat(${selected.length}, 1fr)` }}>
-                  <div className="p-4 bg-muted/20 border-b border-r border-border/30 font-bold text-sm flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-primary" /> Facilities
+                <div className="grid" style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
+                  <div className="p-4 bg-primary/5 border-b border-r border-border/30 font-bold text-sm flex items-center gap-2 text-primary">
+                    <GraduationCap className="h-4 w-4" /> Facilities
                   </div>
                   {selected.map((s) => (
-                    <div key={s!.id} className="p-4 bg-muted/20 border-b border-border/30" />
+                    <div key={s!.id} className="p-4 bg-primary/5 border-b border-border/30" />
                   ))}
                 </div>
-                {allFacilities.map((facility) => (
-                  <div key={facility} className="grid" style={{ gridTemplateColumns: `200px repeat(${selected.length}, 1fr)` }}>
+                {allFacilities.map((facility, idx) => (
+                  <div key={facility} className={`grid ${idx % 2 === 0 ? "" : "bg-muted/10"}`} style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
                     <div className="p-3 border-b border-r border-border/30 text-xs text-muted-foreground pl-6">{facility}</div>
                     {selected.map((s) => (
                       <div key={s!.id} className="p-3 border-b border-border/30 text-center">
                         {(s as any).facilities?.includes(facility) ? (
                           <Check className="h-4 w-4 text-emerald-500 mx-auto" />
                         ) : (
-                          <Minus className="h-4 w-4 text-muted-foreground/40 mx-auto" />
+                          <Minus className="h-4 w-4 text-muted-foreground/30 mx-auto" />
                         )}
                       </div>
                     ))}
@@ -172,14 +202,31 @@ export default function CompareSchoolsPage() {
                 ))}
               </>
             )}
+
+            {/* CTA Row */}
+            <div className="grid" style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
+              <div className="p-4 border-t border-r border-border/30" />
+              {selected.map((s) => (
+                <div key={s!.id} className="p-4 border-t border-border/30 text-center">
+                  <Link to={`/school/${s!.slug}`}>
+                    <Button size="sm" className="gradient-primary text-primary-foreground border-0 rounded-xl shadow-lg shadow-primary/20 font-semibold">
+                      View Profile
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
 
         {selected.length < 2 && (
-          <div className="text-center py-16 text-muted-foreground">
-            <GraduationCap className="h-16 w-16 mx-auto mb-4 opacity-20" />
-            <p className="text-lg font-medium">Select at least 2 schools to start comparing</p>
-          </div>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-center py-20">
+            <div className="h-20 w-20 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/20">
+              <GraduationCap className="h-10 w-10 text-primary-foreground" />
+            </div>
+            <p className="text-xl font-bold text-foreground mb-2">Start Comparing Schools</p>
+            <p className="text-muted-foreground">Select at least 2 schools above to see a detailed side-by-side comparison</p>
+          </motion.div>
         )}
       </div>
     </div>

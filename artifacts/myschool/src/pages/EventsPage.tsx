@@ -51,7 +51,7 @@ export default function EventsPage() {
   const rest = paginated.slice(1);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 lg:pb-0">
       {/* Hero */}
       <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-20 mesh-gradient">
         <div className="absolute top-24 right-[15%] w-80 h-80 bg-purple-500/8 rounded-full blur-[100px] animate-blob" />
