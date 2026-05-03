@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, Mail, Phone, Heart, School, CalendarDays, Briefcase, BookOpen, Newspaper, Crown, MessageSquare, Upload } from "lucide-react";
+import { GraduationCap, Mail, Phone, Heart, School, CalendarDays, Briefcase, BookOpen, Newspaper, Crown, MessageSquare, Upload, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 
 const quickLinks = [
   { label: "Schools", to: "/schools", icon: School },
@@ -17,73 +17,105 @@ const moreLinks = [
   { label: "Parent Dashboard", to: "/dashboard" },
 ];
 
+const socialLinks = [
+  { icon: Facebook, href: "#" },
+  { icon: Instagram, href: "#" },
+  { icon: Twitter, href: "#" },
+  { icon: Linkedin, href: "#" },
+];
+
 export default function Footer() {
   return (
-    <footer className="border-t border-border/30 mt-16 bg-card/30">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Link to="/schools" className="flex items-center gap-2">
-              <div className="gradient-primary p-2 rounded-lg shadow-md shadow-primary/20">
-                <GraduationCap className="h-5 w-5 text-primary-foreground" />
+    <footer className="bg-foreground text-background/90 pt-16 pb-8 lg:pb-12 lg:pt-20">
+      <div className="container mx-auto px-4 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
+          {/* Brand & Contact */}
+          <div className="space-y-6">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="gradient-primary p-2.5 rounded-xl shadow-lg shadow-primary/20">
+                <GraduationCap className="h-6 w-6 text-white" />
               </div>
-              <span className="text-gradient font-extrabold text-xl">MySchool</span>
+              <span className="font-extrabold text-2xl text-white tracking-tight">MySchool</span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              India's premier education marketplace. Helping parents find the perfect school for their children.
+            <p className="text-sm leading-relaxed text-muted-foreground/80 pr-4">
+              India's premier education marketplace. Helping parents find, compare, and apply to the perfect school for their children seamlessly.
             </p>
-            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <a href="mailto:hello@myschool.edu" className="flex items-center gap-2 hover:text-primary transition-colors">
-                <Mail className="h-3.5 w-3.5 text-primary" />hello@myschool.edu
+            <div className="flex flex-col gap-3 pt-2">
+              <a href="mailto:hello@myschool.edu" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors group">
+                <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <Mail className="h-4 w-4 text-primary" />
+                </div>
+                hello@myschool.edu
               </a>
-              <span className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-primary" />+91 98765 43210
-              </span>
+              <a href="tel:+919876543210" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors group">
+                <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <Phone className="h-4 w-4 text-primary" />
+                </div>
+                +91 98765 43210
+              </a>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="font-bold text-foreground mb-4 text-sm uppercase tracking-wider">Explore</h4>
-            <div className="flex flex-col gap-2.5">
+          <div className="lg:pl-8">
+            <h4 className="font-bold text-white mb-6 text-sm uppercase tracking-widest">Explore</h4>
+            <div className="flex flex-col gap-4">
               {quickLinks.map((l) => (
-                <Link key={l.to} to={l.to} className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
-                  <l.icon className="h-3.5 w-3.5" />
+                <Link key={l.to} to={l.to} className="text-sm font-medium text-muted-foreground/80 hover:text-primary transition-colors flex items-center gap-3 group">
+                  <l.icon className="h-4 w-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                   {l.label}
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* More */}
+          {/* More Links */}
           <div>
-            <h4 className="font-bold text-foreground mb-4 text-sm uppercase tracking-wider">More</h4>
-            <div className="flex flex-col gap-2.5">
+            <h4 className="font-bold text-white mb-6 text-sm uppercase tracking-widest">Platform</h4>
+            <div className="flex flex-col gap-4">
               {moreLinks.map((l) => (
-                <Link key={l.to} to={l.to} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link key={l.to} to={l.to} className="text-sm font-medium text-muted-foreground/80 hover:text-primary transition-colors flex items-center gap-2">
                   {l.label}
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Auth */}
+          {/* Connect */}
           <div>
-            <h4 className="font-bold text-foreground mb-4 text-sm uppercase tracking-wider">Get Started</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Join thousands of parents who trust MySchool to make the best education choice.
+            <h4 className="font-bold text-white mb-6 text-sm uppercase tracking-widest">Get Started</h4>
+            <p className="text-sm text-muted-foreground/80 leading-relaxed mb-6">
+              Join millions of parents discovering better education opportunities every day.
             </p>
-            <Link to="/auth" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl gradient-primary text-primary-foreground text-sm font-semibold shadow-md shadow-primary/20 hover:opacity-90 transition-opacity">
+            <Link to="/auth" className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3.5 rounded-xl gradient-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 hover:scale-105 transition-all">
               Sign In / Sign Up
             </Link>
+            
+            <div className="mt-8 pt-8 border-t border-white/10">
+              <h5 className="font-bold text-white mb-4 text-xs uppercase tracking-widest">Follow Us</h5>
+              <div className="flex items-center gap-3">
+                {socialLinks.map((social, i) => (
+                  <a key={i} href={social.href} className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-primary hover:-translate-y-1 transition-all">
+                    <social.icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="h-px bg-border/30 my-8" />
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+        <div className="h-px bg-white/10 w-full mb-8" />
+        
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-muted-foreground/60">
           <p>© {new Date().getFullYear()} MySchool. All rights reserved.</p>
-          <p className="flex items-center gap-1">Made with <Heart className="h-3 w-3 text-destructive fill-destructive" /> in India</p>
+          <div className="flex items-center gap-6">
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Settings</Link>
+          </div>
+          <p className="flex items-center gap-1.5">
+            Made with <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500" /> in India
+          </p>
         </div>
       </div>
     </footer>

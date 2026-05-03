@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, User, Briefcase, Target, FileText, Users,
-  Calendar, LogOut, ChevronLeft, Loader2, GraduationCap, BookOpen
+  Calendar, LogOut, ChevronLeft, Loader2, BookOpen, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isDemoEmail } from "@/data/dummyData";
@@ -20,7 +20,6 @@ const navItems = [
   { label: "Find Jobs", path: "/teacher-panel/jobs", icon: BookOpen },
 ];
 
-/* Default teacher data for demo accounts */
 const defaultTeacher = {
   name: "Priya Sharma",
   title: "Senior Mathematics Teacher",
@@ -28,27 +27,23 @@ const defaultTeacher = {
   experience: "8+ Years",
   rating: 4.8,
   reviews: 47,
-  bio: "Passionate mathematics educator with 8+ years of experience in CBSE and ICSE curriculum. Specialized in making complex concepts simple and engaging for students of all levels. Published author of 'Fun with Numbers' workbook series.",
+  bio: "Passionate mathematics educator with 8+ years of experience in CBSE and ICSE curriculum. Specialized in making complex concepts simple and engaging for students of all levels.",
   email: "priya.sharma@email.com",
   phone: "+91 98765 43210",
   website: "priyasharma.edu",
   avatar: "PS",
-  skills: ["Mathematics", "Physics", "CBSE", "ICSE", "Competitive Exam Prep", "Vedic Maths", "Online Teaching", "Student Counseling"],
+  skills: ["Mathematics", "Physics", "CBSE", "ICSE", "Online Teaching"],
   education: [
     { degree: "M.Sc. Mathematics", institution: "Delhi University", year: "2014" },
     { degree: "B.Ed.", institution: "Jamia Millia Islamia", year: "2016" },
-    { degree: "CTET Qualified", institution: "CBSE", year: "2016" },
   ],
   experience_list: [
     { role: "Senior Math Teacher", school: "Delhi Public School, RK Puram", duration: "2020 - Present", desc: "Teaching classes 9-12, leading math olympiad team" },
     { role: "Math Teacher", school: "Modern School, Barakhamba", duration: "2017 - 2020", desc: "Classes 6-10, developed new curriculum modules" },
-    { role: "Junior Teacher", school: "Springdales School", duration: "2016 - 2017", desc: "Assistant teacher for classes 4-8" },
   ],
   achievements: [
     "Best Teacher Award — DPS RK Puram (2022)",
-    "Published 'Fun with Numbers' workbook series",
     "100% pass rate in Class 12 Board Exams (3 consecutive years)",
-    "Trained 15+ students for Math Olympiad nationals",
   ],
   homeTuition: true,
   onlineClasses: true,
@@ -61,13 +56,12 @@ const defaultTeacher = {
 export default function TeacherPanelLayout() {
   const { user, loading, signOut } = useAuth();
   const location = useLocation();
-  const [teacherData, setTeacherData] = useState(() =>
-    getDemoData("teacher-profile", defaultTeacher)
-  );
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [teacherData, setTeacherData] = useState(() => getDemoData("teacher-profile", defaultTeacher));
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -84,50 +78,67 @@ export default function TeacherPanelLayout() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-64 bg-card/80 backdrop-blur-xl border-r border-border/30 flex flex-col fixed top-0 left-0 h-full z-50">
-        <div className="p-5 border-b border-border/30">
-          <Link to="/teacher-panel" className="flex items-center gap-2.5">
-            <div className="gradient-primary p-2 rounded-lg shadow-md">
-              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 z-50">
+        <div className="flex items-center gap-2 truncate">
+          <BookOpen className="h-6 w-6 text-primary shrink-0" />
+          <span className="font-bold text-white text-lg truncate">Teacher Panel</span>
+        </div>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-slate-300 p-2 shrink-0">
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      <aside className={`w-64 bg-slate-950 border-r border-slate-800 flex flex-col fixed top-0 left-0 h-full z-40 transition-transform duration-300 md:translate-x-0 ${mobileMenuOpen ? "translate-x-0 pt-16 md:pt-0" : "-translate-x-full"}`}>
+        <div className="p-6 border-b border-slate-800 hidden md:block">
+          <Link to="/teacher-panel" className="flex items-center gap-3">
+            <div className="bg-primary/20 p-2 rounded-lg">
+              <BookOpen className="h-6 w-6 text-primary" />
             </div>
             <div className="min-w-0">
-              <span className="text-gradient font-extrabold text-sm block truncate">{teacherData.name}</span>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Teacher Panel</p>
+              <span className="font-bold text-white text-sm block truncate leading-tight">{teacherData.name}</span>
+              <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mt-0.5">Teacher Panel</p>
             </div>
           </Link>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto hidden-scrollbar">
           {navItems.map((item) => {
-            const active = location.pathname === item.path;
+            const active = location.pathname === item.path || (item.path !== '/teacher-panel' && location.pathname.startsWith(item.path));
             return (
-              <Link key={item.path} to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
-                  ${active ? "gradient-primary text-primary-foreground shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-accent/30"}`}
+              <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+                  ${active ? "bg-primary/10 text-primary" : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"}`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={`h-4 w-4 ${active ? "text-primary" : "text-slate-400"}`} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-border/30 space-y-2">
+        <div className="p-4 border-t border-slate-800 space-y-2 bg-slate-950/50">
           <Link to="/">
-            <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground">
+            <Button variant="ghost" className="w-full justify-start text-slate-400 hover:text-white hover:bg-slate-900">
               <ChevronLeft className="h-4 w-4 mr-2" />Back to Site
             </Button>
           </Link>
-          <Button variant="ghost" size="sm" className="w-full justify-start text-destructive/70 hover:text-destructive" onClick={() => signOut()}>
+          <Button variant="ghost" className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950/30" onClick={() => signOut()}>
             <LogOut className="h-4 w-4 mr-2" />Sign Out
           </Button>
         </div>
       </aside>
 
-      <main className="flex-1 ml-64 p-8 min-h-screen">
-        <Outlet context={{ teacherData, updateTeacher }} />
+      <main className="flex-1 md:ml-64 pt-16 md:pt-0 p-4 md:p-8 min-h-screen">
+        <div className="max-w-5xl mx-auto">
+          <Outlet context={{ teacherData, updateTeacher }} />
+        </div>
       </main>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-30" onClick={() => setMobileMenuOpen(false)} />
+      )}
     </div>
   );
 }

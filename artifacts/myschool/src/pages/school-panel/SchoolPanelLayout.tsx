@@ -4,9 +4,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSchoolOwner } from "@/hooks/useSchoolOwner";
 import {
   School, LayoutDashboard, ClipboardList, Image, BarChart3,
-  Star, Calendar, Briefcase, BookOpen, QrCode, LogOut, ChevronLeft, Loader2, GraduationCap, Settings
+  Star, Calendar, Briefcase, BookOpen, QrCode, LogOut, ChevronLeft, Loader2, GraduationCap, Settings, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const navItems = [
   { label: "Dashboard", path: "/school-panel", icon: LayoutDashboard },
@@ -25,10 +26,11 @@ export default function SchoolPanelLayout() {
   const { user, loading: authLoading, signOut } = useAuth();
   const { data: ownership, isLoading: ownerLoading } = useSchoolOwner();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (authLoading || ownerLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -37,25 +39,25 @@ export default function SchoolPanelLayout() {
   if (!user) return <Navigate to="/auth" replace />;
   if (!ownership) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50/50">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50 dark:bg-slate-950">
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-card p-10 rounded-3xl border border-border shadow-2xl shadow-primary/5 max-w-md w-full text-center space-y-6"
+          className="bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full text-center space-y-6"
         >
-          <div className="mx-auto w-20 h-20 rounded-2xl bg-destructive/10 flex items-center justify-center">
-            <School className="h-10 w-10 text-destructive" />
+          <div className="mx-auto w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <School className="h-10 w-10 text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-extrabold tracking-tight">No School Linked</h1>
-            <p className="text-muted-foreground">Your account isn't associated with a school profile yet. You might need to claim your school or wait for admin approval.</p>
+            <h1 className="text-2xl font-bold tracking-tight">No School Linked</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Your account isn't associated with a school profile yet. Claim your school or wait for admin approval.</p>
           </div>
           <div className="pt-4 flex flex-col gap-3">
             <Link to="/upload-school">
-              <Button className="w-full erp-button-gradient h-12 rounded-xl">Register Your School</Button>
+              <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-lg">Register Your School</Button>
             </Link>
             <Link to="/">
-              <Button variant="ghost" className="w-full h-12 rounded-xl">
+              <Button variant="ghost" className="w-full h-11 rounded-lg text-slate-500">
                 <ChevronLeft className="h-4 w-4 mr-2" /> Back to Marketplace
               </Button>
             </Link>
@@ -68,50 +70,67 @@ export default function SchoolPanelLayout() {
   const school = (ownership as any).schools;
 
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-64 bg-card/80 backdrop-blur-xl border-r border-border/30 flex flex-col fixed top-0 left-0 h-full z-50">
-        <div className="p-5 border-b border-border/30">
-          <Link to="/school-panel" className="flex items-center gap-2.5">
-            <div className="gradient-primary p-2 rounded-lg shadow-md">
-              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 z-50">
+        <div className="flex items-center gap-2 truncate">
+          <GraduationCap className="h-6 w-6 text-primary shrink-0" />
+          <span className="font-bold text-white text-lg truncate">{school?.name || "School Panel"}</span>
+        </div>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-slate-300 p-2 shrink-0">
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      <aside className={`w-64 bg-slate-950 border-r border-slate-800 flex flex-col fixed top-0 left-0 h-full z-40 transition-transform duration-300 md:translate-x-0 ${mobileMenuOpen ? "translate-x-0 pt-16 md:pt-0" : "-translate-x-full"}`}>
+        <div className="p-6 border-b border-slate-800 hidden md:block">
+          <Link to="/school-panel" className="flex items-center gap-3">
+            <div className="bg-primary/20 p-2 rounded-lg">
+              <GraduationCap className="h-6 w-6 text-primary" />
             </div>
             <div className="min-w-0">
-              <span className="text-gradient font-extrabold text-sm block truncate">{school?.name || "My School"}</span>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">School Panel</p>
+              <span className="font-bold text-white text-sm block truncate leading-tight">{school?.name || "My School"}</span>
+              <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mt-0.5">School Panel</p>
             </div>
           </Link>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto hidden-scrollbar">
           {navItems.map((item) => {
-            const active = location.pathname === item.path;
+            const active = location.pathname === item.path || (item.path !== '/school-panel' && location.pathname.startsWith(item.path));
             return (
-              <Link key={item.path} to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
-                  ${active ? "gradient-primary text-primary-foreground shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-accent/30"}`}
+              <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+                  ${active ? "bg-primary/10 text-primary" : "text-slate-400 hover:text-slate-100 hover:bg-slate-900"}`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={`h-4 w-4 ${active ? "text-primary" : "text-slate-400"}`} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-border/30 space-y-2">
+        <div className="p-4 border-t border-slate-800 space-y-2 bg-slate-950/50">
           <Link to="/">
-            <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground">
+            <Button variant="ghost" className="w-full justify-start text-slate-400 hover:text-white hover:bg-slate-900">
               <ChevronLeft className="h-4 w-4 mr-2" />Back to Site
             </Button>
           </Link>
-          <Button variant="ghost" size="sm" className="w-full justify-start text-destructive/70 hover:text-destructive" onClick={() => signOut()}>
+          <Button variant="ghost" className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950/30" onClick={() => signOut()}>
             <LogOut className="h-4 w-4 mr-2" />Sign Out
           </Button>
         </div>
       </aside>
 
-      <main className="flex-1 ml-64 p-8 min-h-screen">
-        <Outlet context={{ school, ownership }} />
+      <main className="flex-1 md:ml-64 pt-16 md:pt-0 p-4 md:p-8 min-h-screen">
+        <div className="max-w-5xl mx-auto">
+          <Outlet context={{ school, ownership }} />
+        </div>
       </main>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-30" onClick={() => setMobileMenuOpen(false)} />
+      )}
     </div>
   );
 }

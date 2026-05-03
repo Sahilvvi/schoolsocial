@@ -20,6 +20,14 @@ path = "scripts/post-merge.sh"
 timeoutMs = 20000
 
 [[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
 localPort = 19910
 externalPort = 80
 
@@ -28,3 +36,4 @@ externalPort = 80
 [userenv.shared]
 VITE_SUPABASE_URL = "https://crqcdqrimmvetmbmhapv.supabase.co"
 VITE_SUPABASE_PROJECT_ID = "crqcdqrimmvetmbmhapv"
+VITE_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNycWNkcXJpbW12ZXRtYm1oYXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjQ2MzUsImV4cCI6MjA5MDkwMDYzNX0.33y6-AwZ_3cQ9dwkvlUxxz7a9x-ZTbs6lN9Xooto3HY"
