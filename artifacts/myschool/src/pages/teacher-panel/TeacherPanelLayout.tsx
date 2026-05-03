@@ -1,13 +1,18 @@
 import { Outlet, Link, useLocation, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, User, Briefcase, Target, FileText, Users,
   Calendar, LogOut, ChevronLeft, Loader2, BookOpen, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { isDemoEmail } from "@/data/dummyData";
 import { getDemoData, setDemoData } from "@/lib/demoStorage";
+import { isDemoUserId } from "@/hooks/useDemoMode";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+type TutorRow = Tables<"tutors">;
+type TutorBookingRow = Tables<"tutor_bookings">;
 
 const navItems = [
   { label: "Dashboard", path: "/teacher-panel", icon: LayoutDashboard },
@@ -20,7 +25,34 @@ const navItems = [
   { label: "Find Jobs", path: "/teacher-panel/jobs", icon: BookOpen },
 ];
 
-const defaultTeacher = {
+// Shape used by the teacher profile throughout the panel pages
+type TeacherProfile = {
+  name: string;
+  title: string;
+  location: string;
+  experience: string;
+  rating: number;
+  reviews: number;
+  bio: string;
+  email: string;
+  phone: string;
+  website: string;
+  avatar: string;
+  skills: string[];
+  education: { degree: string; institution: string; year: string }[];
+  experience_list: { role: string; school: string; duration: string; desc: string }[];
+  achievements: string[];
+  homeTuition: boolean;
+  onlineClasses: boolean;
+  paidNotes: boolean;
+  hourlyRate: string;
+  subjects: string[];
+  grades: string[];
+  // Supabase-loaded tutor bookings for real users
+  bookings?: TutorBookingRow[];
+};
+
+const defaultTeacher: TeacherProfile = {
   name: "Priya Sharma",
   title: "Senior Mathematics Teacher",
   location: "New Delhi, India",
@@ -57,7 +89,68 @@ export default function TeacherPanelLayout() {
   const { user, loading, signOut } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [teacherData, setTeacherData] = useState(() => getDemoData("teacher-profile", defaultTeacher));
+
+  // Initialize from demo localStorage; useEffect corrects for real users after auth resolves
+  const [teacherData, setTeacherData] = useState<TeacherProfile>(() =>
+    getDemoData("teacher-profile", defaultTeacher)
+  );
+
+  // After auth resolves, load real Supabase data for non-demo users
+  useEffect(() => {
+    if (!user || !supabase) return;
+    if (isDemoUserId(user.id)) return;
+
+    const realKey = `real-teacher-profile-${user.id}`;
+    const stored = getDemoData<TeacherProfile | null>(realKey, null);
+
+    // Start with user_metadata for display while Supabase loads
+    const metaProfile: TeacherProfile = stored ?? {
+      ...defaultTeacher,
+      name: user.user_metadata?.full_name ?? defaultTeacher.name,
+      email: user.email ?? defaultTeacher.email,
+      avatar: (user.user_metadata?.full_name ?? defaultTeacher.name).slice(0, 2).toUpperCase(),
+    };
+    setTeacherData(metaProfile);
+
+    // Look up tutor profile by name in the tutors table.
+    // Note: tutors table has no user_id column, so we match by full_name.
+    // This is the only available Supabase link for teacher accounts.
+    const fullName = user.user_metadata?.full_name ?? "";
+    if (fullName && supabase) {
+      supabase
+        .from("tutors")
+        .select("*")
+        .ilike("name", fullName)
+        .maybeSingle()
+        .then(({ data: tutor }) => {
+          if (tutor) {
+            // Merge Supabase tutor data with the profile
+            setTeacherData(prev => ({
+              ...prev,
+              name: tutor.name,
+              bio: tutor.bio || prev.bio,
+              location: tutor.location || prev.location,
+              experience: tutor.experience || prev.experience,
+              hourlyRate: tutor.hourly_rate || prev.hourlyRate,
+              rating: tutor.rating ?? prev.rating,
+              subjects: [tutor.subject, ...prev.subjects.filter(s => s !== tutor.subject)],
+            }));
+
+            // Now load bookings for this tutor from tutor_bookings
+            supabase!
+              .from("tutor_bookings")
+              .select("*")
+              .eq("tutor_id", tutor.id)
+              .order("created_at", { ascending: false })
+              .then(({ data: bookings }) => {
+                if (bookings?.length) {
+                  setTeacherData(prev => ({ ...prev, bookings }));
+                }
+              });
+          }
+        });
+    }
+  }, [user?.id]);
 
   if (loading) {
     return (
@@ -69,10 +162,13 @@ export default function TeacherPanelLayout() {
 
   if (!user) return <Navigate to="/auth" replace />;
 
-  const updateTeacher = (updates: Partial<typeof defaultTeacher>) => {
+  const isDemo = isDemoUserId(user.id);
+  const storageKey = isDemo ? "teacher-profile" : `real-teacher-profile-${user.id}`;
+
+  const updateTeacher = (updates: Partial<TeacherProfile>) => {
     setTeacherData(prev => {
       const next = { ...prev, ...updates };
-      setDemoData("teacher-profile", next);
+      setDemoData(storageKey, next);
       return next;
     });
   };
@@ -132,7 +228,7 @@ export default function TeacherPanelLayout() {
 
       <main className="flex-1 md:ml-64 pt-16 md:pt-0 p-4 md:p-8 min-h-screen">
         <div className="max-w-5xl mx-auto">
-          <Outlet context={{ teacherData, updateTeacher }} />
+          <Outlet context={{ teacherData, updateTeacher, isDemo }} />
         </div>
       </main>
 

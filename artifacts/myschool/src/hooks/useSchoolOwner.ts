@@ -13,6 +13,8 @@ export function useSchoolOwner() {
         return DEMO_SCHOOL_OWNERSHIP;
       }
 
+      if (!supabase) return null;
+
       const { data, error } = await supabase
         .from("school_owners")
         .select("*, schools(*)")

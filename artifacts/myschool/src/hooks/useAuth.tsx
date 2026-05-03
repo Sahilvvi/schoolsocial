@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, name: string, role?: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; user: User | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -88,11 +88,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const demo = getDemoUser(email);
       if (demo && password === demo.password) {
         localStorage.setItem("demo_user_email", email);
-        setUser(makeDemoUser(demo));
+        const demoUser = makeDemoUser(demo);
+        setUser(demoUser);
         setSession(makeDemoSession(demo));
-        return { error: null };
+        return { error: null, user: demoUser };
       }
-      return { error: new Error("Invalid demo credentials") };
+      return { error: new Error("Invalid demo credentials"), user: null };
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -114,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    return { error: error as Error | null };
+    return { error: error as Error | null, user: data?.user ?? null };
   };
 
   const signOut = async () => {

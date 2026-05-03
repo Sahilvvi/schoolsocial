@@ -54,7 +54,7 @@ export default function AuthPage() {
   const forgotForm = useForm<z.infer<typeof forgotSchema>>({ resolver: zodResolver(forgotSchema), defaultValues: { email: "" } });
 
   const handleLogin = async (data: z.infer<typeof loginSchema>) => {
-    const { error } = await signIn(data.email, data.password);
+    const { error, user: signedInUser } = await signIn(data.email, data.password);
     if (error) { toast.error(error.message); return; }
     toast.success("Welcome back! 🎉");
 
@@ -69,11 +69,27 @@ export default function AuthPage() {
       }
     }
 
-    const { data: roleData } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
-    if (roleData) { navigate("/admin"); return; }
-    const { data: ownerData } = await supabase.from("school_owners").select("id").limit(1).maybeSingle();
-    if (ownerData) { navigate("/school-panel"); return; }
-    navigate("/schools");
+    // For real users: check role stored in user metadata first
+    const metaRole = signedInUser?.user_metadata?.role as string | undefined;
+    if (metaRole === "admin") { navigate("/admin"); return; }
+    if (metaRole === "school") { navigate("/school-panel"); return; }
+    if (metaRole === "teacher") { navigate("/teacher-panel"); return; }
+    if (metaRole === "tuition_center") { navigate("/tuition-panel"); return; }
+
+    // DB fallback for admin and school roles.
+    // Note: user_roles enum is "admin|moderator|user" only — teacher and
+    // tuition_center are NOT stored in user_roles. There is also no teachers
+    // or tuition_center_owners table with user_id. Therefore teacher/tuition_center
+    // role routing MUST come from user_metadata.role (set at signup above).
+    // Users who signed up before role metadata was added default to /parent-panel.
+    if (supabase && signedInUser?.id) {
+      const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", signedInUser.id).eq("role", "admin").maybeSingle();
+      if (roleData) { navigate("/admin"); return; }
+      const { data: ownerData } = await supabase.from("school_owners").select("id").eq("user_id", signedInUser.id).maybeSingle();
+      if (ownerData) { navigate("/school-panel"); return; }
+    }
+
+    navigate("/parent-panel");
   };
 
   const handleSignup = async (data: z.infer<typeof signupSchema>) => {

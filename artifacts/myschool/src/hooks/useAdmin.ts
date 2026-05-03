@@ -11,6 +11,7 @@ export function useIsAdmin() {
       if (!user) return false;
       // Demo admin bypass
       if (user.id === DEMO_USERS.admin.id) return true;
+      if (!supabase) return false;
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
