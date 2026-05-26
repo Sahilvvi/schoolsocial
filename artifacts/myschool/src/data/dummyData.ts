@@ -1,6 +1,11 @@
 // Comprehensive dummy data for all pages, dashboards, and panels
 // This data is used as fallback when Supabase returns empty results
 
+// Demo credentials are imported from the shared lib (single source of truth
+// for both web and mobile apps).
+import { DEMO_USERS, isDemoEmail, getDemoUser } from "@workspace/shared-data";
+export { DEMO_USERS, isDemoEmail, getDemoUser };
+
 const now = new Date().toISOString();
 const today = new Date().toISOString().split("T")[0];
 
@@ -14,23 +19,6 @@ function daysFromNow(n: number) {
   const d = new Date();
   d.setDate(d.getDate() + n);
   return d.toISOString().split("T")[0];
-}
-
-// ─── Demo credentials & user IDs ───
-export const DEMO_USERS = {
-  admin: { email: "admin@myschool.demo", password: "Demo@1234", role: "admin", id: "demo-admin-001", name: "Admin User" },
-  school: { email: "school@myschool.demo", password: "Demo@1234", role: "school", id: "demo-school-001", name: "School Manager" },
-  parent: { email: "parent@myschool.demo", password: "Demo@1234", role: "parent", id: "demo-parent-001", name: "Rajesh Kumar" },
-  teacher: { email: "teacher@myschool.demo", password: "Demo@1234", role: "teacher", id: "demo-teacher-001", name: "Priya Sharma" },
-  tuition: { email: "tuition@myschool.demo", password: "Demo@1234", role: "tuition_center", id: "demo-tuition-001", name: "Tuition Center Admin" },
-} as const;
-
-export function isDemoEmail(email: string): boolean {
-  return Object.values(DEMO_USERS).some((u) => u.email === email);
-}
-
-export function getDemoUser(email: string) {
-  return Object.values(DEMO_USERS).find((u) => u.email === email) ?? null;
 }
 
 // ─── Schools ───
