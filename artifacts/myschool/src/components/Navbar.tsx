@@ -41,7 +41,7 @@ const mobileNavLinks = [
   { to: "/schools", label: "Search",  icon: Search },
   { to: "/compare", label: "Compare", icon: GitCompareArrows },
   { to: "/events",  label: "Events",  icon: CalendarDays },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/auth",    label: "Profile", icon: User },
 ];
 
 export default function Navbar() {
@@ -313,10 +313,10 @@ export default function Navbar() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
         <div className="flex items-center justify-around px-2 py-1.5">
           {mobileNavLinks.map((tab) => {
-            const isProfile = tab.to === "/profile";
+            const isProfile = tab.label === "Profile";
             const actualTo = isProfile ? getDashboardLink() : tab.to;
             const isActive = isProfile
-              ? (user && ["/parent-panel", "/school-panel", "/teacher-panel", "/tuition-panel", "/admin", "/auth"].some(p => location.pathname.startsWith(p)))
+              ? (["/parent-panel", "/school-panel", "/teacher-panel", "/tuition-panel", "/admin", "/auth"].some(p => location.pathname.startsWith(p)))
               : (tab.to === "/" ? location.pathname === "/" : location.pathname.startsWith(tab.to));
 
             const Icon = tab.icon;

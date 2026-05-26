@@ -30,6 +30,9 @@ import ScannerPage from "@/pages/ScannerPage";
 import SchoolCommunityPage from "@/pages/SchoolCommunityPage";
 import TuitionDashboard from "@/pages/TuitionDashboard";
 import TuitionCenterPage from "@/pages/TuitionCenterPage";
+import PrivacyPage from "@/pages/PrivacyPage";
+import TermsPage from "@/pages/TermsPage";
+import CookiesPage from "@/pages/CookiesPage";
 
 // Teacher Panel
 import TeacherPanelLayout from "@/pages/teacher-panel/TeacherPanelLayout";
@@ -65,6 +68,8 @@ import TuPPerformance from "@/pages/tuition-panel/TuPPerformance";
 import TuPSettings from "@/pages/tuition-panel/TuPSettings";
 import TuPSubscription from "@/pages/tuition-panel/TuPSubscription";
 import TuPHelp from "@/pages/tuition-panel/TuPHelp";
+import TuPFeed from "@/pages/tuition-panel/TuPFeed";
+import TuPEvents from "@/pages/tuition-panel/TuPEvents";
 
 // Parent Panel
 import ParentPanelLayout from "@/pages/parent-panel/ParentPanelLayout";
@@ -168,6 +173,9 @@ function AppShell() {
             <Route path="/scanner" element={<ScannerPage />} />
             <Route path="/community" element={<SchoolCommunityPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/cookies" element={<CookiesPage />} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<AdminLayout />}>
@@ -248,6 +256,8 @@ function AppShell() {
               <Route path="settings" element={<TuPSettings />} />
               <Route path="subscription" element={<TuPSubscription />} />
               <Route path="help" element={<TuPHelp />} />
+              <Route path="feed" element={<TuPFeed />} />
+              <Route path="events" element={<TuPEvents />} />
             </Route>
 
             {/* Parent Panel routes */}
