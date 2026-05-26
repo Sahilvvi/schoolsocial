@@ -182,17 +182,17 @@ export default function SchoolProfilePage() {
             {/* Action Buttons */}
             <div className="grid grid-cols-3 gap-2 mt-4">
               <a href="tel:+911234567890">
-                <button className="w-full flex items-center justify-center gap-1.5 border border-teal-500 text-teal-600 rounded-xl py-2.5 text-xs font-bold hover:bg-teal-50 transition-colors">
+                <button className="w-full flex items-center justify-center gap-1.5 bg-green-500 text-white rounded-xl py-2.5 text-xs font-bold hover:bg-green-600 transition-colors shadow-sm">
                   <Phone className="h-4 w-4" /> Call Now
                 </button>
               </a>
               <Link to={`/school/${school.slug}#enquiry`}>
-                <button className="w-full flex items-center justify-center gap-1.5 border border-teal-500 text-teal-600 rounded-xl py-2.5 text-xs font-bold hover:bg-teal-50 transition-colors">
+                <button className="w-full flex items-center justify-center gap-1.5 bg-green-500 text-white rounded-xl py-2.5 text-xs font-bold hover:bg-green-600 transition-colors shadow-sm">
                   <MessageSquare className="h-4 w-4" /> Enquiry
                 </button>
               </Link>
               <Link to={`/school/${school.slug}#apply`}>
-                <button className="w-full flex items-center justify-center gap-1.5 border border-teal-500 text-teal-600 rounded-xl py-2.5 text-xs font-bold hover:bg-teal-50 transition-colors">
+                <button className="w-full flex items-center justify-center gap-1.5 border border-green-500 text-green-600 rounded-xl py-2.5 text-xs font-bold hover:bg-green-50 transition-colors">
                   <Edit className="h-4 w-4" /> Apply Now
                 </button>
               </Link>
@@ -400,15 +400,15 @@ export default function SchoolProfilePage() {
         {/* Fixed Bottom Action Bar */}
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3 grid grid-cols-3 gap-2">
           <a href="tel:+911234567890">
-            <button className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors">
+            <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors shadow-sm">
               <Phone className="h-4 w-4" /> Call Now
             </button>
           </a>
-          <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors">
+          <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors shadow-sm">
             <MessageSquare className="h-4 w-4" /> Enquiry
           </button>
           <a href={`https://www.google.com/maps?q=${school.lat},${school.lng}`} target="_blank" rel="noopener noreferrer">
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors">
+            <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors shadow-sm">
               <Navigation className="h-4 w-4" /> Directions
             </button>
           </a>

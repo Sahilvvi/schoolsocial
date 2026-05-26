@@ -127,7 +127,7 @@ export default function AuthPage() {
             <div className="gradient-primary p-3 rounded-2xl shadow-xl shadow-primary/20 group-hover:scale-105 transition-transform">
               <GraduationCap className="h-8 w-8 text-white" />
             </div>
-            <span className="font-extrabold text-3xl text-foreground tracking-tight">MySchool</span>
+            <span className="font-extrabold text-3xl text-foreground tracking-tight">SchoolSocial</span>
           </Link>
           <h1 className="text-5xl font-extrabold leading-[1.1] text-foreground">
             The easiest way to <br/>
@@ -162,7 +162,7 @@ export default function AuthPage() {
             <div className="gradient-primary p-3 rounded-xl inline-block shadow-lg shadow-primary/20 mb-4">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
-            <h1 className="font-extrabold text-2xl text-foreground">MySchool</h1>
+            <h1 className="font-extrabold text-2xl text-foreground">SchoolSocial</h1>
           </div>
 
           <div className="bg-card rounded-[2rem] border border-border/60 shadow-2xl shadow-black/5 overflow-hidden">

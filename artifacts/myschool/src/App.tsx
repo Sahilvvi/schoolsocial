@@ -51,6 +51,20 @@ import TuPEnquiries from "@/pages/tuition-panel/TuPEnquiries";
 import TuPTutors from "@/pages/tuition-panel/TuPTutors";
 import TuPBookings from "@/pages/tuition-panel/TuPBookings";
 import TuPNotifications from "@/pages/tuition-panel/TuPNotifications";
+import TuPFees from "@/pages/tuition-panel/TuPFees";
+import TuPGallery from "@/pages/tuition-panel/TuPGallery";
+import TuPSubjects from "@/pages/tuition-panel/TuPSubjects";
+import TuPReviews from "@/pages/tuition-panel/TuPReviews";
+import TuPStudents from "@/pages/tuition-panel/TuPStudents";
+import TuPAnnouncements from "@/pages/tuition-panel/TuPAnnouncements";
+import TuPJobs from "@/pages/tuition-panel/TuPJobs";
+import TuPJobApps from "@/pages/tuition-panel/TuPJobApps";
+import TuPAnalytics from "@/pages/tuition-panel/TuPAnalytics";
+import TuPLeads from "@/pages/tuition-panel/TuPLeads";
+import TuPPerformance from "@/pages/tuition-panel/TuPPerformance";
+import TuPSettings from "@/pages/tuition-panel/TuPSettings";
+import TuPSubscription from "@/pages/tuition-panel/TuPSubscription";
+import TuPHelp from "@/pages/tuition-panel/TuPHelp";
 
 // Parent Panel
 import ParentPanelLayout from "@/pages/parent-panel/ParentPanelLayout";
@@ -90,6 +104,19 @@ import SPJobs from "@/pages/school-panel/SPJobs";
 import SPErp from "@/pages/school-panel/SPErp";
 import SPQrOrders from "@/pages/school-panel/SPQrOrders";
 import SPProfile from "@/pages/school-panel/SPProfile";
+import SPCourses from "@/pages/school-panel/SPCourses";
+import SPFees from "@/pages/school-panel/SPFees";
+import SPFacilities from "@/pages/school-panel/SPFacilities";
+import SPTeachers from "@/pages/school-panel/SPTeachers";
+import SPEnquiries from "@/pages/school-panel/SPEnquiries";
+import SPFeed from "@/pages/school-panel/SPFeed";
+import SPBlogs from "@/pages/school-panel/SPBlogs";
+import SPViews from "@/pages/school-panel/SPViews";
+import SPLeads from "@/pages/school-panel/SPLeads";
+import SPSettings from "@/pages/school-panel/SPSettings";
+import SPSubscription from "@/pages/school-panel/SPSubscription";
+import SPHelp from "@/pages/school-panel/SPHelp";
+import SPJobApps from "@/pages/school-panel/SPJobApps";
 
 const queryClient = new QueryClient();
 
@@ -171,6 +198,19 @@ function AppShell() {
               <Route path="jobs" element={<SPJobs />} />
               <Route path="erp" element={<SPErp />} />
               <Route path="qr-orders" element={<SPQrOrders />} />
+              <Route path="courses" element={<SPCourses />} />
+              <Route path="fees" element={<SPFees />} />
+              <Route path="facilities" element={<SPFacilities />} />
+              <Route path="teachers" element={<SPTeachers />} />
+              <Route path="enquiries" element={<SPEnquiries />} />
+              <Route path="feed" element={<SPFeed />} />
+              <Route path="blogs" element={<SPBlogs />} />
+              <Route path="views" element={<SPViews />} />
+              <Route path="leads" element={<SPLeads />} />
+              <Route path="settings" element={<SPSettings />} />
+              <Route path="subscription" element={<SPSubscription />} />
+              <Route path="help" element={<SPHelp />} />
+              <Route path="job-apps" element={<SPJobApps />} />
             </Route>
 
             {/* Teacher Panel routes */}
@@ -194,6 +234,20 @@ function AppShell() {
               <Route path="tutors" element={<TuPTutors />} />
               <Route path="bookings" element={<TuPBookings />} />
               <Route path="notifications" element={<TuPNotifications />} />
+              <Route path="fees" element={<TuPFees />} />
+              <Route path="gallery" element={<TuPGallery />} />
+              <Route path="subjects" element={<TuPSubjects />} />
+              <Route path="reviews" element={<TuPReviews />} />
+              <Route path="students" element={<TuPStudents />} />
+              <Route path="announcements" element={<TuPAnnouncements />} />
+              <Route path="jobs" element={<TuPJobs />} />
+              <Route path="job-apps" element={<TuPJobApps />} />
+              <Route path="analytics" element={<TuPAnalytics />} />
+              <Route path="leads" element={<TuPLeads />} />
+              <Route path="performance" element={<TuPPerformance />} />
+              <Route path="settings" element={<TuPSettings />} />
+              <Route path="subscription" element={<TuPSubscription />} />
+              <Route path="help" element={<TuPHelp />} />
             </Route>
 
             {/* Parent Panel routes */}

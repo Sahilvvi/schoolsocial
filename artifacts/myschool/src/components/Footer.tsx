@@ -35,17 +35,17 @@ export default function Footer() {
               <div className="gradient-primary p-2.5 rounded-xl shadow-lg shadow-primary/20">
                 <GraduationCap className="h-6 w-6 text-white" />
               </div>
-              <span className="font-extrabold text-2xl text-white tracking-tight">MySchool</span>
+              <span className="font-extrabold text-2xl text-white tracking-tight">School<span className="text-indigo-400">Social</span></span>
             </Link>
             <p className="text-sm leading-relaxed text-muted-foreground/80 pr-4">
               India's premier education marketplace. Helping parents find, compare, and apply to the perfect school for their children seamlessly.
             </p>
             <div className="flex flex-col gap-3 pt-2">
-              <a href="mailto:hello@myschool.edu" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors group">
+              <a href="mailto:hello@schoolsocial.in" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors group">
                 <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                hello@myschool.edu
+                hello@schoolsocial.in
               </a>
               <a href="tel:+919876543210" className="flex items-center gap-3 text-sm font-medium hover:text-primary transition-colors group">
                 <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -107,7 +107,7 @@ export default function Footer() {
         <div className="h-px bg-white/10 w-full mb-8" />
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-muted-foreground/60">
-          <p>© {new Date().getFullYear()} MySchool. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SchoolSocial. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

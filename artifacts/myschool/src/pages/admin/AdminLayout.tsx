@@ -91,7 +91,7 @@ export default function AdminLayout() {
             <GraduationCap className="h-4 w-4 text-white" />
           </div>
           <div>
-            <span className="font-extrabold text-slate-900 text-sm tracking-tight">MySchool</span>
+            <span className="font-extrabold text-slate-900 text-sm tracking-tight">SchoolSocial</span>
             <span className="text-[10px] text-slate-400 font-semibold ml-1.5 uppercase tracking-widest">Admin</span>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function AdminLayout() {
               <GraduationCap className="h-5 w-5 text-white" />
             </div>
             <div>
-              <span className="font-extrabold text-slate-900 text-base tracking-tight">MySchool</span>
+              <span className="font-extrabold text-slate-900 text-base tracking-tight">SchoolSocial</span>
               <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold -mt-0.5">Admin Panel</p>
             </div>
           </Link>
@@ -184,11 +184,35 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 pt-14 md:pt-0 min-h-screen">
+      <main className="flex-1 md:ml-64 pt-14 md:pt-0 min-h-screen pb-20 md:pb-0">
         <div className="p-5 md:p-8 max-w-6xl mx-auto">
           <Outlet />
         </div>
       </main>
+
+      {/* Mobile Bottom Tabs */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-2 py-2 flex items-center">
+        {[
+          { label: "Dashboard", path: "/admin",          icon: LayoutDashboard },
+          { label: "Schools",   path: "/admin/schools",  icon: School },
+          { label: "Events",    path: "/admin/events",   icon: Calendar },
+          { label: "Reviews",   path: "/admin/reviews",  icon: Star },
+          { label: "More",      path: "/admin/jobs",     icon: Menu },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const active = tab.path === "/admin"
+            ? location.pathname === tab.path
+            : location.pathname.startsWith(tab.path);
+          return (
+            <Link key={tab.label} to={tab.path} className="flex-1 flex flex-col items-center gap-0.5 py-1">
+              <Icon className={`h-5 w-5 ${active ? "text-blue-600" : "text-gray-400"}`} />
+              <span className={`text-[10px] font-semibold ${active ? "text-blue-600" : "text-gray-400"}`}>
+                {tab.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
 
       {/* Mobile overlay */}
       {mobileMenuOpen && (
