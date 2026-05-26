@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { DEMO_USERS, isDemoEmail } from "@/data/dummyData";
 
 const loginSchema = z.object({ email: z.string().email("Please enter a valid email"), password: z.string().min(6, "Password must be at least 6 characters") });
@@ -82,7 +82,7 @@ export default function AuthPage() {
     // or tuition_center_owners table with user_id. Therefore teacher/tuition_center
     // role routing MUST come from user_metadata.role (set at signup above).
     // Users who signed up before role metadata was added default to /parent-panel.
-    if (supabase && signedInUser?.id) {
+    if (isSupabaseConfigured && signedInUser?.id) {
       const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", signedInUser.id).eq("role", "admin").maybeSingle();
       if (roleData) { navigate("/admin"); return; }
       const { data: ownerData } = await supabase.from("school_owners").select("id").eq("user_id", signedInUser.id).maybeSingle();
@@ -95,12 +95,29 @@ export default function AuthPage() {
   const handleSignup = async (data: z.infer<typeof signupSchema>) => {
     const { error } = await signUp(data.email, data.password, data.name, data.role);
     if (error) { toast.error(error.message); return; }
+    // In demo mode (no Supabase), auto-login after signup
+    if (!isSupabaseConfigured) {
+      toast.success("Account created! Signing you in... 🎉");
+      const { error: loginError, user: signedInUser } = await signIn(data.email, data.password);
+      if (loginError) { toast.error(loginError.message); return; }
+      const role = data.role;
+      if (role === "admin") { navigate("/admin"); return; }
+      if (role === "school") { navigate("/school-panel"); return; }
+      if (role === "teacher") { navigate("/teacher-panel"); return; }
+      if (role === "tuition_center") { navigate("/tuition-panel"); return; }
+      navigate("/parent-panel");
+      return;
+    }
     toast.success("Account created! Please sign in. 🎉");
     setMode("login");
     loginForm.setValue("email", data.email);
   };
 
   const handleForgotPassword = async (data: z.infer<typeof forgotSchema>) => {
+    if (!isSupabaseConfigured) {
+      toast.error("Password reset is not available in demo mode. Use demo credentials to sign in.");
+      return;
+    }
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
         redirectTo: `${window.location.origin}/auth`,

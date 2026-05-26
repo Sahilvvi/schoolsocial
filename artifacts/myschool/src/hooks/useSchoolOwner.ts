@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { DEMO_USERS, DEMO_SCHOOL_OWNERSHIP } from "@/data/dummyData";
 
@@ -13,7 +13,12 @@ export function useSchoolOwner() {
         return DEMO_SCHOOL_OWNERSHIP;
       }
 
-      if (!supabase) return null;
+      // In demo mode, any user with "school" role gets demo ownership
+      if (!isSupabaseConfigured) {
+        const role = user?.user_metadata?.role;
+        if (role === "school") return DEMO_SCHOOL_OWNERSHIP;
+        return null;
+      }
 
       const { data, error } = await supabase
         .from("school_owners")

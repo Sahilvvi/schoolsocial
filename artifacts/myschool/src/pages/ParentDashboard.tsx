@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -100,11 +100,15 @@ function useUnsaveSchool() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!isSupabaseConfigured) {
+        qc.setQueryData<any[]>(["saved-schools"], (old = []) => old.filter(s => s.id !== id));
+        return;
+      }
       const { error } = await supabase.from("saved_schools").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["saved-schools"] });
+      if (isSupabaseConfigured) qc.invalidateQueries({ queryKey: ["saved-schools"] });
       toast.success("School removed from saved list");
     },
   });

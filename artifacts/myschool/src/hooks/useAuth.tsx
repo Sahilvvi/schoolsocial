@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import { isDemoEmail, getDemoUser, DEMO_USERS } from "@/data/dummyData";
 
@@ -52,9 +52,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         return;
       }
+      // Check for custom local demo accounts
+      const customDemo = localStorage.getItem(`demo_custom_${demoEmail}`);
+      if (customDemo) {
+        try {
+          const parsed = JSON.parse(customDemo);
+          const localUser = {
+            id: parsed.id, email: parsed.email,
+            app_metadata: {},
+            user_metadata: { full_name: parsed.name, role: parsed.role },
+            aud: "authenticated", created_at: new Date().toISOString(),
+          } as unknown as User;
+          const localSession = {
+            access_token: `local-token-${parsed.id}`, refresh_token: `local-refresh-${parsed.id}`,
+            expires_in: 3600, token_type: "bearer", user: localUser,
+          } as unknown as Session;
+          setUser(localUser);
+          setSession(localSession);
+          setLoading(false);
+          return;
+        } catch { /* fall through */ }
+      }
     }
 
-    if (!supabase) {
+    if (!isSupabaseConfigured) {
       setLoading(false);
       return;
     }
@@ -79,6 +100,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isDemoEmail(email)) {
       return { error: new Error("This is a demo account. Please use Sign In instead.") };
     }
+    if (!isSupabaseConfigured) {
+      // Demo mode: create a local demo account
+      const demoId = `local-${Date.now()}`;
+      const localUser = {
+        id: demoId,
+        email,
+        app_metadata: {},
+        user_metadata: { full_name: name, role: role || "parent" },
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+      } as unknown as User;
+      // Store as a custom demo user so they can log in
+      localStorage.setItem(`demo_custom_${email}`, JSON.stringify({ id: demoId, email, name, password, role: role || "parent" }));
+      return { error: null };
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -99,6 +135,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: null, user: demoUser };
       }
       return { error: new Error("Invalid demo credentials"), user: null };
+    }
+
+    // Check custom local demo accounts (created via signup in demo mode)
+    const customDemo = localStorage.getItem(`demo_custom_${email}`);
+    if (customDemo) {
+      try {
+        const parsed = JSON.parse(customDemo);
+        if (parsed.password === password) {
+          localStorage.setItem("demo_user_email", email);
+          localStorage.setItem("demo_custom_active", customDemo);
+          const localUser = {
+            id: parsed.id, email: parsed.email,
+            app_metadata: {},
+            user_metadata: { full_name: parsed.name, role: parsed.role },
+            aud: "authenticated", created_at: new Date().toISOString(),
+          } as unknown as User;
+          const localSession = {
+            access_token: `local-token-${parsed.id}`, refresh_token: `local-refresh-${parsed.id}`,
+            expires_in: 3600, token_type: "bearer", user: localUser,
+          } as unknown as Session;
+          setUser(localUser);
+          setSession(localSession);
+          return { error: null, user: localUser };
+        }
+        return { error: new Error("Invalid password"), user: null };
+      } catch {
+        // Fall through
+      }
+    }
+
+    if (!isSupabaseConfigured) {
+      return { error: new Error("Supabase is not configured. Please use demo credentials to sign in."), user: null };
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -132,8 +200,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.location.href = "/";
       return;
     }
-    await supabase.auth.signOut();
+    if (isSupabaseConfigured) {
+      await supabase.auth.signOut();
+    }
     localStorage.removeItem('myschool_token');
+    localStorage.removeItem('demo_custom_active');
     window.location.href = "/";
   };
 
