@@ -18,10 +18,10 @@ const moreLinks = [
 ];
 
 const socialLinks = [
-  { icon: Facebook, href: "#" },
-  { icon: Instagram, href: "#" },
-  { icon: Twitter, href: "#" },
-  { icon: Linkedin, href: "#" },
+  { icon: Facebook, href: "https://facebook.com/schoolsocial" },
+  { icon: Instagram, href: "https://instagram.com/schoolsocial" },
+  { icon: Twitter, href: "https://twitter.com/schoolsocial" },
+  { icon: Linkedin, href: "https://linkedin.com/company/schoolsocial" },
 ];
 
 export default function Footer() {
@@ -95,7 +95,7 @@ export default function Footer() {
               <h5 className="font-bold text-white mb-4 text-xs uppercase tracking-widest">Follow Us</h5>
               <div className="flex items-center gap-3">
                 {socialLinks.map((social, i) => (
-                  <a key={i} href={social.href} className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-primary hover:-translate-y-1 transition-all">
+                  <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-primary hover:-translate-y-1 transition-all">
                     <social.icon className="h-4 w-4" />
                   </a>
                 ))}
