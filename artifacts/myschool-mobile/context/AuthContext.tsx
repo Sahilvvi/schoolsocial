@@ -6,12 +6,13 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { DEMO_USERS } from "@workspace/shared-data";
 
 interface User {
   id: string;
   email: string;
   name: string;
-  role: "parent" | "school" | "teacher" | "admin" | "tuition";
+  role: "parent" | "school" | "teacher" | "admin" | "tuition" | "tuition_center";
   avatar?: string;
 }
 
@@ -24,53 +25,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const DEMO_USERS: Record<string, { password: string; user: User }> = {
-  "parent@myschool.demo": {
-    password: "Demo@1234",
-    user: {
-      id: "parent-1",
-      email: "parent@myschool.demo",
-      name: "Rahul Sharma",
-      role: "parent",
-    },
-  },
-  "school@myschool.demo": {
-    password: "Demo@1234",
-    user: {
-      id: "school-1",
-      email: "school@myschool.demo",
-      name: "School Admin",
-      role: "school",
-    },
-  },
-  "teacher@myschool.demo": {
-    password: "Demo@1234",
-    user: {
-      id: "teacher-1",
-      email: "teacher@myschool.demo",
-      name: "Priya Gupta",
-      role: "teacher",
-    },
-  },
-  "admin@myschool.demo": {
-    password: "Demo@1234",
-    user: {
-      id: "admin-1",
-      email: "admin@myschool.demo",
-      name: "Admin User",
-      role: "admin",
-    },
-  },
-  "tuition@myschool.demo": {
-    password: "Demo@1234",
-    user: {
-      id: "tuition-1",
-      email: "tuition@myschool.demo",
-      name: "Bright Future Academy",
-      role: "tuition",
-    },
-  },
-};
+type MobileRole = User["role"];
+
+function sharedRoleToMobileRole(role: string): MobileRole {
+  if (role === "tuition_center") return "tuition";
+  return role as MobileRole;
+}
+
+const DEMO_LOOKUP: Record<string, { password: string; user: User }> =
+  Object.fromEntries(
+    Object.values(DEMO_USERS).map((u) => [
+      u.email,
+      {
+        password: u.password,
+        user: {
+          id: u.id,
+          email: u.email,
+          name: u.name,
+          role: sharedRoleToMobileRole(u.role),
+        },
+      },
+    ])
+  );
 
 const AUTH_KEY = "@myschool_auth";
 
@@ -91,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(
     async (email: string, password: string): Promise<{ error?: string }> => {
-      const match = DEMO_USERS[email.toLowerCase()];
+      const match = DEMO_LOOKUP[email.toLowerCase()];
       if (!match) return { error: "No account found with this email." };
       if (match.password !== password)
         return { error: "Incorrect password. Try Demo@1234" };
