@@ -255,7 +255,7 @@ export default function ParentPanelLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-64 pt-14 md:pt-0 min-h-screen">
+      <main className="flex-1 md:ml-64 pt-14 md:pt-0 min-h-screen pb-20 md:pb-0">
         <div className="p-5 md:p-8 max-w-5xl mx-auto">
           <Outlet context={{
             user, isDemo, displayName,
@@ -269,6 +269,30 @@ export default function ParentPanelLayout() {
           }} />
         </div>
       </main>
+
+      {/* Mobile Bottom Tabs */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-2 py-2 flex items-center">
+        {[
+          { label: "Dashboard",  path: "/parent-panel",            icon: LayoutDashboard },
+          { label: "Children",   path: "/parent-panel/children",   icon: Baby },
+          { label: "Admissions", path: "/parent-panel/admissions", icon: ClipboardList },
+          { label: "Fees",       path: "/parent-panel/fees",       icon: IndianRupee },
+          { label: "More",       path: "/parent-panel/saved",      icon: Menu },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const active = tab.path === "/parent-panel"
+            ? location.pathname === tab.path
+            : location.pathname.startsWith(tab.path);
+          return (
+            <Link key={tab.label} to={tab.path} className="flex-1 flex flex-col items-center gap-0.5 py-1">
+              <Icon className={`h-5 w-5 ${active ? "text-blue-600" : "text-gray-400"}`} />
+              <span className={`text-[10px] font-semibold ${active ? "text-blue-600" : "text-gray-400"}`}>
+                {tab.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
 
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-30"

@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// The MySchool ERP runs on a separate dev server on port 5173
+// The SchoolSocial ERP runs on a separate dev server on port 5173
 const ERP_URL = "http://localhost:5173";
 const ERP_DIRECT_URL = `${ERP_URL}/login`;
 
@@ -77,7 +77,7 @@ export default function ErpPage() {
               className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-sm font-semibold text-primary mb-6"
             >
               <Zap className="h-3.5 w-3.5" />
-              Powered by MySchool Platform
+              Powered by SchoolSocial Platform
             </motion.div>
 
             {/* Heading */}
@@ -213,7 +213,7 @@ export default function ErpPage() {
             <div className="h-6 w-6 rounded-md gradient-primary flex items-center justify-center">
               <School className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <span className="text-sm font-semibold hidden sm:block">MySchool ERP</span>
+            <span className="text-sm font-semibold hidden sm:block">SchoolSocial ERP</span>
           </div>
           {/* Status indicator */}
           <AnimatePresence mode="wait">
@@ -302,7 +302,7 @@ export default function ErpPage() {
               <div className="text-center space-y-2 max-w-sm">
                 <h3 className="text-lg font-bold">ERP Server Not Running</h3>
                 <p className="text-sm text-muted-foreground">
-                  The MySchool ERP isn't reachable at{" "}
+                  The SchoolSocial ERP isn't reachable at{" "}
                   <code className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground text-xs">{ERP_URL}</code>
                 </p>
                 <div className="mt-4 p-4 bg-muted/50 rounded-xl border border-border/40 text-left">
@@ -348,7 +348,7 @@ export default function ErpPage() {
           src={ERP_DIRECT_URL}
           className="w-full h-full border-0"
           style={{ minHeight: isFullscreen ? "calc(100vh - 48px)" : "calc(100vh - 100px)" }}
-          title="MySchool ERP"
+          title="SchoolSocial ERP"
           onLoad={handleIframeLoad}
           onError={handleIframeError}
           allow="camera; microphone"

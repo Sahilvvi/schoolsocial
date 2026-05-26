@@ -34,7 +34,7 @@ export async function initiatePayment(planName: string, amount: number) {
         key: data.key_id,
         amount: data.amount,
         currency: data.currency,
-        name: "MySchool",
+        name: "SchoolSocial",
         description: `${planName} Plan`,
         order_id: data.order_id,
         handler: (response: any) => {

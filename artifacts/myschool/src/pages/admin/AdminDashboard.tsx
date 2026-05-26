@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Dashboard Overview</h1>
-          <p className="text-sm text-slate-500 mt-1">Platform metrics and analytics for MySchool ecosystem</p>
+          <p className="text-sm text-slate-500 mt-1">Platform metrics and analytics for SchoolSocial ecosystem</p>
         </div>
         <div className="hidden md:flex items-center gap-2 bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-xl">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
