@@ -11,15 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { DUMMY_TUITION_ENQUIRIES } from "@/data/dummyData";
 
 function useTuitionEnquiries() {
   return useQuery({
     queryKey: ["tuition_enquiries"],
     queryFn: async () => {
       const { data, error } = await supabase.from("tuition_enquiries").select("*").eq("status", "open").order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error || !data || data.length === 0) return DUMMY_TUITION_ENQUIRIES;
       return data;
     },
   });
@@ -29,11 +30,16 @@ function useSubmitEnquiry() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (enquiry: { parent_name: string; phone: string; email: string; student_class: string; subject: string; area: string; budget: string; message: string }) => {
+      if (!isSupabaseConfigured) {
+        const fake = { ...enquiry, id: `demo-${Date.now()}`, status: "open", created_at: new Date().toISOString() };
+        queryClient.setQueryData<any[]>(["tuition_enquiries"], (old = []) => [fake, ...old]);
+        return fake;
+      }
       const { data, error } = await supabase.from("tuition_enquiries").insert(enquiry).select().single();
       if (error) throw error;
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tuition_enquiries"] }),
+    onSuccess: () => { if (isSupabaseConfigured) queryClient.invalidateQueries({ queryKey: ["tuition_enquiries"] }); },
   });
 }
 

@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 const schema = z.object({
@@ -44,6 +44,13 @@ export default function UploadSchoolPage() {
     if (!user) { toast.error("Please sign in first"); navigate("/auth"); return; }
 
     const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+    if (!isSupabaseConfigured) {
+      // Demo mode: simulate school submission
+      setSubmitted(true);
+      toast.success("School submitted for review! (Demo mode)");
+      return;
+    }
 
     try {
       const { error } = await supabase.from("schools").insert({

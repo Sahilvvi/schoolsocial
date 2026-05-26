@@ -10,7 +10,7 @@ import {
   DUMMY_NOTIFICATIONS, DUMMY_HOMEWORK, DUMMY_FEE_RECORDS
 } from "@/data/dummyData";
 import { getDemoData, setDemoData } from "@/lib/demoStorage";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { isDemoUserId } from "@/hooks/useDemoMode";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -108,8 +108,8 @@ export default function ParentPanelLayout() {
   const [homework]                        = useState<typeof PARENT_HOMEWORK>(PARENT_HOMEWORK);
 
   useEffect(() => {
-    if (!user || !supabase) return;
-    if (isDemoUserId(user.id)) return;
+    if (!user) return;
+    if (isDemoUserId(user.id) || !isSupabaseConfigured) return;
     const email = user.email ?? "";
     setAdmissions([]); setSavedSchools([]); setParentBookings([]); setFees([]); setNotifications([]);
 
