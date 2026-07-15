@@ -1,5 +1,5 @@
 import { useAuth } from "./useAuth";
-import { isDemoUserId as _isDemoUserId } from "@workspace/shared-data";
+import { isDemoUserId as _isDemoUserId } from "@/lib/shared-data";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
 /** Returns true when the current session belongs to a demo account OR supabase is not configured */

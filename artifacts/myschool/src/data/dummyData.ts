@@ -3,7 +3,7 @@
 
 // Demo credentials are imported from the shared lib (single source of truth
 // for both web and mobile apps).
-import { DEMO_USERS, isDemoEmail, getDemoUser } from "@workspace/shared-data";
+import { DEMO_USERS, isDemoEmail, getDemoUser } from "@/lib/shared-data";
 export { DEMO_USERS, isDemoEmail, getDemoUser };
 
 const now = new Date().toISOString();

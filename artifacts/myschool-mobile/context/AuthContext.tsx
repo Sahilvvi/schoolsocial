@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { DEMO_USERS } from "@workspace/shared-data";
+import { DEMO_USERS } from "../lib/shared-data";
 
 interface User {
   id: string;
