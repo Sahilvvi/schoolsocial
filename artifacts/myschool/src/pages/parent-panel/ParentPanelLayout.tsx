@@ -12,6 +12,7 @@ import {
 import { getDemoData, setDemoData } from "@/lib/demoStorage";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { isDemoUserId } from "@/hooks/useDemoMode";
+import { getAdmissions, getFees } from "@/lib/erpData";
 import type { Tables } from "@/integrations/supabase/types";
 
 type AdmissionRow = Tables<"admissions"> & {
@@ -109,21 +110,41 @@ export default function ParentPanelLayout() {
 
   useEffect(() => {
     if (!user) return;
-    if (isDemoUserId(user.id) || !isSupabaseConfigured) return;
-    const email = user.email ?? "";
-    setAdmissions([]); setSavedSchools([]); setParentBookings([]); setFees([]); setNotifications([]);
+    const email = (user.email ?? "").toLowerCase();
 
-    supabase.from("admissions").select("*, schools(id, name, slug)").eq("email", email).order("created_at", { ascending: false })
-      .then(({ data }) => { if (data?.length) setAdmissions(data.map(a => ({ ...a, schools: (a as AdmissionRow).schools ?? { id: a.school_id, name: a.school_id, slug: a.school_id } }))); });
+    // Always load admissions and fees from the shared ERP bridge so CRM and ERP stay in sync
+    Promise.all([getAdmissions(), getFees()]).then(([allAdmissions, allFees]) => {
+      const mine = allAdmissions.filter((a: any) => (a.email ?? "").toLowerCase() === email);
+      const studentNames = new Set(mine.map((a: any) => a.student_name));
+      const feeMapped = allFees
+        .filter((f: any) => studentNames.has(f.studentName))
+        .map((f: any) => ({
+          ...f,
+          fee_type: f.feeType ?? "Fee",
+          person_name: f.studentName ?? "Student",
+          due_date: f.dueDate ?? new Date().toISOString(),
+        }));
+      setFees(feeMapped as FeeRow[]);
+
+      const mapped = mine.map((a: any) => {
+        const school = DUMMY_SCHOOLS.find((s: any) => s.id === a.school_id);
+        return {
+          ...a,
+          schools: school
+            ? { id: school.id, name: school.name, slug: school.slug }
+            : { id: a.school_id, name: a.school_id, slug: a.school_id },
+        };
+      });
+      setAdmissions(mapped as AdmissionRow[]);
+    });
+
+    if (isDemoUserId(user.id) || !isSupabaseConfigured) return;
+    setSavedSchools([]); setParentBookings([]); setNotifications([]);
+
     supabase.from("saved_schools").select("*, schools(*)").eq("user_id", user.id).order("created_at", { ascending: false })
       .then(({ data }) => { if (data?.length) setSavedSchools(data as SavedSchoolRow[]); });
     supabase.from("tutor_bookings").select("*, tutors(name, subject)").eq("email", email).order("created_at", { ascending: false })
       .then(({ data }) => { if (data?.length) setParentBookings(data as BookingRow[]); });
-    const fullName = user.user_metadata?.full_name ?? "";
-    if (fullName) {
-      supabase.from("fee_records").select("*").eq("person_name", fullName).order("created_at", { ascending: false })
-        .then(({ data }) => { if (data?.length) setFees(data as FeeRow[]); });
-    }
     const storedChildren = getDemoData<ChildRecord[] | null>(`real-parent-children-${user.id}`, null);
     setChildren(storedChildren ?? []);
   }, [user?.id]);

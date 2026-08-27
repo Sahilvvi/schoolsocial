@@ -1,21 +1,17 @@
 /**
  * Shared data bridge between the CRM marketplace/role dashboards and the ERP module.
  *
- * This module is the single source of truth for demo-mode data used by both sides:
- * admissions, students, fees, classes, teachers, etc. It reads/writes the same
- * localStorage namespace (`demo_data_`) as `demoStorage.ts` so a change made in the
- * CRM panels is immediately visible inside the ERP pages and vice-versa.
- *
- * In production (Supabase configured) this bridge is bypassed in favor of the real
- * database; the ERP `/api` proxy can still proxy to Supabase in the future.
+ * This module now persists to Supabase when configured (table `erp_store`), falling
+ * back to localStorage/demo data when Supabase is unavailable. The same bridge is
+ * used by both the CRM `school-panel` and the ERP `/api` proxy so changes flow
+ * end-to-end through the real database.
  */
 
 import { getDemoData, setDemoData } from "@/lib/demoStorage";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import {
   DUMMY_SCHOOLS,
   DUMMY_ADMISSIONS,
-  DUMMY_FEE_RECORDS,
-  DUMMY_ATTENDANCE,
 } from "@/data/dummyData";
 
 const STORAGE_KEYS = {
@@ -25,6 +21,7 @@ const STORAGE_KEYS = {
   classes: "classes",
   teachers: "teachers",
   attendance: "attendance",
+  erpSchools: "erp-schools",
 } as const;
 
 // CRM schools use string ids like "school-001". ERP APIs use numeric ids.
@@ -59,12 +56,33 @@ export function toSchoolIdNumber(schoolId: string | number | undefined): number 
   return Number.isNaN(asNum) ? undefined : asNum;
 }
 
-function getStored<T>(key: string, fallback: T): T {
-  return getDemoData<T>(key, fallback);
+async function getStored<T>(key: string, fallback: T): Promise<T> {
+  if (!isSupabaseConfigured) return getDemoData<T>(key, fallback);
+  try {
+    const { data, error } = await (supabase as any)
+      .from("erp_store")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle();
+    if (error || !data || data.value === null || data.value === undefined) return fallback;
+    return data.value as T;
+  } catch {
+    return fallback;
+  }
 }
 
-function setStored<T>(key: string, data: T): void {
-  setDemoData(key, data);
+async function setStored<T>(key: string, data: T): Promise<void> {
+  if (!isSupabaseConfigured) {
+    setDemoData(key, data);
+    return;
+  }
+  try {
+    await (supabase as any)
+      .from("erp_store")
+      .upsert({ key, value: data, updated_at: new Date().toISOString() });
+  } catch {
+    // Silently fail so UI doesn't break on network errors
+  }
 }
 
 function now(): string {
@@ -96,15 +114,15 @@ export interface ErpAdmission {
   created_at: string;
 }
 
-export function getAdmissions(schoolId?: string | number): ErpAdmission[] {
+export async function getAdmissions(schoolId?: string | number): Promise<ErpAdmission[]> {
   const schoolString = toSchoolIdString(schoolId);
-  const all = getStored<ErpAdmission[]>(STORAGE_KEYS.admissions, DUMMY_ADMISSIONS as ErpAdmission[]);
+  const all = await getStored<ErpAdmission[]>(STORAGE_KEYS.admissions, DUMMY_ADMISSIONS as ErpAdmission[]);
   if (!schoolString) return all;
   return all.filter((a) => a.school_id === schoolString);
 }
 
-export function addAdmission(admission: Omit<ErpAdmission, "id" | "status" | "created_at">): ErpAdmission {
-  const all = getStored<ErpAdmission[]>(STORAGE_KEYS.admissions, DUMMY_ADMISSIONS as ErpAdmission[]);
+export async function addAdmission(admission: Omit<ErpAdmission, "id" | "status" | "created_at">): Promise<ErpAdmission> {
+  const all = await getStored<ErpAdmission[]>(STORAGE_KEYS.admissions, DUMMY_ADMISSIONS as ErpAdmission[]);
   const record: ErpAdmission = {
     ...admission,
     id: newStringId("adm"),
@@ -112,20 +130,20 @@ export function addAdmission(admission: Omit<ErpAdmission, "id" | "status" | "cr
     created_at: now(),
   };
   all.unshift(record);
-  setStored(STORAGE_KEYS.admissions, all);
+  await setStored(STORAGE_KEYS.admissions, all);
   return record;
 }
 
-export function updateAdmissionStatus(id: string, status: AdmissionStatus): ErpAdmission | undefined {
-  const all = getStored<ErpAdmission[]>(STORAGE_KEYS.admissions, DUMMY_ADMISSIONS as ErpAdmission[]);
+export async function updateAdmissionStatus(id: string, status: AdmissionStatus): Promise<ErpAdmission | undefined> {
+  const all = await getStored<ErpAdmission[]>(STORAGE_KEYS.admissions, DUMMY_ADMISSIONS as ErpAdmission[]);
   const idx = all.findIndex((a) => a.id === id);
   if (idx === -1) return undefined;
   const updated = { ...all[idx], status };
   all[idx] = updated;
-  setStored(STORAGE_KEYS.admissions, all);
+  await setStored(STORAGE_KEYS.admissions, all);
 
   if (status === "approved") {
-    ensureStudentAndFeeFromAdmission(updated);
+    await ensureStudentAndFeeFromAdmission(updated);
   }
   return updated;
 }
@@ -165,51 +183,51 @@ const DEFAULT_STUDENTS: ErpStudent[] = [
   { id: 3, schoolId: 2, admissionNo: "MS/2024/101", name: "Rohan Mehta", parentName: "Suresh Mehta", parentPhone: "9876543220", className: "Grade 8", section: "A", attendancePercent: 88, feePending: 5000, createdAt: now() },
 ];
 
-export function getStudents(schoolId?: string | number): ErpStudent[] {
+export async function getStudents(schoolId?: string | number): Promise<ErpStudent[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
-  const all = getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
+  const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
   if (!schoolNum) return all;
   return all.filter((s) => s.schoolId === schoolNum);
 }
 
-export function getStudentById(id: number, schoolId?: string | number): ErpStudent | undefined {
-  const students = getStudents(schoolId);
+export async function getStudentById(id: number, schoolId?: string | number): Promise<ErpStudent | undefined> {
+  const students = await getStudents(schoolId);
   return students.find((s) => s.id === id);
 }
 
-export function addStudent(student: Omit<ErpStudent, "id" | "createdAt">): ErpStudent {
-  const all = getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
+export async function addStudent(student: Omit<ErpStudent, "id" | "createdAt">): Promise<ErpStudent> {
+  const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
   const record: ErpStudent = { ...student, id: newNumericId(all), createdAt: now() };
   all.push(record);
-  setStored(STORAGE_KEYS.students, all);
+  await setStored(STORAGE_KEYS.students, all);
   return record;
 }
 
-export function updateStudent(id: number, updates: Partial<ErpStudent>): ErpStudent | undefined {
-  const all = getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
+export async function updateStudent(id: number, updates: Partial<ErpStudent>): Promise<ErpStudent | undefined> {
+  const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
   const idx = all.findIndex((s) => s.id === id);
   if (idx === -1) return undefined;
   all[idx] = { ...all[idx], ...updates };
-  setStored(STORAGE_KEYS.students, all);
+  await setStored(STORAGE_KEYS.students, all);
   return all[idx];
 }
 
-export function deleteStudent(id: number): boolean {
-  const all = getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
+export async function deleteStudent(id: number): Promise<boolean> {
+  const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
   const next = all.filter((s) => s.id !== id);
   if (next.length === all.length) return false;
-  setStored(STORAGE_KEYS.students, next);
+  await setStored(STORAGE_KEYS.students, next);
   return true;
 }
 
-function ensureStudentAndFeeFromAdmission(admission: ErpAdmission) {
+async function ensureStudentAndFeeFromAdmission(admission: ErpAdmission): Promise<void> {
   const schoolNum = toSchoolIdNumber(admission.school_id);
   if (!schoolNum) return;
-  const students = getStudents(schoolNum);
+  const students = await getStudents(schoolNum);
   const existing = students.find((s) => s.name === admission.student_name && s.parentName === admission.parent_name);
   if (existing) return;
 
-  const student = addStudent({
+  const student = await addStudent({
     schoolId: schoolNum,
     admissionNo: `ADM/${admission.id.replace(/\D/g, "").slice(-6) || String(Date.now()).slice(-6)}`,
     name: admission.student_name,
@@ -222,7 +240,7 @@ function ensureStudentAndFeeFromAdmission(admission: ErpAdmission) {
     feePending: 0,
   });
 
-  addFee({
+  await addFee({
     schoolId: schoolNum,
     studentId: student.id,
     studentName: student.name,
@@ -259,31 +277,31 @@ const DEFAULT_FEES: ErpFee[] = [
   { id: 3, schoolId: 2, studentId: 3, studentName: "Rohan Mehta", className: "Grade 8", amount: 60000, feeType: "Annual Tuition", dueDate: "2025-04-20", status: "overdue", description: "Overdue" },
 ];
 
-export function getFees(schoolId?: string | number): ErpFee[] {
+export async function getFees(schoolId?: string | number): Promise<ErpFee[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
-  const all = getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
+  const all = await getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
   if (!schoolNum) return all;
   return all.filter((f) => f.schoolId === schoolNum);
 }
 
-export function addFee(fee: Omit<ErpFee, "id">): ErpFee {
-  const all = getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
+export async function addFee(fee: Omit<ErpFee, "id">): Promise<ErpFee> {
+  const all = await getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
   const record: ErpFee = { ...fee, id: newNumericId(all) };
   all.push(record);
-  setStored(STORAGE_KEYS.fees, all);
+  await setStored(STORAGE_KEYS.fees, all);
   return record;
 }
 
-export function updateFee(id: number, updates: Partial<ErpFee>): ErpFee | undefined {
-  const all = getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
+export async function updateFee(id: number, updates: Partial<ErpFee>): Promise<ErpFee | undefined> {
+  const all = await getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
   const idx = all.findIndex((f) => f.id === id);
   if (idx === -1) return undefined;
   all[idx] = { ...all[idx], ...updates };
-  setStored(STORAGE_KEYS.fees, all);
+  await setStored(STORAGE_KEYS.fees, all);
   return all[idx];
 }
 
-export function payFee(id: number): ErpFee | undefined {
+export async function payFee(id: number): Promise<ErpFee | undefined> {
   return updateFee(id, { status: "paid", paidDate: new Date().toISOString().split("T")[0] });
 }
 
@@ -308,35 +326,35 @@ const DEFAULT_CLASSES: ErpClass[] = [
   { id: 3, schoolId: 2, name: "Grade 8", section: "A", teacherId: 3, teacherName: "Anita Rao", studentCount: 30, subject: "English" },
 ];
 
-export function getClasses(schoolId?: string | number): ErpClass[] {
+export async function getClasses(schoolId?: string | number): Promise<ErpClass[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
-  const all = getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
+  const all = await getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
   if (!schoolNum) return all;
   return all.filter((c) => c.schoolId === schoolNum);
 }
 
-export function addClass(cls: Omit<ErpClass, "id">): ErpClass {
-  const all = getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
+export async function addClass(cls: Omit<ErpClass, "id">): Promise<ErpClass> {
+  const all = await getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
   const record: ErpClass = { ...cls, id: newNumericId(all) };
   all.push(record);
-  setStored(STORAGE_KEYS.classes, all);
+  await setStored(STORAGE_KEYS.classes, all);
   return record;
 }
 
-export function updateClass(id: number, updates: Partial<ErpClass>): ErpClass | undefined {
-  const all = getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
+export async function updateClass(id: number, updates: Partial<ErpClass>): Promise<ErpClass | undefined> {
+  const all = await getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
   const idx = all.findIndex((c) => c.id === id);
   if (idx === -1) return undefined;
   all[idx] = { ...all[idx], ...updates };
-  setStored(STORAGE_KEYS.classes, all);
+  await setStored(STORAGE_KEYS.classes, all);
   return all[idx];
 }
 
-export function deleteClass(id: number): boolean {
-  const all = getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
+export async function deleteClass(id: number): Promise<boolean> {
+  const all = await getStored<ErpClass[]>(STORAGE_KEYS.classes, DEFAULT_CLASSES);
   const next = all.filter((c) => c.id !== id);
   if (next.length === all.length) return false;
-  setStored(STORAGE_KEYS.classes, next);
+  await setStored(STORAGE_KEYS.classes, next);
   return true;
 }
 
@@ -362,35 +380,35 @@ const DEFAULT_TEACHERS: ErpTeacher[] = [
   { id: 3, schoolId: 2, name: "Anita Rao", email: "anita.rao@myschool.demo", phone: "9876543303", subjects: ["English"], qualification: "M.A. English", experience: 10, assignedClasses: ["Grade 8-A"], joinedAt: now() },
 ];
 
-export function getTeachers(schoolId?: string | number): ErpTeacher[] {
+export async function getTeachers(schoolId?: string | number): Promise<ErpTeacher[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
-  const all = getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
+  const all = await getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
   if (!schoolNum) return all;
   return all.filter((t) => t.schoolId === schoolNum);
 }
 
-export function addTeacher(teacher: Omit<ErpTeacher, "id" | "joinedAt">): ErpTeacher {
-  const all = getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
+export async function addTeacher(teacher: Omit<ErpTeacher, "id" | "joinedAt">): Promise<ErpTeacher> {
+  const all = await getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
   const record: ErpTeacher = { ...teacher, id: newNumericId(all), joinedAt: now() };
   all.push(record);
-  setStored(STORAGE_KEYS.teachers, all);
+  await setStored(STORAGE_KEYS.teachers, all);
   return record;
 }
 
-export function updateTeacher(id: number, updates: Partial<ErpTeacher>): ErpTeacher | undefined {
-  const all = getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
+export async function updateTeacher(id: number, updates: Partial<ErpTeacher>): Promise<ErpTeacher | undefined> {
+  const all = await getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
   const idx = all.findIndex((t) => t.id === id);
   if (idx === -1) return undefined;
   all[idx] = { ...all[idx], ...updates };
-  setStored(STORAGE_KEYS.teachers, all);
+  await setStored(STORAGE_KEYS.teachers, all);
   return all[idx];
 }
 
-export function deleteTeacher(id: number): boolean {
-  const all = getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
+export async function deleteTeacher(id: number): Promise<boolean> {
+  const all = await getStored<ErpTeacher[]>(STORAGE_KEYS.teachers, DEFAULT_TEACHERS);
   const next = all.filter((t) => t.id !== id);
   if (next.length === all.length) return false;
-  setStored(STORAGE_KEYS.teachers, next);
+  await setStored(STORAGE_KEYS.teachers, next);
   return true;
 }
 
@@ -412,9 +430,9 @@ const DEFAULT_ATTENDANCE: ErpAttendance[] = [
   { id: 2, schoolId: 1, studentId: 2, studentName: "Aaradhya Singh", classId: 2, date: new Date().toISOString().split("T")[0], status: "present" },
 ];
 
-export function getAttendance(schoolId?: string | number, params?: { studentId?: number; classId?: number; startDate?: string; endDate?: string }): ErpAttendance[] {
+export async function getAttendance(schoolId?: string | number, params?: { studentId?: number; classId?: number; startDate?: string; endDate?: string }): Promise<ErpAttendance[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
-  const all = getStored<ErpAttendance[]>(STORAGE_KEYS.attendance, DEFAULT_ATTENDANCE);
+  const all = await getStored<ErpAttendance[]>(STORAGE_KEYS.attendance, DEFAULT_ATTENDANCE);
   return all.filter((a) => {
     if (schoolNum && a.schoolId !== schoolNum) return false;
     if (params?.studentId !== undefined && a.studentId !== params.studentId) return false;
@@ -425,11 +443,11 @@ export function getAttendance(schoolId?: string | number, params?: { studentId?:
   });
 }
 
-export function markAttendance(records: Omit<ErpAttendance, "id">[]): ErpAttendance[] {
-  const all = getStored<ErpAttendance[]>(STORAGE_KEYS.attendance, DEFAULT_ATTENDANCE);
+export async function markAttendance(records: Omit<ErpAttendance, "id">[]): Promise<ErpAttendance[]> {
+  const all = await getStored<ErpAttendance[]>(STORAGE_KEYS.attendance, DEFAULT_ATTENDANCE);
   const created = records.map((r) => ({ ...r, id: newNumericId(all) })) as ErpAttendance[];
   all.push(...created);
-  setStored(STORAGE_KEYS.attendance, all);
+  await setStored(STORAGE_KEYS.attendance, all);
   return created;
 }
 
@@ -463,9 +481,9 @@ export interface ErpSchool {
   gallery?: string[];
 }
 
-export function getErpSchools(): ErpSchool[] {
-  const all = getStored<ErpSchool[]>("erp-schools", []);
-  if (all.length) return all;
+export async function getErpSchools(): Promise<ErpSchool[]> {
+  const stored = await getStored<ErpSchool[]>(STORAGE_KEYS.erpSchools, []);
+  if (stored.length) return JSON.parse(JSON.stringify(stored));
   const fallback = DUMMY_SCHOOLS.map((s, i) => ({
     id: toSchoolIdNumber(s.id) ?? i + 1,
     name: s.name,
@@ -493,10 +511,15 @@ export function getErpSchools(): ErpSchool[] {
     totalTeachers: 35,
     createdAt: s.created_at,
   }));
-  setStored("erp-schools", fallback);
-  return fallback;
+  await setStored(STORAGE_KEYS.erpSchools, fallback);
+  return JSON.parse(JSON.stringify(fallback));
 }
 
-export function getErpSchoolById(id: number): ErpSchool | undefined {
-  return getErpSchools().find((s) => s.id === id);
+export async function getErpSchoolById(id: number): Promise<ErpSchool | undefined> {
+  const schools = await getErpSchools();
+  return schools.find((s) => s.id === id);
+}
+
+export async function saveErpSchools(schools: ErpSchool[]): Promise<void> {
+  await setStored(STORAGE_KEYS.erpSchools, schools);
 }
