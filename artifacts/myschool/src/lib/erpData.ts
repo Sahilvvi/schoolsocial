@@ -8,6 +8,7 @@
  */
 
 import { getDemoData, setDemoData } from "@/lib/demoStorage";
+import { normalizeClassName } from "@/lib/utils";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import {
   DUMMY_SCHOOLS,
@@ -178,9 +179,9 @@ export interface ErpStudent {
 }
 
 const DEFAULT_STUDENTS: ErpStudent[] = [
-  { id: 1, schoolId: 1, admissionNo: "DPS/2024/001", name: "Arjun Patel", parentName: "Vikram Patel", parentPhone: "9876543210", className: "Grade 6", section: "A", attendancePercent: 96, feePending: 0, createdAt: now() },
-  { id: 2, schoolId: 1, admissionNo: "DPS/2024/002", name: "Aaradhya Singh", parentName: "Meena Singh", parentPhone: "9876543211", className: "Grade 3", section: "B", attendancePercent: 92, feePending: 12000, createdAt: now() },
-  { id: 3, schoolId: 2, admissionNo: "MS/2024/101", name: "Rohan Mehta", parentName: "Suresh Mehta", parentPhone: "9876543220", className: "Grade 8", section: "A", attendancePercent: 88, feePending: 5000, createdAt: now() },
+  { id: 1, schoolId: 1, admissionNo: "DPS/2024/001", name: "Arjun Patel", parentName: "Vikram Patel", parentPhone: "9876543210", className: "6", section: "A", attendancePercent: 96, feePending: 0, createdAt: now() },
+  { id: 2, schoolId: 1, admissionNo: "DPS/2024/002", name: "Aaradhya Singh", parentName: "Meena Singh", parentPhone: "9876543211", className: "3", section: "B", attendancePercent: 92, feePending: 12000, createdAt: now() },
+  { id: 3, schoolId: 2, admissionNo: "MS/2024/101", name: "Rohan Mehta", parentName: "Suresh Mehta", parentPhone: "9876543220", className: "8", section: "A", attendancePercent: 88, feePending: 5000, createdAt: now() },
 ];
 
 export async function getStudents(schoolId?: string | number): Promise<ErpStudent[]> {
@@ -197,7 +198,17 @@ export async function getStudentById(id: number, schoolId?: string | number): Pr
 
 export async function addStudent(student: Omit<ErpStudent, "id" | "createdAt">): Promise<ErpStudent> {
   const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
-  const record: ErpStudent = { ...student, id: newNumericId(all), createdAt: now() };
+  let resolved = { ...student };
+  if (resolved.classId && !normalizeClassName(resolved.className)) {
+    const classes = await getClasses(resolved.schoolId);
+    const cls = classes.find((c) => String(c.id) === String(resolved.classId));
+    if (cls) {
+      resolved.className = normalizeClassName(cls.name);
+      resolved.section = cls.section || resolved.section;
+    }
+  }
+  resolved.className = normalizeClassName(resolved.className) || resolved.className;
+  const record: ErpStudent = { ...resolved, id: newNumericId(all), createdAt: now() };
   all.push(record);
   await setStored(STORAGE_KEYS.students, all);
   return record;
@@ -234,7 +245,7 @@ async function ensureStudentAndFeeFromAdmission(admission: ErpAdmission): Promis
     parentName: admission.parent_name,
     parentPhone: admission.phone,
     email: admission.email,
-    className: `Grade ${admission.grade}`,
+    className: normalizeClassName(admission.grade),
     section: "A",
     attendancePercent: 0,
     feePending: 0,
@@ -272,9 +283,9 @@ export interface ErpFee {
 }
 
 const DEFAULT_FEES: ErpFee[] = [
-  { id: 1, schoolId: 1, studentId: 1, studentName: "Arjun Patel", className: "Grade 6", amount: 50000, feeType: "Annual Tuition", dueDate: "2025-04-15", status: "paid", paidDate: "2025-03-20", description: "Full year" },
-  { id: 2, schoolId: 1, studentId: 2, studentName: "Aaradhya Singh", className: "Grade 3", amount: 45000, feeType: "Annual Tuition", dueDate: "2025-04-15", status: "pending", description: "First term pending" },
-  { id: 3, schoolId: 2, studentId: 3, studentName: "Rohan Mehta", className: "Grade 8", amount: 60000, feeType: "Annual Tuition", dueDate: "2025-04-20", status: "overdue", description: "Overdue" },
+  { id: 1, schoolId: 1, studentId: 1, studentName: "Arjun Patel", className: "6", amount: 50000, feeType: "Annual Tuition", dueDate: "2025-04-15", status: "paid", paidDate: "2025-03-20", description: "Full year" },
+  { id: 2, schoolId: 1, studentId: 2, studentName: "Aaradhya Singh", className: "3", amount: 45000, feeType: "Annual Tuition", dueDate: "2025-04-15", status: "pending", description: "First term pending" },
+  { id: 3, schoolId: 2, studentId: 3, studentName: "Rohan Mehta", className: "8", amount: 60000, feeType: "Annual Tuition", dueDate: "2025-04-20", status: "overdue", description: "Overdue" },
 ];
 
 export async function getFees(schoolId?: string | number): Promise<ErpFee[]> {
@@ -321,9 +332,9 @@ export interface ErpClass {
 }
 
 const DEFAULT_CLASSES: ErpClass[] = [
-  { id: 1, schoolId: 1, name: "Grade 6", section: "A", teacherId: 1, teacherName: "Priya Sharma", studentCount: 32, subject: "Maths" },
-  { id: 2, schoolId: 1, name: "Grade 3", section: "B", teacherId: 2, teacherName: "Rahul Verma", studentCount: 28, subject: "Science" },
-  { id: 3, schoolId: 2, name: "Grade 8", section: "A", teacherId: 3, teacherName: "Anita Rao", studentCount: 30, subject: "English" },
+  { id: 1, schoolId: 1, name: "6", section: "A", teacherId: 1, teacherName: "Priya Sharma", studentCount: 32, subject: "Maths" },
+  { id: 2, schoolId: 1, name: "3", section: "B", teacherId: 2, teacherName: "Rahul Verma", studentCount: 28, subject: "Science" },
+  { id: 3, schoolId: 2, name: "8", section: "A", teacherId: 3, teacherName: "Anita Rao", studentCount: 30, subject: "English" },
 ];
 
 export async function getClasses(schoolId?: string | number): Promise<ErpClass[]> {
@@ -375,9 +386,9 @@ export interface ErpTeacher {
 }
 
 const DEFAULT_TEACHERS: ErpTeacher[] = [
-  { id: 1, schoolId: 1, name: "Priya Sharma", email: "teacher@myschool.demo", phone: "9876543301", subjects: ["Mathematics"], qualification: "M.Sc. Mathematics", experience: 8, assignedClasses: ["Grade 6-A"], joinedAt: now() },
-  { id: 2, schoolId: 1, name: "Rahul Verma", email: "rahul.verma@myschool.demo", phone: "9876543302", subjects: ["Science"], qualification: "M.Sc. Physics", experience: 5, assignedClasses: ["Grade 3-B"], joinedAt: now() },
-  { id: 3, schoolId: 2, name: "Anita Rao", email: "anita.rao@myschool.demo", phone: "9876543303", subjects: ["English"], qualification: "M.A. English", experience: 10, assignedClasses: ["Grade 8-A"], joinedAt: now() },
+  { id: 1, schoolId: 1, name: "Priya Sharma", email: "teacher@myschool.demo", phone: "9876543301", subjects: ["Mathematics"], qualification: "M.Sc. Mathematics", experience: 8, assignedClasses: ["6-A"], joinedAt: now() },
+  { id: 2, schoolId: 1, name: "Rahul Verma", email: "rahul.verma@myschool.demo", phone: "9876543302", subjects: ["Science"], qualification: "M.Sc. Physics", experience: 5, assignedClasses: ["3-B"], joinedAt: now() },
+  { id: 3, schoolId: 2, name: "Anita Rao", email: "anita.rao@myschool.demo", phone: "9876543303", subjects: ["English"], qualification: "M.A. English", experience: 10, assignedClasses: ["8-A"], joinedAt: now() },
 ];
 
 export async function getTeachers(schoolId?: string | number): Promise<ErpTeacher[]> {

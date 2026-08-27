@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, TrendingUp, TrendingDown, PieChart, Download, Filter } from "lucide-react";
+import { formatClass } from "@/lib/utils";
 
 const BASE = () => import.meta.env.BASE_URL.replace(/\/$/, "");
 const tok = () => localStorage.getItem("myschool_token") || "";
@@ -150,7 +151,7 @@ export default function FinancialReports() {
               <div key={i} className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">{i + 1}</div>
-                  <div><p className="font-bold text-sm text-foreground">{d.student.name}</p><p className="text-xs text-muted-foreground">Class {d.student.className}</p></div>
+                  <div><p className="font-bold text-sm text-foreground">{d.student.name}</p><p className="text-xs text-muted-foreground">{formatClass(d.student.className)}</p></div>
                 </div>
                 <Badge className="bg-red-100 text-red-700 font-bold">{fmt(d.amount)}</Badge>
               </div>
@@ -171,7 +172,7 @@ export default function FinancialReports() {
               <tbody>
                 {filtered.slice(0, 50).map(f => {
                   const student = students.find(s => s.id === f.studentId);
-                  return (<tr key={f.id} className="border-t border-border hover:bg-secondary/30 transition-colors"><td className="p-3"><p className="font-medium text-foreground">{student?.name || `#${f.studentId}`}</p>{student?.className && <p className="text-xs text-muted-foreground">Class {student.className}</p>}</td><td className="p-3 text-muted-foreground">{f.feeType || "Fee"}</td><td className="p-3 text-right font-bold text-foreground">₹{Number(f.amount).toLocaleString("en-IN")}</td><td className="p-3 text-muted-foreground">{f.dueDate ? new Date(f.dueDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "—"}</td><td className="p-3"><Badge className={`text-xs ${f.status === "paid" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{f.status}</Badge></td></tr>);
+                  return (<tr key={f.id} className="border-t border-border hover:bg-secondary/30 transition-colors"><td className="p-3"><p className="font-medium text-foreground">{student?.name || `#${f.studentId}`}</p>{student?.className && <p className="text-xs text-muted-foreground">{formatClass(student.className)}</p>}</td><td className="p-3 text-muted-foreground">{f.feeType || "Fee"}</td><td className="p-3 text-right font-bold text-foreground">₹{Number(f.amount).toLocaleString("en-IN")}</td><td className="p-3 text-muted-foreground">{f.dueDate ? new Date(f.dueDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "—"}</td><td className="p-3"><Badge className={`text-xs ${f.status === "paid" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{f.status}</Badge></td></tr>);
                 })}
               </tbody>
             </table>

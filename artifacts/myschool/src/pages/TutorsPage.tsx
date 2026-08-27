@@ -202,7 +202,7 @@ export default function TutorsPage() {
                         <MapPin className="h-3 w-3 text-primary" />{tutor.location}
                       </span>
                       <span className="inline-flex items-center gap-1 text-[11px] bg-muted/60 text-muted-foreground px-2.5 py-1 rounded-full font-medium border border-border/30">
-                        <Clock className="h-3 w-3 text-secondary" />{tutor.experience} yrs exp
+                        <Clock className="h-3 w-3 text-secondary" />{tutor.experience}
                       </span>
                       <span className="inline-flex items-center gap-1 text-[11px] bg-muted/60 text-muted-foreground px-2.5 py-1 rounded-full font-medium border border-border/30">
                         <Zap className="h-3 w-3 text-amber-500" />Online & Home
@@ -213,7 +213,7 @@ export default function TutorsPage() {
                     <div className="flex items-center justify-between pt-4 border-t border-border/20">
                       <div>
                         <p className="text-[11px] text-muted-foreground font-medium">Hourly Rate</p>
-                        <p className="text-xl font-extrabold text-foreground">₹{tutor.hourlyRate}<span className="text-sm font-medium text-muted-foreground">/hr</span></p>
+                        <p className="text-xl font-extrabold text-foreground">{tutor.hourly_rate}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Link to={`/tutor/${tutor.id}`}>
