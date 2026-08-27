@@ -9,6 +9,7 @@ import {
   getDummyCount, getDummyTableData,
 } from "@/data/dummyData";
 import { getDemoData, setDemoData } from "@/lib/demoStorage";
+import { addAdmission } from "@/lib/erpData";
 
 // Helper: return dummy data when Supabase returns empty or errors
 function withFallback<T>(data: T[] | null | undefined, fallback: T[]): T[] {
@@ -80,13 +81,22 @@ export function useSubmitAdmission() {
   return useMutation({
     mutationFn: async (admission: { school_id: string; student_name: string; parent_name: string; email: string; phone: string; grade: string }) => {
       if (isDemoUserId(user?.id)) {
-        const fake = { ...admission, id: `demo-${Date.now()}`, status: "pending", created_at: new Date().toISOString() };
-        qc.setQueryData<any[]>(["admissions"], (old = []) => [fake, ...old]);
-        return fake;
+        const record = addAdmission({
+          school_id: admission.school_id,
+          student_name: admission.student_name,
+          parent_name: admission.parent_name,
+          email: admission.email,
+          phone: admission.phone,
+          grade: admission.grade,
+        });
+        qc.setQueryData<any[]>(["admissions"], (old = []) => [record, ...old]);
+        qc.setQueryData<any[]>(["admissions", admission.school_id], (old = []) => [record, ...old]);
+        return record;
       }
       const { data, error } = await supabase.from("admissions").insert(admission).select().single();
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ["admissions"] });
+      qc.invalidateQueries({ queryKey: ["admissions", admission.school_id] });
       qc.invalidateQueries({ queryKey: ["sp-admissions-full", admission.school_id] });
       return data;
     },

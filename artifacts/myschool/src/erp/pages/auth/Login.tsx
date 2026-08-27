@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/erp/hooks/use-auth";
+import { DEMO_USERS } from "@/data/dummyData";
 import { School, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,19 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { motion } from "framer-motion";
 
 const DEMO_CREDS: Record<string, { email: string; password: string; label: string }> = {
-  super_admin: { email: "superadmin@myschool.in", password: "admin123", label: "Platform Admin" },
-  school_admin: { email: "admin@dps.in", password: "school123", label: "School Admin" },
-  teacher: { email: "rajesh@dps.in", password: "teacher123", label: "Teacher" },
-  parent: { email: "parent@myschool.in", password: "parent123", label: "Parent" },
-  student: { email: "student@myschool.in", password: "student123", label: "Student" },
-  job_seeker: { email: "jobseeker@myschool.in", password: "job123", label: "Job Seeker" },
+  super_admin: { email: DEMO_USERS.admin.email, password: DEMO_USERS.admin.password, label: "Platform Admin" },
+  school_admin: { email: DEMO_USERS.school.email, password: DEMO_USERS.school.password, label: "School Admin" },
+  teacher: { email: DEMO_USERS.teacher.email, password: DEMO_USERS.teacher.password, label: "Teacher" },
+  parent: { email: DEMO_USERS.parent.email, password: DEMO_USERS.parent.password, label: "Parent" },
 };
 
 export default function Login() {
   const { login, isLoading } = useAuth();
   const [, setLocation] = useLocation();
-  const [identifier, setIdentifier] = useState("admin@dps.in");
-  const [password, setPassword] = useState("school123");
+  const [identifier, setIdentifier] = useState(DEMO_CREDS.school_admin.email);
+  const [password, setPassword] = useState(DEMO_CREDS.school_admin.password);
   const [role, setRole] = useState("school_admin");
   const [error, setError] = useState("");
 
