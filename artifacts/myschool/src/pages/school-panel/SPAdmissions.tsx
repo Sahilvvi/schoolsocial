@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Search, Download } from "lucide-react";
 import { DUMMY_ADMISSIONS } from "@/data/dummyData";
-import { getDemoData, setDemoData } from "@/lib/demoStorage";
+import { getAdmissions, updateAdmissionStatus } from "@/lib/erpData";
 
 export default function SPAdmissions() {
   const { school } = useOutletContext<any>();
@@ -21,17 +21,13 @@ export default function SPAdmissions() {
   const [filter, setFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
-  const queryKey = ["sp-admissions-full", school.id];
+  const queryKey = ["admissions", school.id];
 
   const { data: admissions = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
       if (isDemoUserId(user?.id)) {
-        const stored = getDemoData<any[] | null>("sp-admissions", null);
-        if (stored) return stored;
-        const fallback = DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
-        setDemoData("sp-admissions", fallback);
-        return fallback;
+        return getAdmissions(school.id);
       }
       const { data, error } = await supabase.from("admissions").select("*").eq("school_id", school.id).order("created_at", { ascending: false });
       if (error || !data || data.length === 0) return DUMMY_ADMISSIONS.filter((a) => a.school_id === school.id);
@@ -42,32 +38,33 @@ export default function SPAdmissions() {
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       if (isDemoUserId(user?.id)) {
-        qc.setQueryData<any[]>(queryKey, (old = []) =>
-          old.map((a) => (a.id === id ? { ...a, status } : a)),
-        );
+        const updated = updateAdmissionStatus(id, status as any);
+        if (updated) {
+          qc.setQueryData<any[]>(queryKey, (old = []) =>
+            old.map((a) => (a.id === id ? { ...updated } : a)),
+          );
+        }
         return;
       }
       const { error } = await supabase.from("admissions").update({ status }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      if (isDemoUserId(user?.id)) {
-        const current = qc.getQueryData<any[]>(queryKey);
-        if (current) setDemoData("sp-admissions", current);
-      } else {
-        qc.invalidateQueries({ queryKey });
-      }
+      qc.invalidateQueries({ queryKey: ["admissions"] });
+      qc.invalidateQueries({ queryKey });
       toast.success("Status updated");
     },
   });
 
+  const isPending = (s: string) => s === "pending" || s === "contacted";
+
   const filtered = admissions
-    .filter(a => filter === "all" || a.status === filter)
+    .filter(a => filter === "all" || (filter === "pending" ? isPending(a.status) : a.status === filter))
     .filter(a => !search || a.student_name.toLowerCase().includes(search.toLowerCase()) || a.parent_name.toLowerCase().includes(search.toLowerCase()));
 
   const counts = {
     all: admissions.length,
-    pending: admissions.filter(a => a.status === "pending").length,
+    pending: admissions.filter(a => isPending(a.status)).length,
     approved: admissions.filter(a => a.status === "approved").length,
     rejected: admissions.filter(a => a.status === "rejected").length,
   };

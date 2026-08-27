@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import { isDemoEmail, getDemoUser, DEMO_USERS } from "@/data/dummyData";
+import type { DemoUser } from "@/lib/shared-data";
 
 interface AuthContextType {
   user: User | null;
@@ -15,7 +16,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Build a fake Supabase-like User object for demo accounts
-function makeDemoUser(demo: typeof DEMO_USERS[keyof typeof DEMO_USERS]): User {
+function makeDemoUser(demo: DemoUser): User {
   return {
     id: demo.id,
     email: demo.email,
@@ -26,7 +27,7 @@ function makeDemoUser(demo: typeof DEMO_USERS[keyof typeof DEMO_USERS]): User {
   } as unknown as User;
 }
 
-function makeDemoSession(demo: typeof DEMO_USERS[keyof typeof DEMO_USERS]): Session {
+function makeDemoSession(demo: DemoUser): Session {
   return {
     access_token: `demo-token-${demo.id}`,
     refresh_token: `demo-refresh-${demo.id}`,

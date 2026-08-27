@@ -1,59 +1,102 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
 import { useLocation } from "wouter";
-import { UserProfile, useGetMe, useLogin, LoginRequestRole } from "@/erp/api-client";
+import { useAuth as useMainAuth } from "@/hooks/useAuth";
+import { getDemoUser } from "@/data/dummyData";
+import type { UserProfile } from "@/erp/api-client";
+import { toSchoolIdNumber } from "@/lib/erpData";
 
 interface AuthContextType {
   user: UserProfile | null | undefined;
   token: string | null;
   isLoading: boolean;
-  login: (data: any) => Promise<void>;
+  login: (data: { identifier: string; password: string; role?: string }) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+function mapMainUserToErp(mainUser: NonNullable<ReturnType<typeof useMainAuth>["user"]>): UserProfile {
+  const role = String(mainUser.user_metadata?.role || "parent");
+  const name = String(mainUser.user_metadata?.full_name || mainUser.email || "User");
+  const roleMap: Record<string, UserProfile["role"]> = {
+    admin: "super_admin",
+    school: "school_admin",
+    parent: "parent",
+    teacher: "teacher",
+    tuition_center: "school_admin",
+  };
+
+  // Stable numeric id derived from the main user id.
+  const numericId = Number(String(mainUser.id).replace(/\D/g, "").slice(0, 9)) || 99;
+
+  let schoolId: number | undefined;
+  if (role === "school" || role === "tuition_center") schoolId = 1;
+  else if (role === "parent" || role === "teacher") schoolId = 1;
+  if (mainUser.user_metadata?.school_id) {
+    schoolId = toSchoolIdNumber(mainUser.user_metadata.school_id) ?? schoolId;
+  }
+
+  return {
+    id: numericId,
+    name,
+    email: mainUser.email || undefined,
+    role: roleMap[role] || (role as UserProfile["role"]),
+    schoolId,
+    avatarUrl: undefined,
+    createdAt: mainUser.created_at,
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("myschool_token"));
+  const { user: mainUser, session, loading, signIn, signOut } = useMainAuth();
   const [, setLocation] = useLocation();
+  const [mounted, setMounted] = useState(false);
 
-  const { data: user, isLoading: isUserLoading, refetch } = useGetMe({
-    query: { enabled: !!token, retry: false }
-  });
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const loginMutation = useLogin();
+  const token = session?.access_token || localStorage.getItem("myschool_token");
 
-  const login = async (data: any) => {
-    try {
-      const response = await loginMutation.mutateAsync({ data });
-      const newToken = response.token;
-      setToken(newToken);
-      localStorage.setItem("myschool_token", newToken);
-      await refetch();
-      
-      // Route based on role
-      const role = response.user.role;
-      if (role === LoginRequestRole.super_admin) setLocation("/super-admin");
-      else if (role === LoginRequestRole.school_admin) setLocation("/school-admin");
-      else if (role === LoginRequestRole.teacher) setLocation("/teacher");
-      else if (role === LoginRequestRole.parent) setLocation("/parent");
-      else if (role === LoginRequestRole.student) setLocation("/student");
-      else if (role === LoginRequestRole.job_seeker) setLocation("/career");
-      else setLocation("/");
-      
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error;
+  const user = useMemo(() => (mainUser ? mapMainUserToErp(mainUser) : null), [mainUser]);
+
+  const login = async (data: { identifier: string; password: string; role?: string }) => {
+    const { error } = await signIn(data.identifier, data.password);
+    if (error) {
+      throw new Error(error.message || "Invalid credentials");
+    }
+    const demo = getDemoUser(data.identifier);
+    if (demo) {
+      localStorage.setItem("myschool_token", `demo-token-${demo.id}`);
+    } else if (session?.access_token) {
+      localStorage.setItem("myschool_token", session.access_token);
     }
   };
 
   const logout = () => {
-    setToken(null);
+    signOut();
     localStorage.removeItem("myschool_token");
     window.location.href = "/";
   };
 
+  // Redirect to the ERP dashboard once the user is loaded and we have a profile.
+  useEffect(() => {
+    if (!mounted || loading) return;
+    if (user) {
+      const loc = window.location.pathname;
+      if (loc === "/erp" || loc === "/erp/" || loc === "/erp/login") {
+        if (user.role === "super_admin") setLocation("/super-admin");
+        else if (user.role === "school_admin") setLocation("/school-admin");
+        else if (user.role === "teacher") setLocation("/teacher");
+        else if (user.role === "parent") setLocation("/parent");
+        else if (user.role === "student") setLocation("/student");
+        else setLocation("/school-admin");
+      }
+    }
+  }, [mounted, loading, user, setLocation]);
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading: isUserLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading: loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

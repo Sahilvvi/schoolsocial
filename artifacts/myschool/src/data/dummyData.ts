@@ -3,8 +3,8 @@
 
 // Demo credentials are imported from the shared lib (single source of truth
 // for both web and mobile apps).
-import { DEMO_USERS, isDemoEmail, getDemoUser } from "@/lib/shared-data";
-export { DEMO_USERS, isDemoEmail, getDemoUser };
+import { DEMO_USERS, isDemoEmail, getDemoUser, getDemoUserById } from "@/lib/shared-data";
+export { DEMO_USERS, isDemoEmail, getDemoUser, getDemoUserById };
 
 const now = new Date().toISOString();
 const today = new Date().toISOString().split("T")[0];

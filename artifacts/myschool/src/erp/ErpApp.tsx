@@ -1,9 +1,9 @@
 import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/erp/hooks/use-auth";
 import { ThemeProvider } from "@/erp/context/ThemeContext";
+import { initErpProxy } from "@/erp/api-client/proxy";
 
 // Pages
 import Login from "@/erp/pages/auth/Login";
@@ -76,26 +76,9 @@ import StudentDashboard from "@/erp/pages/student/StudentDashboard";
 import Leaderboard from "@/erp/pages/public/Leaderboard";
 import NotFound from "@/erp/pages/not-found";
 
-// Global Fetch Interceptor for JWT Auth
-const originalFetch = window.fetch;
-window.fetch = async (input, init) => {
-  const token = localStorage.getItem('myschool_token');
-  if (token) {
-    const urlStr = typeof input === 'string' ? input : (input instanceof Request ? input.url : input.toString());
-    if (urlStr.startsWith('/api') || urlStr.includes('/api/')) {
-      const merged = new Headers(init?.headers);
-      if (!merged.has('Authorization')) {
-        merged.set('Authorization', `Bearer ${token}`);
-        init = { ...(init || {}), headers: merged };
-      }
-    }
-  }
-  return originalFetch(input, init);
-};
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } }
-});
+// Initialize the client-side ERP API proxy so all /api/* calls are served
+// from the same shared store used by the CRM dashboards.
+initErpProxy();
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, isLoading } = useAuth();
@@ -206,18 +189,16 @@ function Router() {
 
 export function ErpApp() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ThemeProvider>
-          <WouterRouter base="/erp">
-            <AuthProvider>
-              <Router />
-            </AuthProvider>
-          </WouterRouter>
-          <Toaster />
-        </ThemeProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TooltipProvider>
+      <ThemeProvider>
+        <WouterRouter base="/erp">
+          <AuthProvider>
+            <Router />
+          </AuthProvider>
+        </WouterRouter>
+        <Toaster />
+      </ThemeProvider>
+    </TooltipProvider>
   );
 }
 
