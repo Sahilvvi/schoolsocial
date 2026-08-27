@@ -184,11 +184,23 @@ const DEFAULT_STUDENTS: ErpStudent[] = [
   { id: 3, schoolId: 2, admissionNo: "MS/2024/101", name: "Rohan Mehta", parentName: "Suresh Mehta", parentPhone: "9876543220", className: "8", section: "A", attendancePercent: 88, feePending: 5000, createdAt: now() },
 ];
 
-export async function getStudents(schoolId?: string | number): Promise<ErpStudent[]> {
+export async function getStudents(schoolId?: string | number, classId?: string | number): Promise<ErpStudent[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
   const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
-  if (!schoolNum) return all;
-  return all.filter((s) => s.schoolId === schoolNum);
+  let students = schoolNum ? all.filter((s) => s.schoolId === schoolNum) : all;
+  if (classId !== undefined && classId !== null && classId !== "") {
+    const classNum = Number(classId);
+    const classes = await getClasses(schoolNum);
+    const cls = classes.find((c) => c.id === classNum);
+    const targetName = cls ? normalizeClassName(cls.name) : "";
+    const targetSection = cls?.section;
+    students = students.filter((s) =>
+      (s.classId && s.classId === classNum) ||
+      (targetName && normalizeClassName(s.className) === targetName &&
+        (!targetSection || s.section === targetSection))
+    );
+  }
+  return students;
 }
 
 export async function getStudentById(id: number, schoolId?: string | number): Promise<ErpStudent | undefined> {
@@ -208,6 +220,8 @@ export async function addStudent(student: Omit<ErpStudent, "id" | "createdAt">):
     }
   }
   resolved.className = normalizeClassName(resolved.className) || resolved.className;
+  // Keep numeric classId so class-based filters work later.
+  if (resolved.classId) resolved.classId = Number(resolved.classId);
   const record: ErpStudent = { ...resolved, id: newNumericId(all), createdAt: now() };
   all.push(record);
   await setStored(STORAGE_KEYS.students, all);
@@ -297,7 +311,16 @@ export async function getFees(schoolId?: string | number): Promise<ErpFee[]> {
 
 export async function addFee(fee: Omit<ErpFee, "id">): Promise<ErpFee> {
   const all = await getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
-  const record: ErpFee = { ...fee, id: newNumericId(all) };
+  let resolved = { ...fee };
+  if ((!resolved.studentName || !resolved.className) && resolved.studentId) {
+    const student = await getStudentById(resolved.studentId, resolved.schoolId);
+    if (student) {
+      resolved.studentName = resolved.studentName || student.name;
+      resolved.className = resolved.className || normalizeClassName(student.className) || student.className;
+      resolved.section = resolved.section || student.section;
+    }
+  }
+  const record: ErpFee = { ...resolved, id: newNumericId(all) };
   all.push(record);
   await setStored(STORAGE_KEYS.fees, all);
   return record;

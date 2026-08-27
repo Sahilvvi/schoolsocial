@@ -346,9 +346,8 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (segments.length === 2) {
       if (method === "GET") {
         const search = params.get("search")?.toLowerCase();
-        let students = await getStudents(schoolNum);
         const classId = params.get("classId");
-        if (classId) students = students.filter((s) => s.classId === Number(classId));
+        let students = await getStudents(schoolNum, classId || undefined);
         if (search) students = students.filter((s) => s.name.toLowerCase().includes(search) || s.admissionNo?.toLowerCase().includes(search));
         return listResponse("students", students);
       }
