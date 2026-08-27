@@ -80,6 +80,16 @@ import NotFound from "@/erp/pages/not-found";
 // from the same shared store used by the CRM dashboards.
 initErpProxy();
 
+function LoginRoute() {
+  const { user } = useAuth();
+  if (user?.role === 'super_admin') return <Redirect to="/super-admin" />;
+  if (user?.role === 'school_admin') return <Redirect to="/school-admin" />;
+  if (user?.role === 'teacher') return <Redirect to="/teacher" />;
+  if (user?.role === 'parent') return <Redirect to="/parent" />;
+  if (user?.role === 'student') return <Redirect to="/student" />;
+  return <Login />;
+}
+
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -103,22 +113,8 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 function Router() {
   return (
     <Switch>
-      <Route path="/">
-        {() => {
-          const { user } = useAuth();
-          if (user?.role === 'super_admin') return <Redirect to="/super-admin" />;
-          if (user?.role === 'school_admin') return <Redirect to="/school-admin" />;
-          return <Login />;
-        }}
-      </Route>
-      <Route path="/login">
-        {() => {
-          const { user } = useAuth();
-          if (user?.role === 'super_admin') return <Redirect to="/super-admin" />;
-          if (user?.role === 'school_admin') return <Redirect to="/school-admin" />;
-          return <Login />;
-        }}
-      </Route>
+      <Route path="/" component={LoginRoute} />
+      <Route path="/login" component={LoginRoute} />
       
       {/* ERP Specific functional routes - Career & Leaderboard keep as is if unique */}
       <Route path="/schools/leaderboard" component={Leaderboard} />

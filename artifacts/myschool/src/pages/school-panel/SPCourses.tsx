@@ -1,8 +1,23 @@
+import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { BookOpen, Plus, Users, Clock, IndianRupee } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
-const DEMO_COURSES = [
+interface Course {
+  id: string;
+  name: string;
+  grade: string;
+  students: number;
+  duration: string;
+  fee: string;
+  status: string;
+}
+
+const INITIAL_COURSES: Course[] = [
   { id: "1", name: "Science Stream", grade: "Class 11-12", students: 120, duration: "2 Years", fee: "₹45,000/yr", status: "Active" },
   { id: "2", name: "Commerce Stream", grade: "Class 11-12", students: 95, duration: "2 Years", fee: "₹42,000/yr", status: "Active" },
   { id: "3", name: "Arts Stream", grade: "Class 11-12", students: 60, duration: "2 Years", fee: "₹38,000/yr", status: "Active" },
@@ -13,7 +28,29 @@ const DEMO_COURSES = [
 
 export default function SPCourses() {
   const { school } = useOutletContext<any>();
-  const [courses] = useState(DEMO_COURSES);
+  const [courses, setCourses] = useState<Course[]>(INITIAL_COURSES);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", grade: "", students: "", duration: "", fee: "" });
+
+  const handleAdd = () => {
+    if (!form.name || !form.grade) {
+      toast.error("Course name and grade are required");
+      return;
+    }
+    const newCourse: Course = {
+      id: `c-${Date.now()}`,
+      name: form.name,
+      grade: form.grade,
+      students: Number(form.students) || 0,
+      duration: form.duration || "—",
+      fee: form.fee || "—",
+      status: "Active",
+    };
+    setCourses(prev => [newCourse, ...prev]);
+    setForm({ name: "", grade: "", students: "", duration: "", fee: "" });
+    setOpen(false);
+    toast.success("Course added");
+  };
 
   return (
     <div className="space-y-6">
@@ -24,9 +61,26 @@ export default function SPCourses() {
           </h1>
           <p className="text-sm text-gray-500 mt-1">{courses.length} courses offered</p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Plus className="h-4 w-4" /> Add Course
-        </button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+              <Plus className="h-4 w-4" /> Add Course
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader><DialogTitle>Add Course</DialogTitle></DialogHeader>
+            <div className="space-y-4 mt-2">
+              <div className="space-y-1"><Label htmlFor="course-name">Course Name *</Label><Input id="course-name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Science Stream" /></div>
+              <div className="space-y-1"><Label htmlFor="course-grade">Grade/Class *</Label><Input id="course-grade" value={form.grade} onChange={e => setForm(p => ({ ...p, grade: e.target.value }))} placeholder="e.g. Class 11-12" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1"><Label htmlFor="course-students">Students</Label><Input id="course-students" type="number" value={form.students} onChange={e => setForm(p => ({ ...p, students: e.target.value }))} placeholder="0" /></div>
+                <div className="space-y-1"><Label htmlFor="course-duration">Duration</Label><Input id="course-duration" value={form.duration} onChange={e => setForm(p => ({ ...p, duration: e.target.value }))} placeholder="e.g. 2 Years" /></div>
+              </div>
+              <div className="space-y-1"><Label htmlFor="course-fee">Fee</Label><Input id="course-fee" value={form.fee} onChange={e => setForm(p => ({ ...p, fee: e.target.value }))} placeholder="e.g. ₹45,000/yr" /></div>
+              <Button onClick={handleAdd} className="w-full bg-blue-600 hover:bg-blue-700">Add Course</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
