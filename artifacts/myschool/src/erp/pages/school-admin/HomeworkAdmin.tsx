@@ -102,7 +102,7 @@ export default function HomeworkAdmin() {
             <div><label className="text-xs font-bold text-muted-foreground block mb-1">Class</label>
               <select value={form.classId} onChange={e => setForm(f => ({ ...f, classId: e.target.value }))} className="w-full border border-border rounded-xl p-2.5 text-sm bg-background focus:outline-none focus:border-primary">
                 <option value="">All classes</option>
-                {classes.map(c => <option key={c.id} value={c.id}>Class {c.name}</option>)}
+                {classes.map(c => <option key={c.id} value={c.id}>{formatClass(c.name, c.section)}</option>)}
               </select>
             </div>
             <div><label className="text-xs font-bold text-muted-foreground block mb-1">Teacher</label>
@@ -126,7 +126,7 @@ export default function HomeworkAdmin() {
         </div>
         <select value={filterClass} onChange={e => setFilterClass(e.target.value)} className="border border-border rounded-xl px-3 text-sm bg-background focus:outline-none focus:border-primary">
           <option value="">All Classes</option>
-          {classes.map(c => <option key={c.id} value={c.id}>Class {c.name}</option>)}
+          {classes.map(c => <option key={c.id} value={c.id}>{formatClass(c.name, c.section)}</option>)}
         </select>
       </div>
 

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { MessageSquare, Phone, Mail, MapPin, IndianRupee, CheckCircle } from "lucide-react";
+import { formatClass } from "@/lib/utils";
 
 const statusColor: Record<string, string> = {
   new: "bg-blue-500/10 text-blue-600 border-blue-500/20",
@@ -34,7 +35,7 @@ export default function TuPEnquiries() {
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground">{enq.parent_name}</h4>
-                    <p className="text-sm text-muted-foreground">{enq.subject} • Class {enq.student_class}</p>
+                    <p className="text-sm text-muted-foreground">{enq.subject} • {formatClass(enq.student_class)}</p>
                   </div>
                 </div>
                 <Badge className={statusColor[enq.status] || statusColor.new}>{enq.status}</Badge>

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import QRCode from "react-qr-code";
 import NotificationBell from "@/erp/components/NotificationBell";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getToken() { return localStorage.getItem("myschool_token"); }
@@ -229,7 +230,7 @@ export default function StudentDashboard() {
       {activeTab === "home" && (
         <div className="space-y-5 max-w-2xl">
           <div>
-            <span className="inline-block px-3 py-1 bg-primary/10 text-primary font-bold text-xs rounded-full mb-2">Class {className}-{section}</span>
+            <span className="inline-block px-3 py-1 bg-primary/10 text-primary font-bold text-xs rounded-full mb-2">{formatClass(className, section)}</span>
             <h1 className="text-2xl font-display font-bold text-foreground">{greeting}, {studentName}!</h1>
             <p className="text-sm text-muted-foreground font-medium mt-1">Ready to learn something new today?</p>
           </div>
@@ -240,7 +241,7 @@ export default function StudentDashboard() {
                 <div className="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-bl-[80px]" />
                 <p className="text-xs font-bold text-white/60 uppercase tracking-widest mb-1">MySchool Student ID</p>
                 <h2 className="text-xl font-bold text-white">{user?.name || "Student"}</h2>
-                <p className="text-sm text-white/80 font-medium">Class {className}-{section} • {admissionNo}</p>
+                <p className="text-sm text-white/80 font-medium">{formatClass(className, section)} • {admissionNo}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <div><p className="text-xs text-white/60">Attendance</p><p className="text-2xl font-bold text-white">{attendancePct}%</p></div>
                   <div className="w-16 h-16 bg-white rounded-xl p-1.5"><QRCode value={`student:${myStudent?.id || 1}:${admissionNo}`} size={52} /></div>
@@ -497,7 +498,7 @@ export default function StudentDashboard() {
               <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center font-bold text-2xl text-white">{(user?.name || "S")[0]}</div>
               <div>
                 <p className="text-xl font-bold text-white">{user?.name}</p>
-                <p className="text-sm text-white/80">Class {className}-{section}</p>
+                <p className="text-sm text-white/80">{formatClass(className, section)}</p>
                 <p className="text-xs text-white/60">{myStudent?.rollNo ? `Roll No. ${myStudent.rollNo}` : admissionNo}</p>
               </div>
             </div>

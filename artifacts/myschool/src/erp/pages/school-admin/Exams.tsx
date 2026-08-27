@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getToken() { return localStorage.getItem("myschool_token"); }
@@ -103,7 +104,7 @@ export default function Exams() {
         <div className="flex items-center gap-3">
           <Select value={String(selectedClass || "")} onValueChange={v => setSelectedClass(Number(v))}>
             <SelectTrigger className="w-44 dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select Class" /></SelectTrigger>
-            <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` - ${c.section}` : ""}</SelectItem>)}</SelectContent>
+            <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
           </Select>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

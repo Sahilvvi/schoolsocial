@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const getToken = () => localStorage.getItem("myschool_token") || "";
@@ -79,7 +80,7 @@ export default function StudyMaterials() {
         <div className="flex gap-2">
           <Select value={filterClass} onValueChange={setFilterClass}>
             <SelectTrigger className="w-36 dark:bg-gray-800 dark:border-gray-700"><SelectValue placeholder="All Classes" /></SelectTrigger>
-            <SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+            <SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
           </Select>
           {tab === "materials" && (
             <Dialog open={matOpen} onOpenChange={setMatOpen}>
@@ -90,7 +91,7 @@ export default function StudyMaterials() {
                   <div><label className="text-sm font-medium dark:text-gray-300">Class *</label>
                     <Select value={matForm.classId} onValueChange={v => setMatForm(p => ({ ...p, classId: v }))}>
                       <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600"><SelectValue placeholder="Select class" /></SelectTrigger>
-                      <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+                      <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
                     </Select></div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className="text-sm font-medium dark:text-gray-300">Subject *</label><Input value={matForm.subject} onChange={e => setMatForm(p => ({ ...p, subject: e.target.value }))} placeholder="Mathematics" className="dark:bg-gray-700 dark:border-gray-600" /></div>
@@ -117,7 +118,7 @@ export default function StudyMaterials() {
                   <div><label className="text-sm font-medium dark:text-gray-300">Class *</label>
                     <Select value={sylForm.classId} onValueChange={v => setSylForm(p => ({ ...p, classId: v }))}>
                       <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600"><SelectValue placeholder="Select class" /></SelectTrigger>
-                      <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+                      <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
                     </Select></div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className="text-sm font-medium dark:text-gray-300">Subject *</label><Input value={sylForm.subject} onChange={e => setSylForm(p => ({ ...p, subject: e.target.value }))} placeholder="Science" className="dark:bg-gray-700 dark:border-gray-600" /></div>
