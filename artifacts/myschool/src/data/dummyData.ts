@@ -30,7 +30,7 @@ export const DUMMY_SCHOOLS = [
     banner: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80",
     lat: 28.5815, lng: 77.2507, rating: 4.7, review_count: 156, is_featured: true, is_verified: true,
     facilities: ["Smart Classrooms", "Olympic Pool", "Science Labs", "Library", "Auditorium", "Sports Complex", "Computer Lab", "Music Room"],
-    gallery: ["https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400", "https://images.unsplash.com/photo-1562774053-701939374585?w=400", "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=400"],
+    gallery: ["https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400", "https://images.unsplash.com/photo-1562774053-701939374585?w=400", "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400"],
     achievements: ["Best CBSE School 2024", "100% Board Results", "National Science Olympiad Winners"],
     class_fees: {}, created_at: daysAgo(365), updated_at: now,
   },
@@ -49,10 +49,10 @@ export const DUMMY_SCHOOLS = [
     id: "school-003", name: "Springdales School", slug: "springdales-school", location: "Pusa Road, New Delhi",
     board: "CBSE", fees: "₹95,000/year", description: "Committed to providing quality education with a focus on values and culture.",
     about: "Springdales School believes in the holistic development of a child. Our curriculum integrates academic excellence with cultural enrichment and moral values.",
-    banner: "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=800&q=80",
+    banner: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80",
     lat: 28.6417, lng: 77.1849, rating: 4.3, review_count: 89, is_featured: false, is_verified: true,
     facilities: ["Computer Lab", "Playground", "Library", "Science Lab", "Music Room"],
-    gallery: ["https://images.unsplash.com/photo-1523050854058-8df90110c476?w=400"],
+    gallery: ["https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400"],
     achievements: ["Best Value School 2024", "State Level Sports Champions"],
     class_fees: {}, created_at: daysAgo(250), updated_at: now,
   },
@@ -102,7 +102,7 @@ export const DUMMY_SCHOOLS = [
     id: "school-008", name: "Sanskriti School", slug: "sanskriti-school", location: "Chanakyapuri, New Delhi",
     board: "CBSE", fees: "₹80,000/year", description: "Known for value-based education and cultural awareness programs.",
     about: "Sanskriti School integrates traditional Indian values with modern education, producing well-rounded individuals who are rooted in their culture while being globally competitive.",
-    banner: "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=800&q=80",
+    banner: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80",
     lat: 28.5961, lng: 77.1774, rating: 4.1, review_count: 54, is_featured: false, is_verified: true,
     facilities: ["Library", "Computer Lab", "Playground", "Art Room"],
     gallery: [], achievements: ["Cultural Excellence Award"],
@@ -115,7 +115,7 @@ export const DUMMY_EVENTS = [
   {
     id: "event-001", title: "Annual Science Fair 2025", description: "Showcase of innovative student projects in physics, chemistry, biology, and technology. Students from classes 6-12 will present their science experiments and models.",
     event_date: daysFromNow(15), location: "Delhi Public School Campus", school_id: "school-001", school_name: "Delhi Public School",
-    image: "https://images.unsplash.com/photo-1564429238961-bf8e8a1e4c16?w=800&q=80", is_public: true, created_at: daysAgo(5),
+    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80", is_public: true, created_at: daysAgo(5),
   },
   {
     id: "event-002", title: "Inter-School Debate Championship", description: "Annual debate competition featuring top schools from across NCR. Topics include AI Ethics, Climate Change, and Education Reform.",
@@ -125,7 +125,7 @@ export const DUMMY_EVENTS = [
   {
     id: "event-003", title: "Sports Day 2025", description: "Annual athletics meet featuring track & field events, team sports, and fun activities for all grades.",
     event_date: daysFromNow(30), location: "Springdales School Grounds", school_id: "school-003", school_name: "Springdales School",
-    image: "https://images.unsplash.com/photo-1461896836934-bd45ba24e916?w=800&q=80", is_public: true, created_at: daysAgo(7),
+    image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80", is_public: true, created_at: daysAgo(7),
   },
   {
     id: "event-004", title: "Cultural Festival - Rang Tarang", description: "A celebration of art, music, dance, and drama. Students perform classical and contemporary pieces.",
@@ -274,7 +274,7 @@ export const DUMMY_NEWS = [
     id: "news-006", title: "Parent Guide: Choosing the Right School Board", author: "Admissions Expert",
     category: "Guide", published_date: daysAgo(12).split("T")[0],
     excerpt: "CBSE vs ICSE vs IB vs State Board — confused? This comprehensive guide helps parents understand the differences and choose the best board for their child.",
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=800&q=80", created_at: daysAgo(12),
+    image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80", created_at: daysAgo(12),
   },
 ];
 

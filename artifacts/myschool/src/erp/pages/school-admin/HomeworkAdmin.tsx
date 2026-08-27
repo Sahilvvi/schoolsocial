@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/erp/hooks/use-toast";
 import { ClipboardList, Plus, Search, Loader2, X, Filter } from "lucide-react";
+import { formatClass } from "@/lib/utils";
 
 const BASE = () => import.meta.env.BASE_URL.replace(/\/$/, "");
 const tok = () => localStorage.getItem("myschool_token") || "";
@@ -145,7 +146,7 @@ export default function HomeworkAdmin() {
                     <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0"><ClipboardList className="w-5 h-5 text-primary" /></div>
                     <div>
                       <p className="font-bold text-foreground">{a.title}</p>
-                      <p className="text-sm text-muted-foreground">{a.subject}{a.className ? ` • Class ${a.className}` : ""}{teacher ? ` • ${teacher.name}` : ""}</p>
+                      <p className="text-sm text-muted-foreground">{a.subject}{a.className ? ` • ${formatClass(a.className)}` : ""}{teacher ? ` • ${teacher.name}` : ""}</p>
                       {a.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{a.description}</p>}
                     </div>
                   </div>

@@ -379,17 +379,20 @@ export default function SchoolProfilePage() {
               </div>
             </div>
             {/* Map placeholder */}
-            <div className="mt-3 h-28 rounded-xl overflow-hidden bg-gray-100 flex items-end justify-end">
-              <img
-                src={`https://maps.googleapis.com/maps/api/staticmap?center=${school.lat},${school.lng}&zoom=14&size=400x120&markers=color:red%7C${school.lat},${school.lng}&key=placeholder`}
-                alt="Map"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const el = e.target as HTMLImageElement;
-                  el.style.display = "none";
-                  el.parentElement!.style.background = "linear-gradient(135deg, #e0f2fe, #bfdbfe)";
-                }}
-              />
+            <div className="mt-3 h-28 rounded-xl overflow-hidden bg-gray-100 flex items-end justify-end relative">
+              {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
+                <img
+                  src={`https://maps.googleapis.com/maps/api/staticmap?center=${school.lat},${school.lng}&zoom=14&size=400x120&markers=color:red%7C${school.lat},${school.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`}
+                  alt="Map"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const el = e.target as HTMLImageElement;
+                    el.style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100" />
+              )}
               <div className="absolute bottom-1 right-1 bg-red-500 rounded-full h-6 w-6 flex items-center justify-center">
                 <MapPin className="h-3.5 w-3.5 text-white fill-white" />
               </div>

@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/erp/hooks/use-toast";
 import NotificationBell from "@/erp/components/NotificationBell";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getToken() { return localStorage.getItem("myschool_token"); }
@@ -344,7 +345,7 @@ export default function ParentDashboard() {
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-base shrink-0 ${isActive ? "bg-white/25 text-white" : "bg-primary/10 text-primary"}`}>{c.name?.charAt(0)}</div>
                   <div className="text-left">
                     <p className={`text-sm font-bold leading-tight ${isActive ? "text-white" : "text-foreground"}`}>{c.name?.split(" ")[0]}</p>
-                    <p className={`text-[11px] font-medium leading-tight ${isActive ? "text-white/75" : "text-muted-foreground"}`}>{c.className ? `Class ${c.className}${c.section ? `-${c.section}` : ""}` : "—"}</p>
+                    <p className={`text-[11px] font-medium leading-tight ${isActive ? "text-white/75" : "text-muted-foreground"}`}>{formatClass(c.className, c.section)}</p>
                   </div>
                   {isActive && <div className="w-2 h-2 rounded-full bg-white/60 ml-1 shrink-0" />}
                 </button>

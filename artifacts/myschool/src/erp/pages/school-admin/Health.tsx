@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/erp/hooks/use-toast";
 import { Heart, Plus, Search, Loader2, X, Activity, Thermometer, AlertCircle } from "lucide-react";
+import { formatClass } from "@/lib/utils";
 
 const BASE = () => import.meta.env.BASE_URL.replace(/\/$/, "");
 const tok = () => localStorage.getItem("myschool_token") || "";
@@ -138,7 +139,7 @@ export default function HealthPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <div><p className="font-bold text-foreground">{student?.name || `Student #${r.studentId}`}</p><p className="text-xs text-muted-foreground">{student ? `Class ${student.className}` : ""} • {new Date(r.recordDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p></div>
+                      <div><p className="font-bold text-foreground">{student?.name || `Student #${r.studentId}`}</p><p className="text-xs text-muted-foreground">{student ? formatClass(student.className) : ""} • {new Date(r.recordDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p></div>
                       {r.conditions && <Badge className="text-xs bg-amber-100 text-amber-700 shrink-0">Has Conditions</Badge>}
                     </div>
                     <div className="flex flex-wrap gap-3 mt-2">

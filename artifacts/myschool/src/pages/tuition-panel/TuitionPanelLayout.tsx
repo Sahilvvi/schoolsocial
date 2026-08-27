@@ -120,6 +120,7 @@ export default function TuitionPanelLayout() {
   const [bookings, setBookings] = useState<TutorBookingRow[]>(() =>
     getDemoData("tuition-bookings", DUMMY_TUTOR_BOOKINGS)
   );
+  const [tutorId, setTutorId] = useState<string | null>(null);
 
   // After auth resolves, override with real data for non-demo users
   useEffect(() => {
@@ -149,7 +150,7 @@ export default function TuitionPanelLayout() {
     supabase
       .from("tuition_enquiries")
       .select("*")
-      .eq("status", "open")
+      .in("status", ["new", "contacted"])
       .order("created_at", { ascending: false })
       .limit(50)
       .then(({ data }) => {
@@ -167,7 +168,8 @@ export default function TuitionPanelLayout() {
         .ilike("name", fullName)
         .maybeSingle()
         .then(({ data: tutor }) => {
-          if (tutor) {
+          if (tutor?.id) {
+            setTutorId(tutor.id);
             // Load batches owned by this tutor
             supabase!
               .from("tuition_batches")
@@ -214,13 +216,36 @@ export default function TuitionPanelLayout() {
   const updateCenter = (u: Partial<CenterProfile>) => {
     setCenterData(p => { const n = { ...p, ...u }; setDemoData(centerKey, n); return n; });
   };
-  const updateBatches = (b: TuitionBatchRow[]) => {
+  const updateBatches = async (b: TuitionBatchRow[]) => {
     setBatches(b);
-    if (isDemo) setDemoData("tuition-batches", b);
+    if (isDemo) {
+      setDemoData("tuition-batches", b);
+      return;
+    }
+    if (!supabase || !tutorId) return;
+    const withTutor = b.map((batch) => ({
+      ...batch,
+      tutor_id: batch.tutor_id || tutorId,
+      updated_at: new Date().toISOString(),
+    }));
+    const { error } = await supabase.from("tuition_batches").upsert(withTutor, { onConflict: "id" });
+    if (error) console.error("[updateBatches] upsert failed:", error);
+    const keep = new Set(withTutor.map((x) => x.id));
+    const { data: existing } = await supabase.from("tuition_batches").select("id").eq("tutor_id", tutorId);
+    const toDelete = existing?.filter((row: any) => !keep.has(row.id)).map((row: any) => row.id) || [];
+    if (toDelete.length) {
+      await supabase.from("tuition_batches").delete().in("id", toDelete);
+    }
   };
-  const updateEnquiries = (e: TuitionEnquiryRow[]) => {
+  const updateEnquiries = async (e: TuitionEnquiryRow[]) => {
     setEnquiries(e);
-    if (isDemo) setDemoData("tuition-enquiries", e);
+    if (isDemo) {
+      setDemoData("tuition-enquiries", e);
+      return;
+    }
+    if (!supabase) return;
+    const { error } = await supabase.from("tuition_enquiries").upsert(e, { onConflict: "id" });
+    if (error) console.error("[updateEnquiries] upsert failed:", error);
   };
   const updateBookings = (b: TutorBookingRow[]) => {
     setBookings(b);

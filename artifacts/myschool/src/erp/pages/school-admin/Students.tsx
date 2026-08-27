@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 export default function StudentsList() {
   const { user } = useAuth();
@@ -249,7 +250,7 @@ export default function StudentsList() {
                       </div>
                     </td>
                     <td className="px-6 py-4 font-bold text-foreground">
-                      {student.className ? `Class ${student.className}${student.section ? "-"+student.section : ""}` : "—"}
+                      {formatClass(student.className, student.section)}
                     </td>
                     <td className="px-6 py-4 font-medium text-muted-foreground">{student.parentName || "—"}</td>
                     <td className="px-6 py-4">
@@ -295,7 +296,7 @@ export default function StudentsList() {
                 </div>
                 <h3 className="text-2xl font-bold font-display text-foreground">{selectedStudent.name}</h3>
                 <p className="text-muted-foreground font-medium mb-6">
-                  {selectedStudent.className ? `Class ${selectedStudent.className}${selectedStudent.section ? "-"+selectedStudent.section : ""}` : ""} • {selectedStudent.admissionNo}
+                  {formatClass(selectedStudent.className, selectedStudent.section)} • {selectedStudent.admissionNo}
                 </p>
                 <div className="p-4 bg-white border-2 border-border rounded-2xl shadow-sm mb-6">
                   <QRCode value={selectedStudent.qrCode || `student:${selectedStudent.id}:${selectedStudent.admissionNo}`} size={160} />
