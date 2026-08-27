@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 type AttendanceStatus = "P" | "A" | "L";
 const statusMap: Record<AttendanceStatus, string> = { P: "present", A: "absent", L: "late" };
@@ -89,7 +90,7 @@ export default function Attendance() {
                   </SelectTrigger>
                   <SelectContent>
                     {classes.map((c: any) => (
-                      <SelectItem key={c.id} value={String(c.id)}>Class {c.name}{c.section ? "-"+c.section : ""}</SelectItem>
+                      <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

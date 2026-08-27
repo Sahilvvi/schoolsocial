@@ -96,7 +96,7 @@ export default function HealthPage() {
             <div><label className="text-xs font-bold text-muted-foreground block mb-1">Student *</label>
               <select value={form.studentId} onChange={e => setForm(f => ({ ...f, studentId: e.target.value }))} className="w-full border border-border rounded-xl p-2.5 text-sm bg-background focus:outline-none focus:border-primary">
                 <option value="">Select student...</option>
-                {students.map(s => <option key={s.id} value={s.id}>{s.name} — Class {s.className}</option>)}
+                {students.map(s => <option key={s.id} value={s.id}>{s.name} — {formatClass(s.className)}</option>)}
               </select>
             </div>
             <div><label className="text-xs font-bold text-muted-foreground block mb-1">Date *</label><Input type="date" value={form.recordDate} onChange={e => setForm(f => ({ ...f, recordDate: e.target.value }))} className="rounded-xl" /></div>

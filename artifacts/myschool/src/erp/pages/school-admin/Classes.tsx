@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const getToken = () => localStorage.getItem("myschool_token") || "";
@@ -341,7 +342,7 @@ export default function Classes() {
           <DialogHeader className="shrink-0">
             <DialogTitle className="dark:text-white flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-primary" />
-              Class {studentsModal.cls?.name}{studentsModal.cls?.section ? `-${studentsModal.cls.section}` : ""} — Students
+              {formatClass(studentsModal.cls?.name, studentsModal.cls?.section)} — Students
             </DialogTitle>
           </DialogHeader>
 
@@ -433,7 +434,7 @@ export default function Classes() {
             <p className="text-sm text-muted-foreground">
               Moving <strong className="text-foreground dark:text-white">{moveModal.student?.name}</strong> from{" "}
               <strong className="text-foreground dark:text-white">
-                Class {studentsModal.cls?.name}{studentsModal.cls?.section ? `-${studentsModal.cls.section}` : ""}
+                {formatClass(studentsModal.cls?.name, studentsModal.cls?.section)}
               </strong>
             </p>
             <div className="space-y-2">
@@ -447,7 +448,7 @@ export default function Classes() {
                     .filter((c: any) => c.id !== studentsModal.cls?.id)
                     .map((c: any) => (
                       <SelectItem key={c.id} value={String(c.id)}>
-                        Class {c.name}{c.section ? `-${c.section}` : ""}
+                        {formatClass(c.name, c.section)}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -470,7 +471,7 @@ export default function Classes() {
           <DialogHeader className="shrink-0 flex flex-row items-center justify-between">
             <DialogTitle className="dark:text-white flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
-              Class {scheduleModal.cls?.name}{scheduleModal.cls?.section ? `-${scheduleModal.cls.section}` : ""} — Weekly Schedule
+              {formatClass(scheduleModal.cls?.name, scheduleModal.cls?.section)} — Weekly Schedule
             </DialogTitle>
             <Button
               size="sm"

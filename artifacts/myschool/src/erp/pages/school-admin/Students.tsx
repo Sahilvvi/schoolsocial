@@ -146,7 +146,7 @@ export default function StudentsList() {
                       <SelectTrigger className="h-11 rounded-xl bg-secondary/50"><SelectValue placeholder="Select class" /></SelectTrigger>
                       <SelectContent>
                         {classes.map((c: any) => (
-                          <SelectItem key={c.id} value={String(c.id)}>Class {c.name}{c.section ? "-"+c.section : ""}</SelectItem>
+                          <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

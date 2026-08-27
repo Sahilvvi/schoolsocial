@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const getToken = () => localStorage.getItem("myschool_token") || "";
@@ -58,7 +59,7 @@ export default function Gradebook({ schoolId, teacherId }: Props) {
       <div className="flex gap-2 mb-4 flex-wrap">
         <Select value={filterClass} onValueChange={setFilterClass}>
           <SelectTrigger className="w-36 dark:bg-gray-800 dark:border-gray-700"><SelectValue placeholder="All Classes" /></SelectTrigger>
-          <SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+          <SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
         </Select>
         <Select value={filterExam} onValueChange={setFilterExam}>
           <SelectTrigger className="w-40 dark:bg-gray-800 dark:border-gray-700"><SelectValue placeholder="All Exams" /></SelectTrigger>

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const getToken = () => localStorage.getItem("myschool_token") || "";
@@ -84,7 +85,7 @@ export default function FeeStructure() {
                 <div><label className="text-sm font-medium dark:text-gray-300">Assign to Class (optional)</label>
                   <Select value={bulkClassId} onValueChange={setBulkClassId}>
                     <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600"><SelectValue placeholder="All students" /></SelectTrigger>
-                    <SelectContent><SelectItem value="all">All Students</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+                    <SelectContent><SelectItem value="all">All Students</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
                   </Select></div>
                 <p className="text-sm text-muted-foreground">This will create fee records for {bulkClassId !== "all" ? students.filter(s => s.classId === Number(bulkClassId)).length : students.length} students.</p>
                 <Button onClick={bulkAssign} className="w-full">Assign Fee to All</Button>
@@ -107,7 +108,7 @@ export default function FeeStructure() {
                 <div><label className="text-sm font-medium dark:text-gray-300">Applicable Class (optional)</label>
                   <Select value={form.classId || "__none__"} onValueChange={v => setForm(p => ({ ...p, classId: v === "__none__" ? "" : v }))}>
                     <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600"><SelectValue placeholder="All classes" /></SelectTrigger>
-                    <SelectContent><SelectItem value="__none__">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+                    <SelectContent><SelectItem value="__none__">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
                   </Select></div>
                 <Button onClick={addStructure} className="w-full">Create Structure</Button>
               </div>

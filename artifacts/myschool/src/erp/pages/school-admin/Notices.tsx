@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -108,7 +109,7 @@ export default function Notices() {
                     <SelectContent>
                       <SelectItem value="__none__">All Classes</SelectItem>
                       {classes.map((c: any) => (
-                        <SelectItem key={c.id} value={String(c.id)}>Class {c.name}{c.section ? "-"+c.section : ""}</SelectItem>
+                        <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

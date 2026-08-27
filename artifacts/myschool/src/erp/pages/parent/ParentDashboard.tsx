@@ -371,7 +371,7 @@ export default function ParentDashboard() {
                   <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center font-bold text-2xl text-white">{child.name?.charAt(0)}</div>
                   <div>
                     <h3 className="font-bold text-xl text-white">{child.name}</h3>
-                    <p className="text-sm font-medium text-white/80">Class {child.className || "—"}{child.section ? `-${child.section}` : ""}</p>
+                    <p className="text-sm font-medium text-white/80">{formatClass(child.className, child.section)}</p>
                     <p className="text-xs text-white/60 mt-0.5">{child.admissionNo}</p>
                   </div>
                 </div>
@@ -436,7 +436,7 @@ export default function ParentDashboard() {
                 <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-2xl">{c.name?.charAt(0)}</div>
                 <div className="flex-1">
                   <h3 className="font-bold text-lg text-foreground">{c.name}</h3>
-                  <p className="text-sm text-primary font-medium">Class {c.className || "—"}{c.section ? `-${c.section}` : ""}</p>
+                  <p className="text-sm text-primary font-medium">{formatClass(c.className, c.section)}</p>
                   <p className="text-xs text-muted-foreground">{c.admissionNo} • {c.gender || "—"}</p>
                 </div>
                 {linkedChildIds.includes(c.id) && (
@@ -548,7 +548,7 @@ export default function ParentDashboard() {
       {activeTab === "homework" && (
         <div className="space-y-4 max-w-2xl">
           <h2 className="text-xl font-bold mb-4">Homework</h2>
-          <p className="text-sm text-muted-foreground -mt-2">For {child?.name} • Class {child?.className}{child?.section ? `-${child?.section}` : ""}</p>
+          <p className="text-sm text-muted-foreground -mt-2">For {child?.name} • {formatClass(child?.className, child?.section)}</p>
           {hwLoading ? <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
           : homework.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground"><ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-20" /><p className="font-bold">No homework assigned</p><p className="text-sm">Check back later</p></div>
@@ -839,7 +839,7 @@ export default function ParentDashboard() {
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">{linkResult.name?.charAt(0)}</div>
                   <div>
                     <p className="font-bold text-foreground">{linkResult.name}</p>
-                    <p className="text-sm text-muted-foreground">Class {linkResult.className || "—"} • {linkResult.admissionNo}</p>
+                    <p className="text-sm text-muted-foreground">{formatClass(linkResult.className)} • {linkResult.admissionNo}</p>
                   </div>
                 </div>
                 {linkedChildIds.includes(linkResult.id) || myChildren.find((c: any) => c.id === linkResult.id)

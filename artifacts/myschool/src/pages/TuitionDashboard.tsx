@@ -16,6 +16,7 @@ import {
   DUMMY_BATCHES, DUMMY_TUITION_ENQUIRIES, DUMMY_TUTOR_BOOKINGS,
   DUMMY_TUTORS, DUMMY_NOTIFICATIONS
 } from "@/data/dummyData";
+import { formatClass } from "@/lib/utils";
 
 /* ── Tuition center dummy data ────────────────────────── */
 const myBatches = DUMMY_BATCHES;
@@ -183,7 +184,7 @@ export default function TuitionDashboard() {
                           </div>
                           <div>
                             <h4 className="font-bold text-foreground">{enq.parent_name}</h4>
-                            <p className="text-sm text-muted-foreground">{enq.subject} • Class {enq.student_class}</p>
+                            <p className="text-sm text-muted-foreground">{enq.subject} • {formatClass(enq.student_class)}</p>
                           </div>
                         </div>
                         <Badge className={statusColor[enq.status] || statusColor.new}>{enq.status}</Badge>
