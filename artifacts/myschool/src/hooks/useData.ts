@@ -8,8 +8,7 @@ import {
   DUMMY_TUITION_ENQUIRIES, DUMMY_QR_ORDERS, DUMMY_BATCHES,
   getDummyCount, getDummyTableData,
 } from "@/data/dummyData";
-import { getDemoData, setDemoData } from "@/lib/demoStorage";
-import { addAdmission } from "@/lib/erpData";
+import { addAdmission, getAdmissions } from "@/lib/erpData";
 
 // Helper: return dummy data when Supabase returns empty or errors
 function withFallback<T>(data: T[] | null | undefined, fallback: T[]): T[] {
@@ -76,29 +75,21 @@ export function useAddReview() {
 }
 
 export function useSubmitAdmission() {
-  const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (admission: { school_id: string; student_name: string; parent_name: string; email: string; phone: string; grade: string }) => {
-      if (isDemoUserId(user?.id)) {
-        const record = addAdmission({
-          school_id: admission.school_id,
-          student_name: admission.student_name,
-          parent_name: admission.parent_name,
-          email: admission.email,
-          phone: admission.phone,
-          grade: admission.grade,
-        });
-        qc.setQueryData<any[]>(["admissions"], (old = []) => [record, ...old]);
-        qc.setQueryData<any[]>(["admissions", admission.school_id], (old = []) => [record, ...old]);
-        return record;
-      }
-      const { data, error } = await supabase.from("admissions").insert(admission).select().single();
-      if (error) throw error;
-      qc.invalidateQueries({ queryKey: ["admissions"] });
-      qc.invalidateQueries({ queryKey: ["admissions", admission.school_id] });
+      const record = await addAdmission({
+        school_id: admission.school_id,
+        student_name: admission.student_name,
+        parent_name: admission.parent_name,
+        email: admission.email,
+        phone: admission.phone,
+        grade: admission.grade,
+      });
+      qc.setQueryData<any[]>(["admissions"], (old = []) => [record, ...old]);
+      qc.setQueryData<any[]>(["admissions", admission.school_id], (old = []) => [record, ...old]);
       qc.invalidateQueries({ queryKey: ["sp-admissions-full", admission.school_id] });
-      return data;
+      return record;
     },
   });
 }
@@ -185,19 +176,11 @@ export function useNews() {
 // ─── Additional hooks used by admin pages ───
 
 export function useAdmissions() {
-  const { user } = useAuth();
   return useQuery({
     queryKey: ["admissions"],
     queryFn: async () => {
-      if (isDemoUserId(user?.id)) {
-        const stored = getDemoData<any[] | null>("admin-admissions", null);
-        if (stored) return stored;
-        setDemoData("admin-admissions", DUMMY_ADMISSIONS);
-        return DUMMY_ADMISSIONS;
-      }
-      const { data, error } = await supabase.from("admissions").select("*").order("created_at", { ascending: false });
-      if (error) return DUMMY_ADMISSIONS;
-      return withFallback(data, DUMMY_ADMISSIONS);
+      const all = await getAdmissions();
+      return all.length ? all : DUMMY_ADMISSIONS;
     },
   });
 }
@@ -252,11 +235,9 @@ export function useAdmissionsByDay() {
   return useQuery({
     queryKey: ["admissions-by-day"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("admissions").select("created_at").order("created_at", { ascending: true });
-      if (error || !data || data.length === 0) {
-        return DUMMY_ADMISSIONS.map((a) => ({ created_at: a.created_at }));
-      }
-      return data;
+      const all = await getAdmissions();
+      const list = all.length ? all : DUMMY_ADMISSIONS;
+      return list.map((a) => ({ created_at: a.created_at }));
     },
   });
 }

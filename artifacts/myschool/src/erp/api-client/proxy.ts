@@ -32,6 +32,7 @@ import {
   markAttendance,
   getErpSchools,
   getErpSchoolById,
+  saveErpSchools,
   toSchoolIdString,
   toSchoolIdNumber,
   type ErpStudent,
@@ -43,7 +44,7 @@ import {
 } from "@/lib/erpData";
 import { DEMO_USERS, getDemoUserById } from "@/data/dummyData";
 import type { DemoUser } from "@/lib/shared-data";
-import { getDemoData } from "@/lib/demoStorage";
+
 
 let installed = false;
 
@@ -200,7 +201,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
   // ─── Schools ────────────────────────────────────────────────────────────────
   if (pathStartsWith(["schools"]) && segments.length === 2) {
     if (method === "GET") {
-      let schools = getErpSchools();
+      let schools = await getErpSchools();
       const status = params.get("status");
       const search = params.get("search");
       if (status) schools = schools.filter((s) => s.status === status);
@@ -211,7 +212,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
       return listResponse("schools", schools);
     }
     if (method === "POST") {
-      const schools = getErpSchools();
+      const schools = await getErpSchools();
       const record: ErpSchool = {
         id: schools.length ? Math.max(...schools.map((s) => s.id)) + 1 : 1,
         name: body.name || "New School",
@@ -220,6 +221,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
         ...body,
       };
       schools.push(record);
+      await saveErpSchools(schools);
       return jsonResponse(record, 201);
     }
   }
@@ -227,22 +229,24 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
   if (pathStartsWith(["schools"]) && segments.length === 3) {
     const id = Number(segments[2]);
     if (method === "GET" || method === "PATCH" || method === "DELETE") {
-      const schools = getErpSchools();
+      const schools = await getErpSchools();
       const idx = schools.findIndex((s) => s.id === id);
       if (idx === -1) return errorResponse("School not found", 404);
       if (method === "GET") return jsonResponse(schools[idx]);
       if (method === "DELETE") {
         schools.splice(idx, 1);
+        await saveErpSchools(schools);
         return jsonResponse({ success: true });
       }
       schools[idx] = { ...schools[idx], ...body };
+      await saveErpSchools(schools);
       return jsonResponse(schools[idx]);
     }
   }
 
   if (pathStartsWith(["schools", "", "impersonate"]) && segments.length === 4) {
     const id = Number(segments[2]);
-    const school = getErpSchoolById(id);
+    const school = await getErpSchoolById(id);
     if (!school) return errorResponse("School not found", 404);
     const demo = getCurrentDemoUser();
     const base = demo ? demoUserToProfile(demo) : { id: 1, name: "Admin", role: "super_admin" };
@@ -256,10 +260,10 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     const id = Number(segments[2]);
     return jsonResponse({
       schoolId: id,
-      totalStudents: getStudents(id).length,
-      totalTeachers: getTeachers(id).length,
-      totalClasses: getClasses(id).length,
-      totalFees: getFees(id).reduce((sum, f) => sum + (f.status === "pending" ? f.amount : 0), 0),
+      totalStudents: (await getStudents(id)).length,
+      totalTeachers: (await getTeachers(id)).length,
+      totalClasses: (await getClasses(id)).length,
+      totalFees: (await getFees(id)).reduce((sum, f) => sum + (f.status === "pending" ? f.amount : 0), 0),
     });
   }
 
@@ -270,7 +274,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     const schoolString = toSchoolIdString(schoolNum);
 
     if (method === "GET") {
-      const admissions = getAdmissions(schoolString).map((a) => ({
+      const admissions = (await getAdmissions(schoolString)).map((a) => ({
         id: a.id,
         schoolId: schoolNum,
         studentName: a.student_name,
@@ -288,7 +292,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     }
 
     if (method === "POST") {
-      const record = addAdmission({
+      const record = await addAdmission({
         school_id: schoolString!,
         student_name: body.studentName || body.student_name || "",
         parent_name: body.parentName || body.parent_name || "",
@@ -315,7 +319,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (method === "PATCH" && segments.length === 4) {
       const id = segments[3];
       const status = ERP_STATUS_TO_INTERNAL[body.status] || body.status;
-      const updated = updateAdmissionStatus(id, status);
+      const updated = await updateAdmissionStatus(id, status);
       if (!updated) return errorResponse("Inquiry not found", 404);
       return jsonResponse({
         id: updated.id,
@@ -342,14 +346,14 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (segments.length === 2) {
       if (method === "GET") {
         const search = params.get("search")?.toLowerCase();
-        let students = getStudents(schoolNum);
+        let students = await getStudents(schoolNum);
         const classId = params.get("classId");
         if (classId) students = students.filter((s) => s.classId === Number(classId));
         if (search) students = students.filter((s) => s.name.toLowerCase().includes(search) || s.admissionNo?.toLowerCase().includes(search));
         return listResponse("students", students);
       }
       if (method === "POST") {
-        const record = addStudent({
+        const record = await addStudent({
           schoolId: schoolNum,
           admissionNo: body.admissionNo || `STU/${Date.now()}`,
           name: body.name,
@@ -373,15 +377,15 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (segments.length === 3) {
       const id = Number(segments[2]);
       if (method === "GET") {
-        const student = getStudentById(id, schoolNum);
+        const student = await getStudentById(id, schoolNum);
         return student ? jsonResponse(student) : errorResponse("Student not found", 404);
       }
       if (method === "PATCH") {
-        const updated = updateStudent(id, body);
+        const updated = await updateStudent(id, body);
         return updated ? jsonResponse(updated) : errorResponse("Student not found", 404);
       }
       if (method === "DELETE") {
-        return deleteStudent(id) ? jsonResponse({ success: true }) : errorResponse("Student not found", 404);
+        return await deleteStudent(id) ? jsonResponse({ success: true }) : errorResponse("Student not found", 404);
       }
     }
   }
@@ -393,11 +397,11 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
 
     if (segments.length === 2) {
       if (method === "GET") {
-        const teachers = getTeachers(schoolNum);
+        const teachers = await getTeachers(schoolNum);
         return listResponse("teachers", teachers);
       }
       if (method === "POST") {
-        const record = addTeacher({
+        const record = await addTeacher({
           schoolId: schoolNum,
           name: body.name,
           email: body.email,
@@ -415,16 +419,16 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (segments.length === 3) {
       const id = Number(segments[2]);
       if (method === "GET") {
-        const teachers = getTeachers(schoolNum);
+        const teachers = await getTeachers(schoolNum);
         const teacher = teachers.find((t) => t.id === id);
         return teacher ? jsonResponse(teacher) : errorResponse("Teacher not found", 404);
       }
       if (method === "PATCH") {
-        const updated = updateTeacher(id, body);
+        const updated = await updateTeacher(id, body);
         return updated ? jsonResponse(updated) : errorResponse("Teacher not found", 404);
       }
       if (method === "DELETE") {
-        return deleteTeacher(id) ? jsonResponse({ success: true }) : errorResponse("Teacher not found", 404);
+        return await deleteTeacher(id) ? jsonResponse({ success: true }) : errorResponse("Teacher not found", 404);
       }
     }
   }
@@ -436,10 +440,10 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
 
     if (segments.length === 2) {
       if (method === "GET") {
-        return listResponse("classes", getClasses(schoolNum));
+        return listResponse("classes", await getClasses(schoolNum));
       }
       if (method === "POST") {
-        const record = addClass({
+        const record = await addClass({
           schoolId: schoolNum,
           name: body.name,
           section: body.section,
@@ -457,15 +461,15 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (segments.length === 3) {
       const id = Number(segments[2]);
       if (method === "GET") {
-        const cls = getClasses(schoolNum).find((c) => c.id === id);
+        const cls = (await getClasses(schoolNum)).find((c) => c.id === id);
         return cls ? jsonResponse(cls) : errorResponse("Class not found", 404);
       }
       if (method === "PATCH") {
-        const updated = updateClass(id, body);
+        const updated = await updateClass(id, body);
         return updated ? jsonResponse(updated) : errorResponse("Class not found", 404);
       }
       if (method === "DELETE") {
-        return deleteClass(id) ? jsonResponse({ success: true }) : errorResponse("Class not found", 404);
+        return await deleteClass(id) ? jsonResponse({ success: true }) : errorResponse("Class not found", 404);
       }
     }
   }
@@ -477,7 +481,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
 
     if (segments.length === 2) {
       if (method === "GET") {
-        let fees = getFees(schoolNum);
+        let fees = await getFees(schoolNum);
         const studentId = params.get("studentId");
         const status = params.get("status");
         if (studentId) fees = fees.filter((f) => f.studentId === Number(studentId));
@@ -487,7 +491,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
         return listResponse("fees", fees, { totalPending, totalPaid });
       }
       if (method === "POST") {
-        const record = addFee({
+        const record = await addFee({
           schoolId: schoolNum,
           studentId: Number(body.studentId),
           studentName: body.studentName,
@@ -504,7 +508,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
 
     if (segments.length === 4 && segments[3] === "pay") {
       const id = Number(segments[2]);
-      const paid = payFee(id);
+      const paid = await payFee(id);
       return paid ? jsonResponse(paid) : errorResponse("Fee not found", 404);
     }
   }
@@ -515,7 +519,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     const schoolNum = Number(schoolIdParam) || 1;
 
     if (method === "GET") {
-      const records = getAttendance(schoolNum, {
+      const records = await getAttendance(schoolNum, {
         studentId: params.has("studentId") ? Number(params.get("studentId")) : undefined,
         classId: params.has("classId") ? Number(params.get("classId")) : undefined,
         startDate: params.get("startDate") || undefined,
@@ -548,7 +552,7 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
               remarks: body.remarks,
             },
           ];
-      const created = markAttendance(records);
+      const created = await markAttendance(records);
       return listResponse("attendance", created);
     }
   }
@@ -590,10 +594,10 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
   // ─── Platform / Support stubs ─────────────────────────────────────────────
   if (pathStartsWith(["platform", "stats"])) {
     return jsonResponse({
-      totalSchools: getErpSchools().length,
+      totalSchools: (await getErpSchools()).length,
       pendingSchools: 0,
-      totalStudents: getStudents().length,
-      totalTeachers: getTeachers().length,
+      totalStudents: (await getStudents()).length,
+      totalTeachers: (await getTeachers()).length,
       activeParents: 3,
       totalRevenue: 1250000,
       monthlyGrowth: 12,
