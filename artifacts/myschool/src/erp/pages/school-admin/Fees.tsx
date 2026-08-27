@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adminLinks } from "./admin-links";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 export default function Fees() {
   const { user } = useAuth();
@@ -106,7 +107,7 @@ export default function Fees() {
                     </SelectTrigger>
                     <SelectContent>
                       {students.map((s: any) => (
-                        <SelectItem key={s.id} value={String(s.id)}>{s.name} — Class {s.className}{s.section ? "-"+s.section : ""}</SelectItem>
+                        <SelectItem key={s.id} value={String(s.id)}>{s.name} — {formatClass(s.className, s.section)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -193,7 +194,7 @@ export default function Fees() {
                   <tr key={fee.id} className="border-b border-border/50 hover:bg-secondary/10">
                     <td className="px-6 py-4">
                       <div className="font-bold text-foreground">{fee.studentName || "—"}</div>
-                      <div className="text-xs text-muted-foreground">{fee.className || ""}</div>
+                      <div className="text-xs text-muted-foreground">{formatClass(fee.className)}</div>
                     </td>
                     <td className="px-6 py-4 capitalize font-medium text-muted-foreground">{fee.feeType}</td>
                     <td className="px-6 py-4 font-bold text-foreground">₹{Number(fee.amount).toLocaleString('en-IN')}</td>
@@ -221,7 +222,7 @@ export default function Fees() {
                           onClick={() => {
                             const w = window.open("", "_blank", "width=500,height=700");
                             if (!w) return;
-                            w.document.write(`<!DOCTYPE html><html><head><title>Fee Receipt</title><style>body{font-family:Arial,sans-serif;padding:30px;max-width:400px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:15px;margin-bottom:20px}h2{margin:0;color:#1a1a1a}.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:bold;background:#dcfce7;color:#166534}.row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}.total{border-top:2px solid #333;padding-top:10px;margin-top:10px;font-size:18px;font-weight:bold}.footer{margin-top:30px;border-top:1px solid #ccc;padding-top:15px;font-size:12px;color:#666;text-align:center}</style></head><body><div class="header"><h2>FEE RECEIPT</h2><p style="font-size:12px;color:#666;margin:5px 0">Official Receipt</p><span class="badge">PAID</span></div><div class="row"><span>Receipt No.</span><span>#REC-${fee.id}</span></div><div class="row"><span>Student</span><span><b>${fee.studentName || "—"}</b></span></div><div class="row"><span>Class</span><span>${fee.className || "—"}</span></div><div class="row"><span>Fee Type</span><span style="text-transform:capitalize">${fee.feeType}</span></div><div class="row"><span>Due Date</span><span>${fee.dueDate}</span></div><div class="row"><span>Description</span><span>${fee.description || "—"}</span></div><div class="row total"><span>Amount Paid</span><span>₹${Number(fee.amount).toLocaleString("en-IN")}</span></div><div class="footer"><p>Thank you for your payment</p><p style="font-size:11px">This is a computer-generated receipt</p></div></body></html>`);
+                            w.document.write(`<!DOCTYPE html><html><head><title>Fee Receipt</title><style>body{font-family:Arial,sans-serif;padding:30px;max-width:400px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:15px;margin-bottom:20px}h2{margin:0;color:#1a1a1a}.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:bold;background:#dcfce7;color:#166534}.row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}.total{border-top:2px solid #333;padding-top:10px;margin-top:10px;font-size:18px;font-weight:bold}.footer{margin-top:30px;border-top:1px solid #ccc;padding-top:15px;font-size:12px;color:#666;text-align:center}</style></head><body><div class="header"><h2>FEE RECEIPT</h2><p style="font-size:12px;color:#666;margin:5px 0">Official Receipt</p><span class="badge">PAID</span></div><div class="row"><span>Receipt No.</span><span>#REC-${fee.id}</span></div><div class="row"><span>Student</span><span><b>${fee.studentName || "—"}</b></span></div><div class="row"><span>Class</span><span>${formatClass(fee.className)}</span></div><div class="row"><span>Fee Type</span><span style="text-transform:capitalize">${fee.feeType}</span></div><div class="row"><span>Due Date</span><span>${fee.dueDate}</span></div><div class="row"><span>Description</span><span>${fee.description || "—"}</span></div><div class="row total"><span>Amount Paid</span><span>₹${Number(fee.amount).toLocaleString("en-IN")}</span></div><div class="footer"><p>Thank you for your payment</p><p style="font-size:11px">This is a computer-generated receipt</p></div></body></html>`);
                             w.document.close();
                             w.print();
                           }}>

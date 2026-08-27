@@ -1,4 +1,4 @@
-create table public.erp_store (
+create table if not exists public.erp_store (
   key text primary key,
   value jsonb not null default '{}'::jsonb,
   updated_at timestamptz default now()
