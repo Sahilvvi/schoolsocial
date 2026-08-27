@@ -1,10 +1,24 @@
 import { useOutletContext } from "react-router-dom";
 import { Settings, Bell, Lock, Globe } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function TuPSettings() {
   const ctx = useOutletContext<any>();
   const [notifications, setNotifications] = useState({ email: true, sms: false, push: true });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("tuitionPanelNotifications");
+    if (saved) {
+      try { setNotifications(JSON.parse(saved)); } catch {}
+    }
+  }, []);
+
+  const handleSave = () => {
+    localStorage.setItem("tuitionPanelNotifications", JSON.stringify(notifications));
+    toast.success("Settings saved");
+  };
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
@@ -44,7 +58,7 @@ export default function TuPSettings() {
           </div>
         </div>
       </div>
-      <button className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700">Save Settings</button>
+      <button onClick={handleSave} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">Save Settings</button>
     </div>
   );
 }

@@ -1,8 +1,21 @@
 import { useOutletContext } from "react-router-dom";
 import { Building2, Plus, Check } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
-const DEMO_FACILITIES = [
+interface Facility {
+  id: string;
+  name: string;
+  description: string;
+  available: boolean;
+  icon: string;
+}
+
+const DEMO_FACILITIES: Facility[] = [
   { id: "1", name: "Smart Classrooms", description: "Air-conditioned rooms with digital boards and projectors", available: true, icon: "🖥️" },
   { id: "2", name: "Science Labs", description: "Fully equipped Physics, Chemistry, and Biology labs", available: true, icon: "🔬" },
   { id: "3", name: "Computer Lab", description: "50+ computers with high-speed internet", available: true, icon: "💻" },
@@ -17,9 +30,31 @@ const DEMO_FACILITIES = [
   { id: "12", name: "CCTV Surveillance", description: "24/7 monitoring for campus security", available: true, icon: "📷" },
 ];
 
+const ICONS = ["🖥️", "🔬", "💻", "📚", "🏟️", "🎭", "🍽️", "🚌", "🏥", "🎨", "🎪", "📷", "⚽", "🏀", "🏊", "🎸"];
+
 export default function SPFacilities() {
   const { school } = useOutletContext<any>();
-  const [facilities] = useState(DEMO_FACILITIES);
+  const [facilities, setFacilities] = useState<Facility[]>(DEMO_FACILITIES);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", description: "", icon: "🖥️" });
+
+  const handleAdd = () => {
+    if (!form.name || !form.description) {
+      toast.error("Facility name and description are required");
+      return;
+    }
+    const newFacility: Facility = {
+      id: `f-${Date.now()}`,
+      name: form.name,
+      description: form.description,
+      available: true,
+      icon: form.icon || ICONS[0],
+    };
+    setFacilities(prev => [newFacility, ...prev]);
+    setForm({ name: "", description: "", icon: "🖥️" });
+    setOpen(false);
+    toast.success("Facility added");
+  };
 
   return (
     <div className="space-y-6">
@@ -30,9 +65,22 @@ export default function SPFacilities() {
           </h1>
           <p className="text-sm text-gray-500 mt-1">{facilities.filter(f => f.available).length} facilities available</p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Plus className="h-4 w-4" /> Add Facility
-        </button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+              <Plus className="h-4 w-4" /> Add Facility
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader><DialogTitle>Add Facility</DialogTitle></DialogHeader>
+            <div className="space-y-4 mt-2">
+              <div className="space-y-1"><Label htmlFor="facility-name">Facility Name *</Label><Input id="facility-name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Swimming Pool" /></div>
+              <div className="space-y-1"><Label htmlFor="facility-desc">Description *</Label><Input id="facility-desc" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Short description" /></div>
+              <div className="space-y-1"><Label htmlFor="facility-icon">Icon</Label><Input id="facility-icon" value={form.icon} onChange={e => setForm(p => ({ ...p, icon: e.target.value }))} placeholder="Emoji icon" /></div>
+              <Button onClick={handleAdd} className="w-full bg-blue-600 hover:bg-blue-700">Add Facility</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

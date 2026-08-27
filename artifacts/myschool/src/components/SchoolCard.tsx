@@ -7,6 +7,8 @@ import { useSavedSchoolIds, useToggleSaveSchool } from "@/hooks/useSaveSchool";
 import { useAuth } from "@/hooks/useAuth";
 import type { School } from "@/data/mock";
 
+const FALLBACK_BANNER = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80";
+
 export default function SchoolCard({ school, index }: { school: School; index: number }) {
   const { user } = useAuth();
   const { data: savedIds } = useSavedSchoolIds();
@@ -24,7 +26,7 @@ export default function SchoolCard({ school, index }: { school: School; index: n
         {/* Image Section */}
         <Link to={`/school/${school.slug}`} className="block relative aspect-[16/10] overflow-hidden">
           <img
-            src={school.banner}
+            src={school.banner || FALLBACK_BANNER}
             alt={school.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
