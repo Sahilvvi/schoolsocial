@@ -43,8 +43,19 @@ export default function Fees() {
       toast({ title: "Missing fields", description: "Student, amount, and due date are required.", variant: "destructive" });
       return;
     }
+    const student = students.find((s: any) => String(s.id) === String(form.studentId));
     try {
-      await createFee.mutateAsync({ data: { schoolId, studentId: Number(form.studentId), amount: Number(form.amount), feeType: form.feeType as any, dueDate: form.dueDate, description: form.description || undefined } });
+      await createFee.mutateAsync({ data: {
+        schoolId,
+        studentId: Number(form.studentId),
+        studentName: student?.name,
+        className: student?.className,
+        section: student?.section,
+        amount: Number(form.amount),
+        feeType: form.feeType as any,
+        dueDate: form.dueDate,
+        description: form.description || undefined,
+      } as any });
       toast({ title: "Fee created", description: "Fee record added successfully." });
       setDialogOpen(false);
       setForm({ studentId: "", amount: "", feeType: "tuition", dueDate: "", description: "" });

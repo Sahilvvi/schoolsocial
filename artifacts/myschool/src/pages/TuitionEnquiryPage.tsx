@@ -19,7 +19,7 @@ function useTuitionEnquiries() {
   return useQuery({
     queryKey: ["tuition_enquiries"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tuition_enquiries").select("*").eq("status", "open").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("tuition_enquiries").select("*").in("status", ["open", "new", "contacted"]).order("created_at", { ascending: false });
       if (error || !data || data.length === 0) return DUMMY_TUITION_ENQUIRIES;
       return data;
     },
@@ -29,13 +29,14 @@ function useTuitionEnquiries() {
 function useSubmitEnquiry() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (enquiry: { parent_name: string; phone: string; email: string; student_class: string; subject: string; area: string; budget: string; message: string }) => {
+    mutationFn: async (enquiry: { parent_name: string; phone: string; email: string; student_class: string; subject: string; area: string; budget: string; message: string; status: string }) => {
       if (!isSupabaseConfigured) {
-        const fake = { ...enquiry, id: `demo-${Date.now()}`, status: "open", created_at: new Date().toISOString() };
+        const fake = { ...enquiry, id: `demo-${Date.now()}`, created_at: new Date().toISOString() };
         queryClient.setQueryData<any[]>(["tuition_enquiries"], (old = []) => [fake, ...old]);
         return fake;
       }
-      const { data, error } = await supabase.from("tuition_enquiries").insert(enquiry).select().single();
+      const payload = { ...enquiry, id: enquiry.id || `tenq-${Date.now()}` };
+      const { data, error } = await supabase.from("tuition_enquiries").insert(payload).select().single();
       if (error) throw error;
       return data;
     },
@@ -78,7 +79,7 @@ export default function TuitionEnquiryPage() {
       return;
     }
     try {
-      await submitEnquiry.mutateAsync({ parent_name: parentName, phone, email, student_class: studentClass, subject, area, budget, message });
+      await submitEnquiry.mutateAsync({ parent_name: parentName, phone, email, student_class: studentClass, subject, area, budget, message, status: "new" });
       toast.success("Tuition requirement posted successfully! 🎉");
       setFormOpen(false);
       setParentName(""); setPhone(""); setEmail(""); setStudentClass(""); setSubject(""); setArea(""); setBudget(""); setMessage("");

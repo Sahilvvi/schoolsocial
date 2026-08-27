@@ -54,6 +54,7 @@ export default function UploadSchoolPage() {
 
     try {
       const { error } = await supabase.from("schools").insert({
+        id: crypto.randomUUID(),
         name: data.name,
         slug,
         location: data.location,
@@ -61,10 +62,17 @@ export default function UploadSchoolPage() {
         fees: data.fees,
         description: data.description,
         about: data.about || data.description,
-        banner: bannerUrl,
-        gallery: galleryUrls,
+        banner: bannerUrl || "",
+        gallery: galleryUrls.length ? galleryUrls : [],
         is_verified: false,
         is_featured: false,
+        rating: 0,
+        review_count: 0,
+        lat: 0,
+        lng: 0,
+        achievements: [],
+        facilities: [],
+        class_fees: [],
       } as any);
 
       if (error) throw error;

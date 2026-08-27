@@ -35,6 +35,10 @@ import {
   saveErpSchools,
   toSchoolIdString,
   toSchoolIdNumber,
+  getGenericRecords,
+  addGenericRecord,
+  updateGenericRecord,
+  deleteGenericRecord,
   type ErpStudent,
   type ErpFee,
   type ErpClass,
@@ -346,9 +350,8 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     if (segments.length === 2) {
       if (method === "GET") {
         const search = params.get("search")?.toLowerCase();
-        let students = await getStudents(schoolNum);
         const classId = params.get("classId");
-        if (classId) students = students.filter((s) => s.classId === Number(classId));
+        let students = await getStudents(schoolNum, classId || undefined);
         if (search) students = students.filter((s) => s.name.toLowerCase().includes(search) || s.admissionNo?.toLowerCase().includes(search));
         return listResponse("students", students);
       }
@@ -557,6 +560,81 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     }
   }
 
+  // ─── Discipline (custom response shape) ─────────────────────────────────────
+  if (pathStartsWith(["discipline"])) {
+    const schoolIdParam = params.get("schoolId") || "1";
+    const schoolNum = Number(schoolIdParam) || 1;
+
+    if (segments.length === 2) {
+      if (method === "GET") {
+        const records = await getGenericRecords("discipline", schoolNum);
+        return jsonResponse({ records });
+      }
+      if (method === "POST") {
+        const students = await getStudents(schoolNum);
+        const student = students.find((s) => String(s.id) === String(body.studentId));
+        const record = await addGenericRecord("discipline", schoolNum, {
+          ...body,
+          studentName: student?.name || body.studentName || "Unknown",
+          status: body.status || "open",
+          schoolId: schoolNum,
+        });
+        return jsonResponse(record, 201);
+      }
+    }
+
+    if (segments.length === 3) {
+      const id = segments[2];
+      if (method === "GET") {
+        const records = await getGenericRecords("discipline", schoolNum);
+        const record = records.find((r) => String(r.id) === String(id));
+        return record ? jsonResponse(record) : errorResponse("Record not found", 404);
+      }
+      if (method === "PATCH") {
+        const updated = await updateGenericRecord("discipline", id, { ...body, schoolId: schoolNum });
+        return updated ? jsonResponse(updated) : errorResponse("Record not found", 404);
+      }
+      if (method === "DELETE") {
+        const deleted = await deleteGenericRecord("discipline", id);
+        return deleted ? jsonResponse({ success: true }) : errorResponse("Record not found", 404);
+      }
+    }
+  }
+
+  // ─── Gallery (custom response shape) ──────────────────────────────────────
+  if (pathStartsWith(["gallery"])) {
+    const schoolIdParam = params.get("schoolId") || "1";
+    const schoolNum = Number(schoolIdParam) || 1;
+
+    if (segments.length === 2) {
+      if (method === "GET") {
+        const images = await getGenericRecords("gallery", schoolNum);
+        return jsonResponse({ images, total: images.length });
+      }
+      if (method === "POST") {
+        const image = await addGenericRecord("gallery", schoolNum, {
+          imageUrl: body.imageUrl,
+          caption: body.caption || "",
+          schoolId: schoolNum,
+        });
+        return jsonResponse(image, 201);
+      }
+    }
+
+    if (segments.length === 3) {
+      const id = segments[2];
+      if (method === "GET") {
+        const images = await getGenericRecords("gallery", schoolNum);
+        const image = images.find((i) => String(i.id) === String(id));
+        return image ? jsonResponse(image) : errorResponse("Image not found", 404);
+      }
+      if (method === "DELETE") {
+        const deleted = await deleteGenericRecord("gallery", id);
+        return deleted ? jsonResponse({ success: true }) : errorResponse("Image not found", 404);
+      }
+    }
+  }
+
   // ─── Generic CRUD tables ──────────────────────────────────────────────────
   const simpleTables = [
     "notices",
@@ -576,7 +654,6 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     "messages",
     "leaves",
     "student-leaves",
-    "discipline",
     "student-health",
     "quizzes",
     "transport",
@@ -586,7 +663,35 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
 
   const tableName = segments[1];
   if (simpleTables.includes(tableName)) {
-    // Many pages expect { tableName: [], total: 0 } or a singular form.
+    const schoolIdParam = params.get("schoolId") || "1";
+    const schoolNum = Number(schoolIdParam) || 1;
+
+    if (method === "GET" && segments.length === 2) {
+      const items = await getGenericRecords(tableName, schoolNum);
+      return listResponse(tableName, items);
+    }
+    if (method === "POST" && segments.length === 2) {
+      const item = await addGenericRecord(tableName, schoolNum, { ...body, schoolId: schoolNum });
+      return jsonResponse(item, 201);
+    }
+    if (segments.length === 3) {
+      const id = segments[2];
+      if (method === "GET") {
+        const items = await getGenericRecords(tableName, schoolNum);
+        const item = items.find((i) => String(i.id) === String(id));
+        return item ? jsonResponse(item) : errorResponse("Not found", 404);
+      }
+      if (method === "PATCH") {
+        const updated = await updateGenericRecord(tableName, id, { ...body, schoolId: schoolNum });
+        return updated ? jsonResponse(updated) : errorResponse("Not found", 404);
+      }
+      if (method === "DELETE") {
+        const deleted = await deleteGenericRecord(tableName, id);
+        return deleted ? jsonResponse({ success: true }) : errorResponse("Not found", 404);
+      }
+    }
+
+    // Fallback for any other sub-route under the table.
     const key = segments.length >= 3 ? segments[segments.length - 1] : tableName;
     return listResponse(key, []);
   }

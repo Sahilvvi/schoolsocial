@@ -1,10 +1,23 @@
 import { useOutletContext } from "react-router-dom";
 import { Settings, Bell, Lock, Globe, Mail, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function SPSettings() {
   const { school } = useOutletContext<any>();
   const [notifications, setNotifications] = useState({ email: true, sms: false, push: true });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("schoolPanelNotifications");
+    if (saved) {
+      try { setNotifications(JSON.parse(saved)); } catch {}
+    }
+  }, []);
+
+  const handleSave = () => {
+    localStorage.setItem("schoolPanelNotifications", JSON.stringify(notifications));
+    toast.success("Settings saved");
+  };
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -86,7 +99,7 @@ export default function SPSettings() {
         </div>
       </div>
 
-      <button className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+      <button onClick={handleSave} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
         Save Settings
       </button>
     </div>

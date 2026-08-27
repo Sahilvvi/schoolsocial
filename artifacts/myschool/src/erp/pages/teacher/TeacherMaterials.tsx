@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const getToken = () => localStorage.getItem("myschool_token") || "";
@@ -62,7 +63,7 @@ export default function TeacherMaterials({ schoolId, teacherId }: Props) {
                 <div><label className="text-sm font-medium dark:text-gray-300">Class *</label>
                   <Select value={matForm.classId} onValueChange={v => setMatForm(p => ({ ...p, classId: v }))}>
                     <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600"><SelectValue placeholder="Select class" /></SelectTrigger>
-                    <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+                    <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
                   </Select></div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><label className="text-sm font-medium dark:text-gray-300">Subject</label><Input value={matForm.subject} onChange={e => setMatForm(p => ({ ...p, subject: e.target.value }))} className="dark:bg-gray-700 dark:border-gray-600" /></div>

@@ -127,11 +127,11 @@ export default function SPEvents() {
           <DialogContent>
             <DialogHeader><DialogTitle>{editing ? "Edit Event" : "Create Event"}</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div><Label>Title *</Label><Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Event title" /></div>
-              <div><Label>Date *</Label><Input type="date" value={form.event_date} onChange={e => setForm(p => ({ ...p, event_date: e.target.value }))} /></div>
-              <div><Label>Location</Label><Input value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="Event location" /></div>
-              <div><Label>Image URL</Label><Input value={form.image} onChange={e => setForm(p => ({ ...p, image: e.target.value }))} placeholder="https://..." /></div>
-              <div><Label>Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Event details..." rows={3} /></div>
+              <div><Label htmlFor="event-title">Title *</Label><Input id="event-title" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Event title" /></div>
+              <div><Label htmlFor="event-date">Date *</Label><Input id="event-date" type="date" value={form.event_date} onChange={e => setForm(p => ({ ...p, event_date: e.target.value }))} /></div>
+              <div><Label htmlFor="event-location">Location</Label><Input id="event-location" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="Event location" /></div>
+              <div><Label htmlFor="event-image">Image URL</Label><Input id="event-image" value={form.image} onChange={e => setForm(p => ({ ...p, image: e.target.value }))} placeholder="https://..." /></div>
+              <div><Label htmlFor="event-description">Description</Label><Textarea id="event-description" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Event details..." rows={3} /></div>
               <div className="flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
                 <Button type="submit" disabled={createEvent.isPending}>{editing ? "Update" : "Create"}</Button>

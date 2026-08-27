@@ -8,14 +8,14 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { adminLinks } from "./admin-links";
-import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
+import { toast as sonner } from "sonner";
 
 type AttendanceStatus = "P" | "A" | "L";
 const statusMap: Record<AttendanceStatus, string> = { P: "present", A: "absent", L: "late" };
 
 export default function Attendance() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const schoolId = user?.schoolId || 1;
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -41,11 +41,11 @@ export default function Attendance() {
 
   const handleSave = async () => {
     if (!classId) {
-      toast({ title: "Select a class", description: "Please select a class before saving attendance.", variant: "destructive" });
+      sonner.error("Select a class", { description: "Please select a class before saving attendance." });
       return;
     }
     if (students.length === 0) {
-      toast({ title: "No students", description: "No students in this class.", variant: "destructive" });
+      sonner.error("No students", { description: "No students in this class." });
       return;
     }
     setSaving(true);
@@ -54,12 +54,14 @@ export default function Attendance() {
         studentId: s.id,
         status: statusMap[attendance[s.id] || "P"] as any,
       }));
-      for (const record of records) {
-        await markAttendance.mutateAsync({ data: { schoolId, classId: Number(classId), date, ...record } });
-      }
-      toast({ title: "Attendance saved", description: `Saved attendance for ${records.length} students on ${date}.` });
-    } catch {
-      toast({ title: "Error", description: "Failed to save attendance. Please try again.", variant: "destructive" });
+      await sonner.promise(
+        Promise.all(records.map((record) => markAttendance.mutateAsync({ data: { schoolId, classId: Number(classId), date, ...record } }))),
+        {
+          loading: "Saving attendance...",
+          success: { message: "Attendance saved", description: `Saved attendance for ${records.length} students on ${date}.` },
+          error: (err: any) => ({ message: "Error", description: err?.message || "Failed to save attendance. Please try again." }),
+        }
+      );
     } finally {
       setSaving(false);
     }
@@ -89,7 +91,7 @@ export default function Attendance() {
                   </SelectTrigger>
                   <SelectContent>
                     {classes.map((c: any) => (
-                      <SelectItem key={c.id} value={String(c.id)}>Class {c.name}{c.section ? "-"+c.section : ""}</SelectItem>
+                      <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

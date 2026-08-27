@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getToken() { return localStorage.getItem("myschool_token"); }
@@ -347,7 +348,7 @@ export default function TeacherDashboard() {
                 <Card key={cls.id} className="p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer dark:bg-gray-800 dark:border-gray-700"
                   onClick={() => { setSelectedClassId(cls.id); setActiveTab("attendance"); }}>
                   <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl mb-4">{cls.name?.charAt(0)}</div>
-                  <h3 className="text-lg font-bold dark:text-white">{cls.name}{cls.section ? `-${cls.section}` : ""}</h3>
+                  <h3 className="text-lg font-bold dark:text-white">{formatClass(cls.name, cls.section)}</h3>
                   <p className="text-sm text-muted-foreground">{cls.subject || "General"}</p>
                   <div className="mt-4 flex items-center gap-2 flex-wrap">
                     <Button size="sm" variant="outline" className="rounded-lg text-xs font-bold dark:border-gray-600 dark:text-gray-300"
@@ -378,7 +379,7 @@ export default function TeacherDashboard() {
             <div className="flex gap-3 flex-wrap items-center">
               <Select value={effectiveClassId?.toString() ?? ""} onValueChange={v => setSelectedClassId(Number(v))}>
                 <SelectTrigger className="w-44 rounded-xl h-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select Class" /></SelectTrigger>
-                <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={c.id.toString()}>{c.name}{c.section ? `-${c.section}` : ""}</SelectItem>)}</SelectContent>
+                <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={c.id.toString()}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
               </Select>
               <input type="date" value={attendanceDate} onChange={e => setAttendanceDate(e.target.value)}
                 className="rounded-xl border border-border dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 h-10 text-sm font-medium bg-background focus:outline-none" />
@@ -420,7 +421,7 @@ export default function TeacherDashboard() {
             <h2 className="text-xl font-bold dark:text-white">Class Timetable</h2>
             <Select value={timetableClassId} onValueChange={v => { setTimetableClassId(v); fetchTimetable(v); }}>
               <SelectTrigger className="w-48 rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select Class" /></SelectTrigger>
-              <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? `-${c.section}` : ""}</SelectItem>)}</SelectContent>
+              <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           {ttLoading ? <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
@@ -487,7 +488,7 @@ export default function TeacherDashboard() {
                     <Label className="dark:text-gray-300">Class *</Label>
                     <Select value={hwForm.classId} onValueChange={v => setHwForm(p => ({ ...p, classId: v }))}>
                       <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select class" /></SelectTrigger>
-                      <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` - ${c.section}` : ""}</SelectItem>)}</SelectContent>
+                      <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -749,7 +750,7 @@ export default function TeacherDashboard() {
               const d = await res.json(); setPerfExams(d.exams || []);
             }}>
               <SelectTrigger className="w-44 dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select class" /></SelectTrigger>
-              <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` ${c.section}` : ""}</SelectItem>)}</SelectContent>
+              <SelectContent>{classes.map((c: any) => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
             </Select>
             {perfExams.length > 0 && (
               <Select value={perfExamId} onValueChange={async (v) => {
@@ -1051,7 +1052,7 @@ function TeacherSyllabus({ schoolId, teacherId, classes }: { schoolId: number; t
         {classes.map(c => (
           <button key={c.id} onClick={() => setSelClass(c.id)}
             className={`px-3 py-1.5 rounded-xl text-sm font-bold transition-all ${selClass === c.id ? "bg-primary text-white" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
-            {c.name} {c.section}
+            {formatClass(c.name, c.section)}
           </button>
         ))}
       </div>
@@ -1130,7 +1131,7 @@ function TeacherParentContact({ schoolId, classes, students }: { schoolId: numbe
     <div className="space-y-5">
       <h2 className="text-xl font-bold font-display text-foreground">Parent Contact</h2>
       <div className="flex gap-3 flex-wrap">
-        {classes.map(c => (<button key={c.id} onClick={() => setSelClass(c.id)} className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${selClass === c.id ? "bg-primary text-white" : "bg-secondary text-foreground hover:bg-secondary/80"}`}>Class {c.name}</button>))}
+        {classes.map(c => (<button key={c.id} onClick={() => setSelClass(c.id)} className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${selClass === c.id ? "bg-primary text-white" : "bg-secondary text-foreground hover:bg-secondary/80"}`}>{formatClass(c.name, c.section)}</button>))}
       </div>
       {msgStudent && (
         <Card className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5 space-y-3">
@@ -1290,7 +1291,7 @@ function TeacherQuizBuilder({ schoolId, classes, teacherId }: { schoolId: number
             <div><Label className="dark:text-gray-300">Class *</Label>
               <select value={form.classId} onChange={e => setForm(p => ({ ...p, classId: e.target.value }))} className="w-full border border-border rounded-xl p-2 text-sm bg-background dark:bg-gray-700 dark:border-gray-600 dark:text-white mt-1">
                 <option value="">Select class</option>
-                {classes.map(c => <option key={c.id} value={c.id}>{c.name} {c.section && `- ${c.section}`}</option>)}
+                {classes.map(c => <option key={c.id} value={c.id}>{formatClass(c.name, c.section)}</option>)}
               </select></div>
             <div><Label className="dark:text-gray-300">Subject</Label><Input value={form.subject} onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} placeholder="e.g. Mathematics" className="dark:bg-gray-700 dark:border-gray-600 mt-1" /></div>
           </div>

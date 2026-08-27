@@ -318,6 +318,12 @@
   animation-delay: 4s;
 }
 
+/* ── Keep Radix popper menus above dialog overlays ──────────── */
+[data-radix-popper-content-wrapper],
+[data-radix-select-content-wrapper] {
+  z-index: 60 !important;
+}
+
 /* ── Scroll hide ───────────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

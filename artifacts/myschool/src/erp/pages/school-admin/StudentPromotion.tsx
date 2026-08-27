@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/erp/hooks/use-toast";
+import { formatClass } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getToken() { return localStorage.getItem("myschool_token"); }
@@ -87,7 +88,7 @@ export default function StudentPromotion() {
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">From Class</label>
             <Select value={String(fromClass || "")} onValueChange={v => setFromClass(Number(v))}>
               <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select source class" /></SelectTrigger>
-              <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` - ${c.section}` : ""}</SelectItem>)}</SelectContent>
+              <SelectContent>{classes.map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <ArrowRight className="w-8 h-8 text-blue-500 mt-5 flex-shrink-0"/>
@@ -95,7 +96,7 @@ export default function StudentPromotion() {
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">To Class</label>
             <Select value={String(toClass || "")} onValueChange={v => setToClass(Number(v))}>
               <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"><SelectValue placeholder="Select target class" /></SelectTrigger>
-              <SelectContent>{classes.filter(c => c.id !== fromClass).map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}{c.section ? ` - ${c.section}` : ""}</SelectItem>)}</SelectContent>
+              <SelectContent>{classes.filter(c => c.id !== fromClass).map(c => <SelectItem key={c.id} value={String(c.id)}>{formatClass(c.name, c.section)}</SelectItem>)}</SelectContent>
             </Select>
           </div>
         </div>

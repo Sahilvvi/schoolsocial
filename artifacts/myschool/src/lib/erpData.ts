@@ -23,6 +23,7 @@ const STORAGE_KEYS = {
   teachers: "teachers",
   attendance: "attendance",
   erpSchools: "erp-schools",
+  generic: "generic-store",
 } as const;
 
 // CRM schools use string ids like "school-001". ERP APIs use numeric ids.
@@ -184,11 +185,23 @@ const DEFAULT_STUDENTS: ErpStudent[] = [
   { id: 3, schoolId: 2, admissionNo: "MS/2024/101", name: "Rohan Mehta", parentName: "Suresh Mehta", parentPhone: "9876543220", className: "8", section: "A", attendancePercent: 88, feePending: 5000, createdAt: now() },
 ];
 
-export async function getStudents(schoolId?: string | number): Promise<ErpStudent[]> {
+export async function getStudents(schoolId?: string | number, classId?: string | number): Promise<ErpStudent[]> {
   const schoolNum = toSchoolIdNumber(schoolId);
   const all = await getStored<ErpStudent[]>(STORAGE_KEYS.students, DEFAULT_STUDENTS);
-  if (!schoolNum) return all;
-  return all.filter((s) => s.schoolId === schoolNum);
+  let students = schoolNum ? all.filter((s) => s.schoolId === schoolNum) : all;
+  if (classId !== undefined && classId !== null && classId !== "") {
+    const classNum = Number(classId);
+    const classes = await getClasses(schoolNum);
+    const cls = classes.find((c) => c.id === classNum);
+    const targetName = cls ? normalizeClassName(cls.name) : "";
+    const targetSection = cls?.section;
+    students = students.filter((s) =>
+      (s.classId && s.classId === classNum) ||
+      (targetName && normalizeClassName(s.className) === targetName &&
+        (!targetSection || s.section === targetSection))
+    );
+  }
+  return students;
 }
 
 export async function getStudentById(id: number, schoolId?: string | number): Promise<ErpStudent | undefined> {
@@ -208,6 +221,8 @@ export async function addStudent(student: Omit<ErpStudent, "id" | "createdAt">):
     }
   }
   resolved.className = normalizeClassName(resolved.className) || resolved.className;
+  // Keep numeric classId so class-based filters work later.
+  if (resolved.classId) resolved.classId = Number(resolved.classId);
   const record: ErpStudent = { ...resolved, id: newNumericId(all), createdAt: now() };
   all.push(record);
   await setStored(STORAGE_KEYS.students, all);
@@ -297,7 +312,16 @@ export async function getFees(schoolId?: string | number): Promise<ErpFee[]> {
 
 export async function addFee(fee: Omit<ErpFee, "id">): Promise<ErpFee> {
   const all = await getStored<ErpFee[]>(STORAGE_KEYS.fees, DEFAULT_FEES);
-  const record: ErpFee = { ...fee, id: newNumericId(all) };
+  let resolved = { ...fee };
+  if ((!resolved.studentName || !resolved.className) && resolved.studentId) {
+    const student = await getStudentById(resolved.studentId, resolved.schoolId);
+    if (student) {
+      resolved.studentName = resolved.studentName || student.name;
+      resolved.className = resolved.className || normalizeClassName(student.className) || student.className;
+      resolved.section = resolved.section || student.section;
+    }
+  }
+  const record: ErpFee = { ...resolved, id: newNumericId(all) };
   all.push(record);
   await setStored(STORAGE_KEYS.fees, all);
   return record;
@@ -533,4 +557,67 @@ export async function getErpSchoolById(id: number): Promise<ErpSchool | undefine
 
 export async function saveErpSchools(schools: ErpSchool[]): Promise<void> {
   await setStored(STORAGE_KEYS.erpSchools, schools);
+}
+
+// ─── Generic ERP records (notices, events, discipline, gallery, etc.) ───────
+
+type GenericStore = Record<string, any[]>;
+
+async function getGenericStore(): Promise<GenericStore> {
+  return getStored<GenericStore>(STORAGE_KEYS.generic, {});
+}
+
+async function setGenericStore(store: GenericStore): Promise<void> {
+  await setStored(STORAGE_KEYS.generic, store);
+}
+
+function normalizeGenericId(id: any): string {
+  return id === undefined || id === null ? "" : String(id);
+}
+
+export async function getGenericRecords(table: string, schoolId?: string | number): Promise<any[]> {
+  const store = await getGenericStore();
+  const records = store[table] || [];
+  if (schoolId === undefined || schoolId === null || schoolId === "") return records;
+  const num = toSchoolIdNumber(schoolId);
+  return records.filter((r) => {
+    if (r.schoolId === schoolId) return true;
+    if (num !== undefined && Number(r.schoolId) === num) return true;
+    return false;
+  });
+}
+
+export async function addGenericRecord(table: string, schoolId: string | number, data: any): Promise<any> {
+  const store = await getGenericStore();
+  if (!store[table]) store[table] = [];
+  const record = {
+    ...data,
+    id: data.id || `demo-${table}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    schoolId: schoolId,
+    createdAt: data.createdAt || now(),
+  };
+  store[table].unshift(record);
+  await setGenericStore(store);
+  return record;
+}
+
+export async function updateGenericRecord(table: string, id: string | number, patch: any): Promise<any | undefined> {
+  const store = await getGenericStore();
+  const records = store[table] || [];
+  const idx = records.findIndex((r) => normalizeGenericId(r.id) === normalizeGenericId(id));
+  if (idx === -1) return undefined;
+  const updated = { ...records[idx], ...patch, id: records[idx].id };
+  records[idx] = updated;
+  await setGenericStore(store);
+  return updated;
+}
+
+export async function deleteGenericRecord(table: string, id: string | number): Promise<boolean> {
+  const store = await getGenericStore();
+  const records = store[table] || [];
+  const idx = records.findIndex((r) => normalizeGenericId(r.id) === normalizeGenericId(id));
+  if (idx === -1) return false;
+  records.splice(idx, 1);
+  await setGenericStore(store);
+  return true;
 }
