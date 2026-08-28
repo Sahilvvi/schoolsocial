@@ -7,7 +7,13 @@ import { useSavedSchoolIds, useToggleSaveSchool } from "@/hooks/useSaveSchool";
 import { useAuth } from "@/hooks/useAuth";
 import type { School } from "@/data/mock";
 
-const FALLBACK_BANNER = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80";
+const FALLBACK_BANNER = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iI2U1ZTdlYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjQwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlNjaG9vbDwvdGV4dD48L3N2Zz4=";
+
+function handleImageError(e: React.SyntheticEvent<HTMLImageElement>) {
+  const el = e.currentTarget;
+  el.onerror = null;
+  el.src = FALLBACK_BANNER;
+}
 
 export default function SchoolCard({ school, index }: { school: School; index: number }) {
   const { user } = useAuth();
@@ -30,7 +36,7 @@ export default function SchoolCard({ school, index }: { school: School; index: n
             alt={school.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
-            onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"; }}
+            onError={handleImageError}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           

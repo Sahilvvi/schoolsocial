@@ -9,6 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "@/erp/hooks/use-toast";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const FALLBACK_GALLERY_IMG = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==";
+function handleImageError(e: React.SyntheticEvent<HTMLImageElement>) {
+  const el = e.currentTarget;
+  el.onerror = null;
+  el.src = FALLBACK_GALLERY_IMG;
+}
 function getToken() { return localStorage.getItem("myschool_token"); }
 function getUser() { try { return JSON.parse(localStorage.getItem("myschool_user") || "{}"); } catch { return {}; } }
 
@@ -94,7 +100,7 @@ export default function Gallery() {
           {images.map((img, i) => (
             img ? (
             <div key={`gallery-${img.id ?? i}-${i}`} className="group relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 aspect-square cursor-pointer" onClick={() => setPreview(img.imageUrl || '')}>
-              <img src={img.imageUrl || 'https://via.placeholder.com/300?text=Image'} alt={img.caption || ""} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/300?text=Image"; }} />
+              <img src={img.imageUrl || FALLBACK_GALLERY_IMG} alt={img.caption || ""} className="w-full h-full object-cover" onError={handleImageError} />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                 <button onClick={e => { e.stopPropagation(); handleDelete(img.id); }} className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600">
                   <Trash2 className="w-4 h-4"/>
