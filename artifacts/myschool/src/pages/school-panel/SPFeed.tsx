@@ -23,7 +23,7 @@ const DEMO_POSTS: Post[] = [
   {
     id: "1", type: "photo",
     content: "Our students participated in the Inter-School Science Exhibition and won 3 gold medals! 🏆 Proud of our young scientists!",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=500&q=80",
+    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==",
     likes: 45, comments: 12, shares: 8, time: "2h ago",
   },
   {
@@ -35,13 +35,13 @@ const DEMO_POSTS: Post[] = [
   {
     id: "3", type: "photo",
     content: "Annual Sports Day celebrations! Our students showcased their athletic skills across various events. What a day! 🏃‍♂️⚽🏏",
-    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&q=80",
+    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==",
     likes: 92, comments: 18, shares: 15, time: "3d ago",
   },
   {
     id: "4", type: "update",
     content: "New smart classrooms inaugurated today! Equipped with interactive boards, projectors, and AI-powered learning tools. 🖥️",
-    image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=500&q=80",
+    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==",
     likes: 56, comments: 9, shares: 6, time: "5d ago",
   },
 ];
