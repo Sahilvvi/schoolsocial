@@ -218,7 +218,7 @@ export default function SchoolCommunityPage() {
                       <CardContent className="pt-5 flex items-center gap-4">
                         <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-border/30">
                           <img src={school.banner} alt={school.name} className="w-full h-full object-cover"
-                            onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=200&q=80"; }} />
+                            onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=="; }} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <Link to={`/school/${school.slug}`} className="font-bold text-foreground hover:text-primary transition-colors text-sm">{school.name}</Link>
@@ -262,7 +262,7 @@ export default function SchoolCommunityPage() {
                         <div className="flex items-center gap-4">
                           <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-border/30">
                             <img src={school.banner} alt={school.name} className="w-full h-full object-cover"
-                              onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=200&q=80"; }} />
+                              onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=="; }} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <Link to={`/school/${school.slug}`} className="font-bold text-foreground hover:text-primary transition-colors text-sm">{school.name}</Link>

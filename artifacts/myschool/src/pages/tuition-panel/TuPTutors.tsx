@@ -22,7 +22,7 @@ export default function TuPTutors() {
               <div className="flex items-start gap-4">
                 <div className="h-16 w-16 rounded-xl overflow-hidden border border-border/30 shrink-0">
                   <img src={tutor.avatar} alt={tutor.name} className="w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80"; }} />
+                    onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=="; }} />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-bold text-foreground text-lg">{tutor.name}</h4>

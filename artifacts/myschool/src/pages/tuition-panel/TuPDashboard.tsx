@@ -55,9 +55,9 @@ const DEMO_REVIEWS = [
 ];
 
 const DEMO_NOTICES = [
-  { title: "Summer Crash Course 2024",       desc: "Admissions open for Class 9th & 10th (All Subjects)",    date: "Posted on 25 May 2024", img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=80&q=80", status: "Published" },
-  { title: "New Batch for Class 11th (Science)", desc: "Batch starting from 1st June 2024, limited seats!",  date: "Posted on 20 May 2024", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=80&q=80", status: "Published" },
-  { title: "Weekly Test Schedule",           desc: "Weekly tests for all batches will start from this Sunday.", date: "Posted on 18 May 2024", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=80&q=80", status: "Published" },
+  { title: "Summer Crash Course 2024",       desc: "Admissions open for Class 9th & 10th (All Subjects)",    date: "Posted on 25 May 2024", img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==", status: "Published" },
+  { title: "New Batch for Class 11th (Science)", desc: "Batch starting from 1st June 2024, limited seats!",  date: "Posted on 20 May 2024", img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==", status: "Published" },
+  { title: "Weekly Test Schedule",           desc: "Weekly tests for all batches will start from this Sunday.", date: "Posted on 18 May 2024", img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==", status: "Published" },
 ];
 
 const QUICK_ACTIONS = [

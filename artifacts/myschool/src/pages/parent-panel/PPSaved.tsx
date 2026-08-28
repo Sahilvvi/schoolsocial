@@ -26,7 +26,7 @@ export default function PPSaved() {
             <Card key={s.id} className="border-border/30 hover:border-primary/20 transition-colors">
               <CardContent className="p-4 flex items-center gap-4">
                 <img src={s.schools?.banner} alt="" className="h-20 w-20 rounded-xl object-cover shadow-md"
-                  onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=200&q=80"; }} />
+                  onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=="; }} />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold truncate text-foreground">{s.schools?.name}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3 text-primary" />{s.schools?.location}</p>

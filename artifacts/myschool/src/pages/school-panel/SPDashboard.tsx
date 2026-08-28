@@ -39,9 +39,9 @@ const DONUT_DATA = [
 ];
 
 const DEMO_NOTICES = [
-  { title: "Annual Day Celebration 2024",  desc: "Join us for our Annual Day Celebration on 25th May 2024.",     date: "Posted on 10 May 2024", img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=80&q=80" },
-  { title: "Admissions Open 2024-25",      desc: "Admissions are open for Nursery to Class 12.",                 date: "Posted on 5 May 2024",  img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=80&q=80" },
-  { title: "Science Exhibition",           desc: "Students showcase their innovative projects.",                  date: "Posted on 28 Apr 2024", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=80&q=80" },
+  { title: "Annual Day Celebration 2024",  desc: "Join us for our Annual Day Celebration on 25th May 2024.",     date: "Posted on 10 May 2024", img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==" },
+  { title: "Admissions Open 2024-25",      desc: "Admissions are open for Nursery to Class 12.",                 date: "Posted on 5 May 2024",  img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==" },
+  { title: "Science Exhibition",           desc: "Students showcase their innovative projects.",                  date: "Posted on 28 Apr 2024", img: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg==" },
 ];
 
 const DEMO_ENQUIRIES = [
