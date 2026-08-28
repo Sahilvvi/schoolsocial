@@ -1,7 +1,25 @@
 import { useOutletContext } from "react-router-dom";
 import { Rss, Plus, Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
-const DEMO_POSTS = [
+interface Post {
+  id: string;
+  type: string;
+  content: string;
+  image: string | null;
+  likes: number;
+  comments: number;
+  shares: number;
+  time: string;
+}
+
+const DEMO_POSTS: Post[] = [
   {
     id: "1", type: "photo",
     content: "Our students participated in the Inter-School Science Exhibition and won 3 gold medals! 🏆 Proud of our young scientists!",
@@ -30,6 +48,30 @@ const DEMO_POSTS = [
 
 export default function SPFeed() {
   const { school } = useOutletContext<any>();
+  const [posts, setPosts] = useState<Post[]>(DEMO_POSTS);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ content: "", image: "" });
+
+  const handleAdd = () => {
+    if (!form.content) {
+      toast.error("Post content is required");
+      return;
+    }
+    const newPost: Post = {
+      id: `p-${Date.now()}`,
+      type: form.image ? "photo" : "update",
+      content: form.content,
+      image: form.image || null,
+      likes: 0,
+      comments: 0,
+      shares: 0,
+      time: "Just now",
+    };
+    setPosts(prev => [newPost, ...prev]);
+    setForm({ content: "", image: "" });
+    setOpen(false);
+    toast.success("Post created");
+  };
 
   return (
     <div className="space-y-6">
@@ -40,13 +82,25 @@ export default function SPFeed() {
           </h1>
           <p className="text-sm text-gray-500 mt-1">Share updates with parents and community</p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-          <Plus className="h-4 w-4" /> Create Post
-        </button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+              <Plus className="h-4 w-4" /> Create Post
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader><DialogTitle>Create Post</DialogTitle></DialogHeader>
+            <div className="space-y-4 mt-2">
+              <div className="space-y-1"><Label htmlFor="post-content">Content *</Label><Textarea id="post-content" value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} placeholder="What's happening?" /></div>
+              <div className="space-y-1"><Label htmlFor="post-image">Image URL (optional)</Label><Input id="post-image" value={form.image} onChange={e => setForm(p => ({ ...p, image: e.target.value }))} placeholder="https://..." /></div>
+              <Button onClick={handleAdd} className="w-full bg-blue-600 hover:bg-blue-700">Create Post</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="max-w-2xl mx-auto space-y-4">
-        {DEMO_POSTS.map((post) => (
+        {posts.map((post) => (
           <div key={post.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">

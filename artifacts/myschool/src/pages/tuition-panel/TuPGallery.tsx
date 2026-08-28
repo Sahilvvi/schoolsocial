@@ -6,7 +6,7 @@ const DEMO_PHOTOS = [
   { id: "2", url: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80", label: "Students" },
   { id: "3", url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=80", label: "Study Hall" },
   { id: "4", url: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80", label: "Sports" },
-  { id: "5", url: "https://images.unsplash.com/photo-1523050854058-8df90110c8f1?w=400&q=80", label: "Lab" },
+  { id: "5", url: "https://images.unsplash.com/photo-1758685734062-165cc0094e61?w=400&q=80", label: "Lab" },
   { id: "6", url: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80", label: "Library" },
 ];
 

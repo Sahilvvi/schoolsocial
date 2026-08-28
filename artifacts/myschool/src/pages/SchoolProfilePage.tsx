@@ -461,7 +461,7 @@ export default function SchoolProfilePage() {
                 <MapPin className="h-5 w-5 text-blue-400" />{school.location}
               </span>
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20">
-                <IndianRupee className="h-5 w-5 text-blue-400" />{school.fees} / yr
+                <IndianRupee className="h-5 w-5 text-blue-400" />{school.fees}
               </span>
               <AskAIChat schoolName={school.name} schoolAbout={school.about} schoolFees={school.fees} schoolBoard={school.board} schoolFacilities={school.facilities ?? []} />
             </div>

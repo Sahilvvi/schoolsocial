@@ -23,6 +23,7 @@ const STORAGE_KEYS = {
   teachers: "teachers",
   attendance: "attendance",
   erpSchools: "erp-schools",
+  generic: "generic-store",
 } as const;
 
 // CRM schools use string ids like "school-001". ERP APIs use numeric ids.
@@ -556,4 +557,67 @@ export async function getErpSchoolById(id: number): Promise<ErpSchool | undefine
 
 export async function saveErpSchools(schools: ErpSchool[]): Promise<void> {
   await setStored(STORAGE_KEYS.erpSchools, schools);
+}
+
+// ─── Generic ERP records (notices, events, discipline, gallery, etc.) ───────
+
+type GenericStore = Record<string, any[]>;
+
+async function getGenericStore(): Promise<GenericStore> {
+  return getStored<GenericStore>(STORAGE_KEYS.generic, {});
+}
+
+async function setGenericStore(store: GenericStore): Promise<void> {
+  await setStored(STORAGE_KEYS.generic, store);
+}
+
+function normalizeGenericId(id: any): string {
+  return id === undefined || id === null ? "" : String(id);
+}
+
+export async function getGenericRecords(table: string, schoolId?: string | number): Promise<any[]> {
+  const store = await getGenericStore();
+  const records = store[table] || [];
+  if (schoolId === undefined || schoolId === null || schoolId === "") return records;
+  const num = toSchoolIdNumber(schoolId);
+  return records.filter((r) => {
+    if (r.schoolId === schoolId) return true;
+    if (num !== undefined && Number(r.schoolId) === num) return true;
+    return false;
+  });
+}
+
+export async function addGenericRecord(table: string, schoolId: string | number, data: any): Promise<any> {
+  const store = await getGenericStore();
+  if (!store[table]) store[table] = [];
+  const record = {
+    ...data,
+    id: data.id || `demo-${table}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    schoolId: schoolId,
+    createdAt: data.createdAt || now(),
+  };
+  store[table].unshift(record);
+  await setGenericStore(store);
+  return record;
+}
+
+export async function updateGenericRecord(table: string, id: string | number, patch: any): Promise<any | undefined> {
+  const store = await getGenericStore();
+  const records = store[table] || [];
+  const idx = records.findIndex((r) => normalizeGenericId(r.id) === normalizeGenericId(id));
+  if (idx === -1) return undefined;
+  const updated = { ...records[idx], ...patch, id: records[idx].id };
+  records[idx] = updated;
+  await setGenericStore(store);
+  return updated;
+}
+
+export async function deleteGenericRecord(table: string, id: string | number): Promise<boolean> {
+  const store = await getGenericStore();
+  const records = store[table] || [];
+  const idx = records.findIndex((r) => normalizeGenericId(r.id) === normalizeGenericId(id));
+  if (idx === -1) return false;
+  records.splice(idx, 1);
+  await setGenericStore(store);
+  return true;
 }

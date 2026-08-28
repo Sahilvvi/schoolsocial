@@ -1,5 +1,4 @@
 import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/erp/hooks/use-auth";
 import { ThemeProvider } from "@/erp/context/ThemeContext";
@@ -192,7 +191,6 @@ export function ErpApp() {
             <Router />
           </AuthProvider>
         </WouterRouter>
-        <Toaster />
       </ThemeProvider>
     </TooltipProvider>
   );
