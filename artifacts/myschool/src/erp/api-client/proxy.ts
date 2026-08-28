@@ -635,6 +635,69 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     }
   }
 
+  // ─── Study Materials & Syllabus (nested path + custom response keys) ────────
+  if (pathStartsWith(["study-materials"])) {
+    const schoolIdParam = params.get("schoolId") || "1";
+    const schoolNum = Number(schoolIdParam) || 1;
+
+    if (segments.length === 2) {
+      if (method === "GET") {
+        const materials = await getGenericRecords("study-materials", schoolNum);
+        return jsonResponse({ materials, total: materials.length });
+      }
+      if (method === "POST") {
+        const material = await addGenericRecord("study-materials", schoolNum, { ...body, schoolId: schoolNum });
+        return jsonResponse(material, 201);
+      }
+    }
+
+    if (segments.length >= 3 && segments[2] === "syllabus") {
+      if (segments.length === 3) {
+        if (method === "GET") {
+          const syllabus = await getGenericRecords("syllabus", schoolNum);
+          return jsonResponse({ syllabus, total: syllabus.length });
+        }
+        if (method === "POST") {
+          const item = await addGenericRecord("syllabus", schoolNum, { ...body, schoolId: schoolNum });
+          return jsonResponse(item, 201);
+        }
+      }
+      if (segments.length === 4) {
+        const id = segments[3];
+        if (method === "GET") {
+          const items = await getGenericRecords("syllabus", schoolNum);
+          const item = items.find((r) => String(r.id) === String(id));
+          return item ? jsonResponse(item) : errorResponse("Not found", 404);
+        }
+        if (method === "PATCH") {
+          const updated = await updateGenericRecord("syllabus", id, { ...body, schoolId: schoolNum });
+          return updated ? jsonResponse(updated) : errorResponse("Not found", 404);
+        }
+        if (method === "DELETE") {
+          const deleted = await deleteGenericRecord("syllabus", id);
+          return deleted ? jsonResponse({ success: true }) : errorResponse("Not found", 404);
+        }
+      }
+    }
+
+    if (segments.length === 3) {
+      const id = segments[2];
+      if (method === "GET") {
+        const items = await getGenericRecords("study-materials", schoolNum);
+        const item = items.find((r) => String(r.id) === String(id));
+        return item ? jsonResponse(item) : errorResponse("Not found", 404);
+      }
+      if (method === "PATCH") {
+        const updated = await updateGenericRecord("study-materials", id, { ...body, schoolId: schoolNum });
+        return updated ? jsonResponse(updated) : errorResponse("Not found", 404);
+      }
+      if (method === "DELETE") {
+        const deleted = await deleteGenericRecord("study-materials", id);
+        return deleted ? jsonResponse({ success: true }) : errorResponse("Not found", 404);
+      }
+    }
+  }
+
   // ─── Generic CRUD tables ──────────────────────────────────────────────────
   const simpleTables = [
     "notices",
@@ -647,8 +710,6 @@ async function handleApiRequest(url: URL, init?: RequestInit): Promise<Response>
     "assignments",
     "timetable",
     "exams",
-    "study-materials",
-    "syllabus",
     "library",
     "issues",
     "messages",
