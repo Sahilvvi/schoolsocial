@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   LayoutDashboard, User, Briefcase, Target, FileText, Users,
   Calendar, LogOut, ChevronLeft, Loader2, BookOpen, Menu, X, GraduationCap
@@ -101,6 +102,7 @@ export default function TeacherPanelLayout() {
   const { user, loading, signOut } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const [teacherData, setTeacherData] = useState<TeacherProfile>(() =>
     getDemoData("teacher-profile", defaultTeacher)
@@ -292,7 +294,6 @@ export default function TeacherPanelLayout() {
           { label: "Profile",   path: "/teacher-panel/profile",    icon: User },
           { label: "Students",  path: "/teacher-panel/students",   icon: Users },
           { label: "Schedule",  path: "/teacher-panel/schedule",   icon: Calendar },
-          { label: "More",      path: "/teacher-panel/notes",      icon: Menu },
         ].map((tab) => {
           const Icon = tab.icon;
           const active = tab.path === "/teacher-panel"
@@ -307,6 +308,34 @@ export default function TeacherPanelLayout() {
             </Link>
           );
         })}
+
+        <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+          <SheetTrigger asChild>
+            <button className="flex-1 flex flex-col items-center gap-0.5 py-1">
+              <Menu className="h-5 w-5 text-gray-400" />
+              <span className="text-[10px] font-semibold text-gray-400">More</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="rounded-t-2xl pb-8">
+            <SheetHeader>
+              <SheetTitle className="text-left text-base font-bold">More Options</SheetTitle>
+            </SheetHeader>
+            <div className="grid gap-2 mt-4">
+              <Link to="/teacher-panel/notes" onClick={() => setMoreOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-50 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors">
+                <FileText className="h-4 w-4 text-primary" /> Notes & Material
+              </Link>
+              <Link to="/" onClick={() => setMoreOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-50 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors">
+                <ChevronLeft className="h-4 w-4 text-slate-500" /> Back to Site
+              </Link>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-sm font-semibold text-red-600 hover:bg-red-100 transition-colors w-full"
+              >
+                <LogOut className="h-4 w-4" /> Sign Out
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {mobileMenuOpen && (

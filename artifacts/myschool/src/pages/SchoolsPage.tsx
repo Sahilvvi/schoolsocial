@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { Search, SlidersHorizontal, X, Map, Grid3X3, Loader2, Sparkles, TrendingUp, Users, Award, GraduationCap, Star, Shield, CheckCircle, BarChart3, ChevronDown, Filter } from "lucide-react";
+import { Search, SlidersHorizontal, X, Map, Grid3X3, Loader2, Sparkles, TrendingUp, Users, Award, GraduationCap, Star, Shield, CheckCircle, BarChart3, ChevronDown, Filter, GitCompare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -42,7 +43,31 @@ export default function SchoolsPage() {
   const [sortBy, setSortBy] = useState("rating");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [compareIds, setCompareIds] = useState<string[]>(() => {
+    const ids = searchParams.get("ids");
+    return ids ? ids.split(",").filter(Boolean) : [];
+  });
+
+  useEffect(() => {
+    if (compareIds.length > 0) {
+      setSearchParams({ ids: compareIds.join(",") }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }, [compareIds]);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((prev) => {
+      if (prev.includes(id)) return prev.filter((i) => i !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
+  };
+
+  const clearCompare = () => setCompareIds([]);
+
   const parseFee = (fee: string) => parseInt(fee.replace(/[^0-9]/g, "")) || 0;
 
   const filtered = useMemo(() => {
@@ -232,9 +257,45 @@ export default function SchoolsPage() {
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                       {paginated.map((school, i) => (
-                        <SchoolCard key={school.id} school={mapSchool(school)} index={i} />
+                        <SchoolCard
+                          key={school.id}
+                          school={mapSchool(school)}
+                          index={i}
+                          isCompared={compareIds.includes(school.id)}
+                          onCompareToggle={() => toggleCompare(school.id)}
+                        />
                       ))}
                     </div>
+
+                    <AnimatePresence>
+                      {compareIds.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 20 }}
+                          className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 bg-card border border-border/40 shadow-2xl rounded-2xl px-5 py-3"
+                        >
+                          <div className="flex items-center gap-2 text-sm font-bold">
+                            <GitCompare className="h-4 w-4 text-primary" />
+                            {compareIds.length} selected
+                          </div>
+                          <Link
+                            to={`/compare?ids=${compareIds.join(",")}`}
+                            className="rounded-xl gradient-primary px-4 py-2 text-sm font-bold text-white shadow-md"
+                          >
+                            Compare
+                          </Link>
+                          <button
+                            onClick={clearCompare}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                            aria-label="Clear compare"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
                     {hasMore && (
                       <div ref={loadMoreRef} className="flex justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />

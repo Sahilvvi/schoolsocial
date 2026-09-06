@@ -105,14 +105,14 @@ export default function SchoolCommunityPage() {
 
       <div className="container mx-auto px-4 pb-20">
         <Tabs defaultValue="feed" className="space-y-8">
-          <TabsList className="flex gap-1 h-auto bg-transparent p-0 justify-center">
-            <TabsTrigger value="feed" className="rounded-xl gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-semibold text-sm px-5 py-3">
+          <TabsList className="flex flex-wrap gap-2 h-auto bg-transparent p-0 justify-start sm:justify-center">
+            <TabsTrigger value="feed" className="rounded-xl gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-3">
               <Bell className="h-4 w-4" /> Feed
             </TabsTrigger>
-            <TabsTrigger value="discover" className="rounded-xl gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-semibold text-sm px-5 py-3">
-              <Search className="h-4 w-4" /> Discover Schools
+            <TabsTrigger value="discover" className="rounded-xl gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-3">
+              <Search className="h-4 w-4" /> Discover
             </TabsTrigger>
-            <TabsTrigger value="following" className="rounded-xl gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-semibold text-sm px-5 py-3">
+            <TabsTrigger value="following" className="rounded-xl gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20 transition-all font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-3">
               <Heart className="h-4 w-4" /> Following
             </TabsTrigger>
           </TabsList>
@@ -169,14 +169,14 @@ export default function SchoolCommunityPage() {
                             <item.icon className="h-5 w-5" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Link to={`/school/${item.schoolSlug}`} className="text-sm font-bold text-primary hover:underline">{item.schoolName}</Link>
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <Link to={`/school/${item.schoolSlug}`} className="text-sm font-bold text-primary hover:underline truncate max-w-full">{item.schoolName}</Link>
                               <Badge variant="outline" className="rounded-lg border-border/40 text-[10px] capitalize">{item.type}</Badge>
-                              <span className="text-[11px] text-muted-foreground ml-auto shrink-0">{item.time}</span>
+                              <span className="text-[11px] text-muted-foreground ml-0 sm:ml-auto shrink-0">{item.time}</span>
                             </div>
                             <h4 className="font-bold text-foreground mb-1">{item.title}</h4>
                             <p className="text-sm text-muted-foreground leading-relaxed">{item.content}</p>
-                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border/20">
+                            <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-border/20">
                               <Button variant="ghost" size="sm" className="rounded-lg text-xs text-muted-foreground hover:text-primary gap-1 h-8">
                                 <Heart className="h-3.5 w-3.5" /> Like
                               </Button>
@@ -215,16 +215,16 @@ export default function SchoolCommunityPage() {
                 return (
                   <motion.div key={school.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
                     <Card className="bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/20 transition-colors">
-                      <CardContent className="pt-5 flex items-center gap-4">
+                      <CardContent className="pt-5 flex items-start gap-4">
                         <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-border/30">
                           <img src={school.banner} alt={school.name} className="w-full h-full object-cover"
                             onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=="; }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <Link to={`/school/${school.slug}`} className="font-bold text-foreground hover:text-primary transition-colors text-sm">{school.name}</Link>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <MapPin className="h-3 w-3 text-primary" />{school.location}
-                            <Star className="h-3 w-3 fill-primary text-primary ml-2" />{Number(school.rating).toFixed(1)}
+                          <Link to={`/school/${school.slug}`} className="font-bold text-foreground hover:text-primary transition-colors text-sm block truncate">{school.name}</Link>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
+                            <span className="flex items-center gap-1 truncate"><MapPin className="h-3 w-3 text-primary shrink-0" />{school.location}</span>
+                            <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-primary text-primary" />{Number(school.rating).toFixed(1)}</span>
                           </div>
                         </div>
                         <Button size="sm" variant={isFollowing ? "outline" : "default"}
@@ -259,15 +259,16 @@ export default function SchoolCommunityPage() {
                   <motion.div key={school.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
                     <Card className="bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/20 transition-colors">
                       <CardContent className="pt-5">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-start gap-4">
                           <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-border/30">
                             <img src={school.banner} alt={school.name} className="w-full h-full object-cover"
                               onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlPC90ZXh0Pjwvc3ZnPg=="; }} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <Link to={`/school/${school.slug}`} className="font-bold text-foreground hover:text-primary transition-colors text-sm">{school.name}</Link>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                              <MapPin className="h-3 w-3 text-primary" />{school.location}
+                            <Link to={`/school/${school.slug}`} className="font-bold text-foreground hover:text-primary transition-colors text-sm block truncate">{school.name}</Link>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                              <MapPin className="h-3 w-3 text-primary shrink-0" />
+                              <span className="truncate">{school.location}</span>
                             </div>
                           </div>
                           <Button size="sm" variant="outline" onClick={() => toggleFollow(school.slug, school.name)}

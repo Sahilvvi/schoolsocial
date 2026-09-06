@@ -5,10 +5,11 @@ import {
   GraduationCap, Menu, X, User, LogOut,
   School, CalendarDays, BookOpen, Newspaper,
   ChevronDown, LayoutDashboard, GitCompareArrows,
-  Globe, Search, Home, MapPin, Bell, Heart, Plus
+  Globe, Search, Home, MapPin, Heart, Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import NotificationBell from "@/components/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -136,10 +137,7 @@ export default function Navbar() {
             <button className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
               <Search className="h-4.5 w-4.5 text-gray-600" />
             </button>
-            <button className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors relative">
-              <Bell className="h-4.5 w-4.5 text-gray-600" />
-              <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">3</span>
-            </button>
+            <NotificationBell />
 
             {user ? (
               <DropdownMenu>
@@ -206,10 +204,7 @@ export default function Navbar() {
               <span className="hidden sm:inline">Loni, Ghaziabad</span>
               <ChevronDown className="h-3 w-3" />
             </div>
-            <button className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100 relative">
-              <Bell className="h-5 w-5 text-gray-600" />
-              <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">3</span>
-            </button>
+            <NotificationBell />
             {user ? (
               <button className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold text-white ml-1">
                 {user.email?.[0]?.toUpperCase()}

@@ -103,10 +103,10 @@ export default function CompareSchoolsPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <h3 className="font-bold text-sm text-foreground">{school.name}</h3>
+                            <h3 className="font-bold text-sm text-foreground line-clamp-1">{school.name}</h3>
                             {(school as any).is_verified && <BadgeCheck className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />}
                           </div>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" />{school.location}</p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3 shrink-0" /><span className="truncate">{school.location}</span></p>
                           <div className="flex items-center gap-2 mt-1.5">
                             <Badge className="gradient-primary text-primary-foreground border-0 text-[10px] px-2 py-0">{school.board}</Badge>
                             <span className="flex items-center gap-0.5 text-[11px] text-muted-foreground"><Star className="h-3 w-3 fill-primary text-primary" />{Number(school.rating).toFixed(1)}</span>
@@ -146,29 +146,30 @@ export default function CompareSchoolsPage() {
 
         {/* Comparison Table */}
         {selected.length >= 2 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm overflow-hidden shadow-xl shadow-primary/5">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm shadow-xl shadow-primary/5 overflow-x-auto">
+            <div className="min-w-[640px]">
             {/* Header */}
             <div className="grid" style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
-              <div className="p-4 bg-muted/30 border-b border-r border-border/30 font-bold text-sm text-muted-foreground">Criteria</div>
+              <div className="p-4 bg-muted/30 border-b border-r border-border/30 font-bold text-sm text-muted-foreground whitespace-nowrap">Criteria</div>
               {selected.map((s) => (
                 <div key={s!.id} className="p-4 bg-muted/30 border-b border-border/30 text-center">
-                  <Link to={`/school/${s!.slug}`} className="font-bold text-sm hover:text-primary transition-colors">{s!.name}</Link>
+                  <Link to={`/school/${s!.slug}`} className="font-bold text-sm hover:text-primary transition-colors truncate block">{s!.name}</Link>
                 </div>
               ))}
             </div>
 
             {/* Rows */}
             {[
-              { label: "Board", render: (s: any) => <Badge className="gradient-primary text-primary-foreground border-0 text-xs">{s.board}</Badge> },
-              { label: "Rating", render: (s: any) => <span className="flex items-center justify-center gap-1 font-semibold"><Star className="h-4 w-4 fill-primary text-primary" />{Number(s.rating).toFixed(1)}</span> },
-              { label: "Reviews", render: (s: any) => <span className="text-muted-foreground">{s.review_count} reviews</span> },
-              { label: "Fees", render: (s: any) => <span className="font-bold text-gradient">{s.fees}</span> },
-              { label: "Location", render: (s: any) => <span className="flex items-center justify-center gap-1 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5 text-primary" />{s.location}</span> },
+              { label: "Board", render: (s: any) => <Badge className="gradient-primary text-primary-foreground border-0 text-xs whitespace-nowrap">{s.board}</Badge> },
+              { label: "Rating", render: (s: any) => <span className="flex items-center justify-center gap-1 font-semibold whitespace-nowrap"><Star className="h-4 w-4 fill-primary text-primary" />{Number(s.rating).toFixed(1)}</span> },
+              { label: "Reviews", render: (s: any) => <span className="text-muted-foreground whitespace-nowrap">{s.review_count} reviews</span> },
+              { label: "Fees", render: (s: any) => <span className="font-bold text-gradient whitespace-nowrap">{s.fees}</span> },
+              { label: "Location", render: (s: any) => <span className="flex items-center justify-center gap-1 text-sm text-muted-foreground whitespace-nowrap"><MapPin className="h-3.5 w-3.5 text-primary shrink-0" /><span className="truncate max-w-[120px]">{s.location}</span></span> },
               { label: "Verified", render: (s: any) => s.is_verified ? <BadgeCheck className="h-5 w-5 text-blue-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/40 mx-auto" /> },
               { label: "Featured", render: (s: any) => s.is_featured ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground/40 mx-auto" /> },
             ].map((row, idx) => (
               <div key={row.label} className={`grid ${idx % 2 === 0 ? "" : "bg-muted/10"}`} style={{ gridTemplateColumns: `180px repeat(${selected.length}, 1fr)` }}>
-                <div className="p-4 border-b border-r border-border/30 text-sm font-semibold text-foreground">{row.label}</div>
+                <div className="p-4 border-b border-r border-border/30 text-sm font-semibold text-foreground whitespace-nowrap">{row.label}</div>
                 {selected.map((s) => (
                   <div key={s!.id} className="p-4 border-b border-border/30 text-center text-sm">{row.render(s)}</div>
                 ))}
@@ -215,6 +216,7 @@ export default function CompareSchoolsPage() {
                   </Link>
                 </div>
               ))}
+            </div>
             </div>
           </motion.div>
         )}
