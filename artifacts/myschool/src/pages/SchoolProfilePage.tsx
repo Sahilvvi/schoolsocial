@@ -20,7 +20,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useSchoolBySlug, useReviews, useJobs, useEvents, useSubmitAdmission } from "@/hooks/useData";
 import { useSavedSchoolIds, useToggleSaveSchool } from "@/hooks/useSaveSchool";
@@ -83,13 +85,220 @@ export default function SchoolProfilePage() {
       await submitAdmission.mutateAsync({ school_id: school.id, ...values });
       toast.success("Application submitted successfully! The school will contact you soon.");
       admissionForm.reset();
+      setApplyOpen(false);
     } catch {
       toast.error("Failed to submit application. Please try again.");
     }
   };
 
+  const enquirySchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    email: z.string().email("Valid email is required"),
+    phone: z.string().min(10, "Valid phone number required"),
+    message: z.string().min(5, "Please enter your enquiry"),
+  });
+
+  const enquiryForm = useForm<z.infer<typeof enquirySchema>>({
+    resolver: zodResolver(enquirySchema),
+    defaultValues: {
+      name: user?.user_metadata?.full_name || "",
+      email: user?.email || "",
+      phone: "",
+      message: "",
+    },
+  });
+
+  useEffect(() => {
+    if (user) {
+      enquiryForm.setValue("email", user.email || "");
+      enquiryForm.setValue("name", user.user_metadata?.full_name || "");
+    }
+  }, [user?.id]);
+
+  const onSubmitEnquiry = async (values: z.infer<typeof enquirySchema>) => {
+    if (!school) return;
+    // Send enquiry via the same admission/submit path for school visibility.
+    try {
+      await submitAdmission.mutateAsync({
+        school_id: school.id,
+        student_name: values.name,
+        parent_name: values.name,
+        email: values.email,
+        phone: values.phone,
+        grade: "Enquiry",
+      });
+      toast.success("Enquiry submitted! The school will contact you soon.");
+      enquiryForm.reset();
+      setEnquiryOpen(false);
+    } catch {
+      toast.error("Failed to submit enquiry. Please try again.");
+    }
+  };
+
   const [activeTab, setActiveTab] = useState("about");
   const [showFullAbout, setShowFullAbout] = useState(false);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [applyOpen, setApplyOpen] = useState(false);
+
+  const AdmissionSection = () => (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
+      <div className="p-8 text-center border-b border-gray-100">
+        <GraduationCap className="h-14 w-14 text-blue-600 mx-auto mb-4" />
+        <h2 className="text-3xl font-extrabold mb-2 text-gray-900">Apply to {school!.name}</h2>
+        <p className="text-gray-500 font-medium">Submit your details to initiate the admission process for the upcoming academic year.</p>
+      </div>
+      <div className="p-8">
+        {!user ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600 font-medium mb-4">Please sign in to submit your application and track its status in your dashboard.</p>
+            <Link to="/auth">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl">Sign In to Apply</Button>
+            </Link>
+          </div>
+        ) : (
+        <Form {...admissionForm}>
+          <form onSubmit={admissionForm.handleSubmit(onSubmitAdmission)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField control={admissionForm.control} name="student_name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm text-gray-700">Student Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Child's full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={admissionForm.control} name="parent_name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm text-gray-700">Parent / Guardian Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField control={admissionForm.control} name="email" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm text-gray-700">Email Address</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="you@email.com" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={admissionForm.control} name="phone" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm text-gray-700">Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="+91 XXXXX XXXXX" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
+            <FormField control={admissionForm.control} name="grade" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-sm text-gray-700">Applying for Grade</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="h-12 rounded-xl bg-gray-50 border-gray-200">
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {["Nursery", "LKG", "UKG", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+                      "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12"].map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <Button
+              type="submit"
+              className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm mt-2"
+              disabled={submitAdmission.isPending}
+            >
+              {submitAdmission.isPending ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</>
+              ) : (
+                "Submit Application"
+              )}
+            </Button>
+          </form>
+        </Form>
+        )}
+      </div>
+    </div>
+  );
+
+  const EnquirySection = () => (
+    <div className="p-6">
+      {!user ? (
+        <div className="text-center py-6">
+          <p className="text-gray-600 font-medium mb-4">Please sign in to send an enquiry.</p>
+          <Link to="/auth">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl">Sign In</Button>
+          </Link>
+        </div>
+      ) : (
+      <Form {...enquiryForm}>
+        <form onSubmit={enquiryForm.handleSubmit(onSubmitEnquiry)} className="space-y-4">
+          <FormField control={enquiryForm.control} name="name" render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-bold text-sm text-gray-700">Your Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+          <FormField control={enquiryForm.control} name="email" render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-bold text-sm text-gray-700">Email Address</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="you@email.com" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+          <FormField control={enquiryForm.control} name="phone" render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-bold text-sm text-gray-700">Phone Number</FormLabel>
+              <FormControl>
+                <Input placeholder="+91 XXXXX XXXXX" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+          <FormField control={enquiryForm.control} name="message" render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-bold text-sm text-gray-700">Message</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Tell us what you would like to know..." className="min-h-[120px] rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+          <Button
+            type="submit"
+            className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm"
+            disabled={submitAdmission.isPending}
+          >
+            {submitAdmission.isPending ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</>
+            ) : (
+              "Send Enquiry"
+            )}
+          </Button>
+        </form>
+      </Form>
+      )}
+    </div>
+  );
 
   const schoolJobs = allJobs.filter((j) => j.school_id === school?.id);
   const schoolEvents = allEvents.filter((e: any) => e.school_id === school?.id || (e.school_name && school?.name && e.school_name === school.name));
@@ -186,16 +395,18 @@ export default function SchoolProfilePage() {
                   <Phone className="h-4 w-4" /> Call Now
                 </button>
               </a>
-              <Link to={`/school/${school.slug}#enquiry`}>
-                <button className="w-full flex items-center justify-center gap-1.5 bg-green-500 text-white rounded-xl py-2.5 text-xs font-bold hover:bg-green-600 transition-colors shadow-sm">
-                  <MessageSquare className="h-4 w-4" /> Enquiry
-                </button>
-              </Link>
-              <Link to={`/school/${school.slug}#apply`}>
-                <button className="w-full flex items-center justify-center gap-1.5 border border-green-500 text-green-600 rounded-xl py-2.5 text-xs font-bold hover:bg-green-50 transition-colors">
-                  <Edit className="h-4 w-4" /> Apply Now
-                </button>
-              </Link>
+              <button
+                onClick={() => setEnquiryOpen(true)}
+                className="w-full flex items-center justify-center gap-1.5 bg-green-500 text-white rounded-xl py-2.5 text-xs font-bold hover:bg-green-600 transition-colors shadow-sm"
+              >
+                <MessageSquare className="h-4 w-4" /> Enquiry
+              </button>
+              <button
+                onClick={() => setApplyOpen(true)}
+                className="w-full flex items-center justify-center gap-1.5 border border-green-500 text-green-600 rounded-xl py-2.5 text-xs font-bold hover:bg-green-50 transition-colors"
+              >
+                <Edit className="h-4 w-4" /> Apply Now
+              </button>
             </div>
           </div>
 
@@ -407,7 +618,10 @@ export default function SchoolProfilePage() {
               <Phone className="h-4 w-4" /> Call Now
             </button>
           </a>
-          <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+          <button
+            onClick={() => setEnquiryOpen(true)}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xs rounded-xl py-3 flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+          >
             <MessageSquare className="h-4 w-4" /> Enquiry
           </button>
           <a href={`https://www.google.com/maps?q=${school.lat},${school.lng}`} target="_blank" rel="noopener noreferrer">
@@ -559,7 +773,10 @@ export default function SchoolProfilePage() {
                   <GraduationCap className="h-12 w-12 mx-auto mb-3 opacity-80" />
                   <h3 className="font-extrabold text-xl mb-2">Admissions Open</h3>
                   <p className="text-white/80 text-sm mb-4">Apply now for 2024-25 academic year</p>
-                  <button className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-sm rounded-xl py-3 transition-colors">
+                  <button
+                    onClick={() => setApplyOpen(true)}
+                    className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold text-sm rounded-xl py-3 transition-colors"
+                  >
                     Apply Now
                   </button>
                 </div>
@@ -608,102 +825,25 @@ export default function SchoolProfilePage() {
             </div>
           )}
 
-          {activeTab === "admission" && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
-              <div className="p-8 text-center border-b border-gray-100">
-                <GraduationCap className="h-14 w-14 text-blue-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-extrabold mb-2 text-gray-900">Apply to {school.name}</h2>
-                <p className="text-gray-500 font-medium">Submit your details to initiate the admission process for the upcoming academic year.</p>
-              </div>
-              <div className="p-8">
-                {!user ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600 font-medium mb-4">Please sign in to submit your application and track its status in your dashboard.</p>
-                    <Link to="/auth">
-                      <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl">Sign In to Apply</Button>
-                    </Link>
-                  </div>
-                ) : (
-                <Form {...admissionForm}>
-                  <form onSubmit={admissionForm.handleSubmit(onSubmitAdmission)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField control={admissionForm.control} name="student_name" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-bold text-sm text-gray-700">Student Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Child's full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={admissionForm.control} name="parent_name" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-bold text-sm text-gray-700">Parent / Guardian Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Your full name" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField control={admissionForm.control} name="email" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-bold text-sm text-gray-700">Email Address</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="you@email.com" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={admissionForm.control} name="phone" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-bold text-sm text-gray-700">Phone Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="+91 XXXXX XXXXX" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-400" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                    </div>
-                    <FormField control={admissionForm.control} name="grade" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-bold text-sm text-gray-700">Applying for Grade</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="h-12 rounded-xl bg-gray-50 border-gray-200">
-                              <SelectValue placeholder="Select grade" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {["Nursery", "LKG", "UKG", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
-                              "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12"].map((g) => (
-                              <SelectItem key={g} value={g}>{g}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                    <Button
-                      type="submit"
-                      className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm mt-2"
-                      disabled={submitAdmission.isPending}
-                    >
-                      {submitAdmission.isPending ? (
-                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</>
-                      ) : (
-                        "Submit Application"
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-                )}
-              </div>
-            </div>
-          )}
+          {activeTab === "admission" && <AdmissionSection />}
         </div>
       </div>
+
+      {/* Apply / Enquiry Dialogs */}
+      <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 sm:p-0">
+          <AdmissionSection />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={enquiryOpen} onOpenChange={setEnquiryOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-extrabold">Enquire about {school.name}</DialogTitle>
+          </DialogHeader>
+          <EnquirySection />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

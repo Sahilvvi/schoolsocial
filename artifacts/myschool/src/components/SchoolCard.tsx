@@ -15,7 +15,17 @@ function handleImageError(e: React.SyntheticEvent<HTMLImageElement>) {
   el.src = FALLBACK_BANNER;
 }
 
-export default function SchoolCard({ school, index }: { school: School; index: number }) {
+export default function SchoolCard({
+  school,
+  index,
+  isCompared,
+  onCompareToggle,
+}: {
+  school: School;
+  index: number;
+  isCompared?: boolean;
+  onCompareToggle?: () => void;
+}) {
   const { user } = useAuth();
   const { data: savedIds } = useSavedSchoolIds();
   const toggleSave = useToggleSaveSchool();
@@ -104,11 +114,14 @@ export default function SchoolCard({ school, index }: { school: School; index: n
                 Apply Now <GraduationCap className="h-4 w-4" />
               </Button>
             </Link>
-            <Link to={`/schools?compare=${school.slug}`} className="col-span-1">
-              <Button variant="outline" className="w-full rounded-xl font-bold h-11 gap-2 text-sm border-border/60 hover:border-primary/40 hover:text-primary hover:bg-primary/5">
-                Compare <GitCompare className="h-4 w-4" />
-              </Button>
-            </Link>
+            <Button
+              type="button"
+              variant={isCompared ? "default" : "outline"}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCompareToggle?.(); }}
+              className={`w-full rounded-xl font-bold h-11 gap-2 text-sm ${isCompared ? "" : "border-border/60 hover:border-primary/40 hover:text-primary hover:bg-primary/5"}`}
+            >
+              {isCompared ? "Added" : "Compare"} <GitCompare className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Users, GraduationCap, MapPin, Phone, Mail, Star, Plus, Search } from "lucide-react";
+import { Users, GraduationCap, Phone, Mail, Star, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 
 const dummyStudents = [
@@ -76,23 +76,23 @@ export default function TPStudents() {
       <div className="space-y-3">
         {filtered.map(student => (
           <Card key={student.id} className="border-border/30 hover:border-primary/20 transition-colors">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-lg font-bold text-primary-foreground shadow-md">
+            <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-lg font-bold text-primary-foreground shadow-md shrink-0">
                   {student.name[0]}
                 </div>
-                <div>
-                  <p className="font-bold text-foreground">{student.name}</p>
+                <div className="min-w-0">
+                  <p className="font-bold text-foreground truncate">{student.name}</p>
                   <p className="text-sm text-muted-foreground">{student.grade} • {student.subject}</p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {student.phone}</span>
-                    <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {student.email}</span>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Phone className="h-3 w-3 shrink-0" /> {student.phone}</span>
+                    <span className="flex items-center gap-1"><Mail className="h-3 w-3 shrink-0" /> {student.email}</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <div className="flex items-center gap-1 justify-end">
+              <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 md:gap-1">
+                <div className="text-left md:text-right">
+                  <div className="flex items-center gap-1 justify-start md:justify-end">
                     <Star className="h-3 w-3 fill-primary text-primary" />
                     <span className="text-sm font-semibold">{student.rating}</span>
                   </div>
